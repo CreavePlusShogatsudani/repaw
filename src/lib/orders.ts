@@ -41,6 +41,13 @@ export async function createOrder(orderData: OrderData) {
 
         if (itemsError) throw itemsError;
 
+        // 3. 購入された商品を売り切れ状態に更新（1点物のため）
+        const productIds = orderData.cartItems.map(item => item.id);
+        await supabase
+            .from('products')
+            .update({ status: 'sold_out', stock: 0 })
+            .in('id', productIds);
+
         return order;
 
     } catch (error) {

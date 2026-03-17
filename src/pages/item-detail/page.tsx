@@ -302,12 +302,18 @@ export default function ProductDetail() {
                   </div>
                 </div>
                 <div className="flex gap-3">
+                  {product.status === 'sold_out' ? (
+                    <div className="flex-1 bg-gray-200 text-gray-500 py-3 md:py-4 rounded-lg text-sm md:text-base font-medium text-center whitespace-nowrap">
+                      売り切れ
+                    </div>
+                  ) : (
                   <button
                     onClick={addToCart}
                     className="flex-1 bg-gray-900 text-white py-3 md:py-4 rounded-lg text-sm md:text-base font-medium hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
                   >
                     カートに追加
                   </button>
+                  )}
                   <button
                     onClick={toggleFavorite}
                     className={`px-4 md:px-6 py-3 md:py-4 border rounded-lg transition-colors cursor-pointer ${isFavorite
