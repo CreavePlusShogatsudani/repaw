@@ -328,6 +328,33 @@ export default function ProductDetail() {
                 </div>
               </div>
 
+              {/* 売主Instagram */}
+              {product.seller_instagram && (
+                <div className="mb-6 pb-6 border-b">
+                  <h3 className="font-bold mb-3 text-sm md:text-base flex items-center gap-2">
+                    <i className="ri-instagram-line text-pink-500"></i>
+                    このお洋服の元のオーナー
+                  </h3>
+                  <a
+                    href={`https://www.instagram.com/${product.seller_instagram}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-100 rounded-xl hover:from-pink-100 hover:to-purple-100 transition-colors group"
+                  >
+                    <div className="w-10 h-10 bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <i className="ri-instagram-line text-white text-xl"></i>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm text-gray-900 group-hover:text-pink-600 transition-colors">
+                        @{product.seller_instagram}
+                      </p>
+                      <p className="text-xs text-gray-500">Instagramでプロフィールを見る</p>
+                    </div>
+                    <i className="ri-external-link-line text-gray-400 ml-auto text-sm"></i>
+                  </a>
+                </div>
+              )}
+
               {/* 配送情報 */}
               <div className="bg-gray-50 rounded-lg p-3 md:p-4">
                 <div className="flex items-start gap-3 mb-3">

@@ -14,6 +14,7 @@ export default function BuybackPage() {
     itemDescription: '',
     condition: '',
     purchaseDate: '',
+    instagram: '',
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,6 +43,7 @@ export default function BuybackPage() {
         item_description: formData.itemDescription,
         condition: formData.condition,
         purchase_date: formData.purchaseDate,
+        instagram: formData.instagram || null,
         message: formData.message,
       });
 
@@ -57,7 +59,8 @@ export default function BuybackPage() {
         itemDescription: '',
         condition: '',
         purchaseDate: '',
-        message: ''
+        instagram: '',
+        message: '',
       });
     } catch (error) {
       setSubmitStatus('error');
@@ -219,6 +222,25 @@ export default function BuybackPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
                   placeholder="2023年春頃"
                 />
+              </div>
+
+              <div>
+                <label htmlFor="instagram" className="block text-sm font-medium text-gray-700 mb-2">
+                  Instagramアカウント <span className="text-gray-400 font-normal">（任意）</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">@</span>
+                  <input
+                    type="text"
+                    id="instagram"
+                    name="instagram"
+                    value={formData.instagram}
+                    onChange={handleChange}
+                    className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+                    placeholder="your_instagram_id"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">入力いただいた場合、商品ページに「このお洋服の元のオーナー」として表示されます</p>
               </div>
 
               <div>

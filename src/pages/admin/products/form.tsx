@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
 
 export default function AdminProductFormPage() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const isEdit = Boolean(id);
 
     const [loading, setLoading] = useState(isEdit);
@@ -12,10 +13,10 @@ export default function AdminProductFormPage() {
 
     // Form state
     const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
+    const [description, setDescription] = useState(searchParams.get('description') || '');
     const [price, setPrice] = useState('');
     const [originalPrice, setOriginalPrice] = useState('');
-    const [category, setCategory] = useState('');
+    const [category, setCategory] = useState(searchParams.get('category') || '');
     const [size, setSize] = useState('');
     const [color, setColor] = useState('');
     const [condition, setCondition] = useState('');
@@ -25,6 +26,8 @@ export default function AdminProductFormPage() {
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState('');
     const [uploadingImage, setUploadingImage] = useState(false);
+    const [sellerInstagram, setSellerInstagram] = useState(searchParams.get('seller_instagram') || '');
+    const fromBuyback = searchParams.get('from_buyback');
 
     useEffect(() => {
         if (isEdit) {
@@ -57,6 +60,7 @@ export default function AdminProductFormPage() {
             const existingUrl = data.images?.[0] || '';
             setImageUrl(existingUrl);
             setImagePreview(existingUrl);
+            setSellerInstagram(data.seller_instagram || '');
         }
         setLoading(false);
     };
@@ -110,6 +114,7 @@ export default function AdminProductFormPage() {
             stock: parseInt(stock, 10) || 0,
             status,
             images: finalImageUrl ? [finalImageUrl] : [],
+            seller_instagram: sellerInstagram.replace('@', '') || null,
         };
 
         if (isEdit) {
@@ -284,6 +289,29 @@ export default function AdminProductFormPage() {
                             <option value="published">公開</option>
                             <option value="draft">非公開 (下書き)</option>
                         </select>
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                          売主のInstagramアカウント
+                          <span className="text-gray-400 font-normal ml-1">（任意・商品ページに表示されます）</span>
+                        </label>
+                        {fromBuyback && (
+                          <p className="text-xs text-orange-600 flex items-center gap-1">
+                            <i className="ri-link"></i>
+                            買取申込から自動入力されました
+                          </p>
+                        )}
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">@</span>
+                          <input
+                            type="text"
+                            value={sellerInstagram}
+                            onChange={(e) => setSellerInstagram(e.target.value)}
+                            className="w-full pl-7 p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                            placeholder="instagram_id"
+                          />
+                        </div>
                     </div>
 
                     <div className="space-y-2 md:col-span-2">

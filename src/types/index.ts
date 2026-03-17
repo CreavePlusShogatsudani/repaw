@@ -31,6 +31,7 @@ export interface Product {
     stock: number;
     status: string | null;
     seller_id: string | null;
+    seller_instagram: string | null;
     created_at: string;
     updated_at: string;
 }

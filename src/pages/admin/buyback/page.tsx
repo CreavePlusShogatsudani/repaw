@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
 
 interface BuybackRequest {
@@ -16,6 +17,7 @@ interface BuybackRequest {
   status: 'pending' | 'reviewing' | 'completed' | 'rejected';
   estimated_price: number | null;
   admin_note: string | null;
+  instagram: string | null;
   created_at: string;
 }
 
@@ -27,6 +29,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 };
 
 export default function AdminBuybackPage() {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState<BuybackRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -215,12 +218,47 @@ export default function AdminBuybackPage() {
                             <p><span className="text-gray-500">電話:</span> {req.phone || '-'}</p>
                             <p><span className="text-gray-500">住所:</span> {req.address || '-'}</p>
                             <p><span className="text-gray-500">購入時期:</span> {req.purchase_date || '-'}</p>
+                            {req.instagram && (
+                              <p className="flex items-center gap-1.5">
+                                <span className="text-gray-500">Instagram:</span>
+                                <a
+                                  href={`https://www.instagram.com/${req.instagram.replace('@', '')}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-pink-600 hover:underline flex items-center gap-1"
+                                >
+                                  <i className="ri-instagram-line"></i>
+                                  @{req.instagram.replace('@', '')}
+                                </a>
+                              </p>
+                            )}
                           </div>
                           <div className="space-y-2">
                             <p><span className="text-gray-500">商品詳細:</span> {req.item_description || '-'}</p>
                             <p><span className="text-gray-500">その他ご要望:</span> {req.message || '-'}</p>
                           </div>
                         </div>
+
+                        {/* 査定完了時：商品登録ボタン */}
+                        {req.status === 'completed' && (
+                          <div className="mt-4 pt-4 border-t border-gray-200">
+                            <button
+                              onClick={() => {
+                                const params = new URLSearchParams({
+                                  from_buyback: req.id,
+                                  ...(req.instagram ? { seller_instagram: req.instagram.replace('@', '') } : {}),
+                                  ...(req.item_description ? { description: req.item_description } : {}),
+                                  ...(req.item_type ? { category: req.item_type } : {}),
+                                });
+                                navigate(`/admin/products/new?${params.toString()}`);
+                              }}
+                              className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 transition-colors"
+                            >
+                              <i className="ri-add-box-line"></i>
+                              この買取から商品を登録する
+                            </button>
+                          </div>
+                        )}
 
                         {/* 管理者メモ */}
                         {editingId === req.id ? (
