@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l /Users/minoru/Downloads/repaw/src/pages/*/*.tsx /Users/minoru/Downloads/repaw/src/pages/*.tsx)"
+    ]
+  }
+}
