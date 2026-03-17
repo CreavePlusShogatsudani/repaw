@@ -32,15 +32,41 @@ export default function AdminOrdersPage() {
         setLoading(true);
         const { data, error } = await supabase
             .from('orders')
-            .select('*, profiles:user_id(email)')
+            .select('*')
             .order('created_at', { ascending: false });
 
         if (error) {
             console.error('Error fetching orders:', error);
             alert('注文データの取得に失敗しました。');
-        } else {
-            setOrders((data as unknown as OrderWithUser[]) || []);
+            setLoading(false);
+            return;
         }
+
+        const orders = (data || []) as Order[];
+
+        // user_id から profiles のメールを別途取得
+        const userIds = [...new Set(orders.map((o) => o.user_id).filter(Boolean))] as string[];
+        let emailMap: Record<string, string> = {};
+        if (userIds.length > 0) {
+            const { data: profiles } = await supabase
+                .from('profiles')
+                .select('id, email')
+                .in('id', userIds);
+            if (profiles) {
+                profiles.forEach((p: { id: string; email: string | null }) => {
+                    if (p.email) emailMap[p.id] = p.email;
+                });
+            }
+        }
+
+        const merged: OrderWithUser[] = orders.map((o) => ({
+            ...o,
+            profiles: o.user_id && emailMap[o.user_id]
+                ? { email: emailMap[o.user_id] }
+                : null,
+        }));
+
+        setOrders(merged);
         setLoading(false);
     };
 
