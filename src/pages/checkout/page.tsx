@@ -31,9 +31,14 @@ interface FormData {
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const { cartItems, totalAmount, clearCart } = useCart();
+  const { user, profile, loading: authLoading } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [clientSecret, setClientSecret] = useState<string>("");
   const [loading, setLoading] = useState(false);
+
+  // 住所選択モード: 'saved' = 登録済み, 'new' = 別の住所
+  const [addressMode, setAddressMode] = useState<'saved' | 'new'>('saved');
+
   const [formData, setFormData] = useState<FormData>({
     email: '',
     lastName: '',
@@ -54,12 +59,34 @@ export default function CheckoutPage() {
   });
 
   // 未認証の場合はログインページへリダイレクト
-  const { user, loading: authLoading } = useAuth();
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/login');
     }
   }, [user, authLoading, navigate]);
+
+  // プロフィールデータをフォームに反映
+  useEffect(() => {
+    if (!profile) return;
+    const fullName = profile.full_name || '';
+    const nameParts = fullName.split(/\s+/);
+    setFormData(prev => ({
+      ...prev,
+      email: profile.email || user?.email || '',
+      lastName: nameParts[0] || '',
+      firstName: nameParts[1] || '',
+      postalCode: profile.postal_code || '',
+      prefecture: profile.prefecture || '',
+      city: profile.city || '',
+      address: profile.address || '',
+      building: profile.building || '',
+      phone: profile.phone || '',
+    }));
+    // 登録済み住所がなければ「別の住所」モードに切り替え
+    if (!profile.postal_code && !profile.address) {
+      setAddressMode('new');
+    }
+  }, [profile, user]);
 
   // カートが空の場合はカートページへリダイレクト
   useEffect(() => {
@@ -67,6 +94,8 @@ export default function CheckoutPage() {
       navigate('/cart');
     }
   }, [cartItems, navigate]);
+
+  const hasSavedAddress = !!(profile?.postal_code || profile?.address);
 
   const subtotal = totalAmount;
   const shippingFee = subtotal >= 5000 ? 0 : 500;
@@ -162,9 +191,36 @@ export default function CheckoutPage() {
                 {/* ステップ1: 配送情報 */}
                 {currentStep === 1 && (
                   <div className="bg-white rounded-lg p-6 md:p-8 shadow-sm">
-                    <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">配送情報</h2>
+                    <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">配送先</h2>
 
-                    <div className="space-y-4 md:space-y-6">
+                    {/* 住所切り替え */}
+                    {hasSavedAddress && (
+                      <div className="mb-6 space-y-3">
+                        <label
+                          className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${addressMode === 'saved' ? 'border-gray-900 bg-gray-50' : 'border-gray-200'}`}
+                          onClick={() => setAddressMode('saved')}
+                        >
+                          <input type="radio" checked={addressMode === 'saved'} readOnly className="mt-1 w-4 h-4" />
+                          <div className="text-sm">
+                            <p className="font-medium mb-1">登録済みの住所を使う</p>
+                            <p className="text-gray-600">
+                              {profile?.full_name}　{profile?.phone}<br />
+                              〒{profile?.postal_code}　{profile?.prefecture}{profile?.city}{profile?.address}
+                              {profile?.building && `　${profile.building}`}
+                            </p>
+                          </div>
+                        </label>
+                        <label
+                          className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${addressMode === 'new' ? 'border-gray-900 bg-gray-50' : 'border-gray-200'}`}
+                          onClick={() => setAddressMode('new')}
+                        >
+                          <input type="radio" checked={addressMode === 'new'} readOnly className="w-4 h-4" />
+                          <p className="text-sm font-medium">別の住所を入力する</p>
+                        </label>
+                      </div>
+                    )}
+
+                    <div className={`space-y-4 md:space-y-6 ${addressMode === 'saved' && hasSavedAddress ? 'hidden' : ''}`}>
                       <div>
                         <label className="block text-xs md:text-sm font-medium mb-2">
                           メールアドレス <span className="text-red-500">*</span>
@@ -329,12 +385,12 @@ export default function CheckoutPage() {
                           name="phone"
                           value={formData.phone}
                           onChange={handleInputChange}
-                          required
+                          required={addressMode === 'new' || !hasSavedAddress}
                           className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
                           placeholder="090-1234-5678"
                         />
                       </div>
-                    </div>
+                    </div>{/* end of new address form */}
 
                     <div className="flex flex-col sm:flex-row justify-between mt-6 md:mt-8 gap-4">
                       <Link
@@ -426,6 +482,8 @@ export default function CheckoutPage() {
                                 clearCart={clearCart}
                                 cartItems={cartItems}
                                 totalAmount={totalAmount}
+                                addressMode={addressMode}
+                                profile={profile}
                               />
                             </Elements>
                           ) : (
@@ -461,38 +519,43 @@ export default function CheckoutPage() {
                   <div className="space-y-6">
                     <div className="bg-white rounded-lg p-8 shadow-sm">
                       <h2 className="text-2xl font-bold mb-6">配送先情報</h2>
-                      <div className="space-y-3 text-sm">
-                        <div className="flex">
-                          <span className="text-gray-600 w-32">お名前：</span>
-                          <span className="font-medium">{formData.lastName} {formData.firstName}</span>
+                      {addressMode === 'saved' && hasSavedAddress ? (
+                        <div className="text-sm text-gray-700 space-y-1">
+                          <p className="font-medium">{profile?.full_name}</p>
+                          <p>〒{profile?.postal_code}</p>
+                          <p>{profile?.prefecture}{profile?.city}{profile?.address}{profile?.building && `　${profile.building}`}</p>
+                          <p>{profile?.phone}</p>
                         </div>
-                        <div className="flex">
-                          <span className="text-gray-600 w-32">フリガナ：</span>
-                          <span className="font-medium">{formData.lastNameKana} {formData.firstNameKana}</span>
-                        </div>
-                        <div className="flex">
-                          <span className="text-gray-600 w-32">メール：</span>
-                          <span className="font-medium">{formData.email}</span>
-                        </div>
-                        <div className="flex">
-                          <span className="text-gray-600 w-32">電話番号：</span>
-                          <span className="font-medium">{formData.phone}</span>
-                        </div>
-                        <div className="flex">
-                          <span className="text-gray-600 w-32">住所：</span>
-                          <div className="font-medium">
-                            <div>〒{formData.postalCode}</div>
-                            <div>{formData.prefecture}{formData.city}{formData.address}</div>
-                            {formData.building && <div>{formData.building}</div>}
+                      ) : (
+                        <div className="space-y-3 text-sm">
+                          <div className="flex">
+                            <span className="text-gray-600 w-32">お名前：</span>
+                            <span className="font-medium">{formData.lastName} {formData.firstName}</span>
+                          </div>
+                          <div className="flex">
+                            <span className="text-gray-600 w-32">フリガナ：</span>
+                            <span className="font-medium">{formData.lastNameKana} {formData.firstNameKana}</span>
+                          </div>
+                          <div className="flex">
+                            <span className="text-gray-600 w-32">電話番号：</span>
+                            <span className="font-medium">{formData.phone}</span>
+                          </div>
+                          <div className="flex">
+                            <span className="text-gray-600 w-32">住所：</span>
+                            <div className="font-medium">
+                              <div>〒{formData.postalCode}</div>
+                              <div>{formData.prefecture}{formData.city}{formData.address}</div>
+                              {formData.building && <div>{formData.building}</div>}
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
                       <button
                         type="button"
                         onClick={() => setCurrentStep(1)}
                         className="mt-4 text-sm text-orange-600 hover:text-orange-700 cursor-pointer whitespace-nowrap"
                       >
-                        編集する
+                        変更する
                       </button>
                     </div>
 
@@ -650,12 +713,14 @@ export default function CheckoutPage() {
   );
 }
 
-function PaymentForm({ setCurrentStep, formData, clearCart, cartItems, totalAmount }: {
+function PaymentForm({ setCurrentStep, formData, clearCart, cartItems, totalAmount, addressMode, profile }: {
   setCurrentStep: (step: number) => void,
   formData: FormData,
   clearCart: () => void,
   cartItems: CartItem[],
-  totalAmount: number
+  totalAmount: number,
+  addressMode: 'saved' | 'new',
+  profile: any,
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -703,9 +768,29 @@ function PaymentForm({ setCurrentStep, formData, clearCart, cartItems, totalAmou
     if (paymentIntent && paymentIntent.status === 'succeeded') {
       try {
         // 注文データの作成
+        const shippingAddress = addressMode === 'saved' && profile
+          ? {
+              name: profile.full_name,
+              postal_code: profile.postal_code,
+              prefecture: profile.prefecture,
+              city: profile.city,
+              address: profile.address,
+              building: profile.building,
+              phone: profile.phone,
+            }
+          : {
+              name: `${formData.lastName} ${formData.firstName}`,
+              postal_code: formData.postalCode,
+              prefecture: formData.prefecture,
+              city: formData.city,
+              address: formData.address,
+              building: formData.building,
+              phone: formData.phone,
+            };
+
         const order = await createOrder({
-          totalAmount: totalAmount + (totalAmount >= 5000 ? 0 : 500), // 送料込みの合計
-          shippingAddress: formData,
+          totalAmount: totalAmount + (totalAmount >= 5000 ? 0 : 500),
+          shippingAddress,
           paymentIntentId: paymentIntent.id,
           cartItems: cartItems
         });
