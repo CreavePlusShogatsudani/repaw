@@ -292,26 +292,38 @@ export default function AdminProductFormPage() {
                     </div>
 
                     <div className="space-y-2 md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700">
-                          売主のInstagramアカウント
-                          <span className="text-gray-400 font-normal ml-1">（任意・商品ページに表示されます）</span>
+                        <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                            <i className="ri-instagram-line text-pink-500"></i>
+                            売主のInstagramアカウント
+                            <span className="text-gray-400 font-normal text-xs">任意・商品ページに表示</span>
                         </label>
                         {fromBuyback && (
-                          <p className="text-xs text-orange-600 flex items-center gap-1">
-                            <i className="ri-link"></i>
-                            買取申込から自動入力されました
-                          </p>
+                            <p className="text-xs text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg flex items-center gap-1.5 w-fit">
+                                <i className="ri-links-line"></i>
+                                買取申込から自動入力されました
+                            </p>
                         )}
                         <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">@</span>
-                          <input
-                            type="text"
-                            value={sellerInstagram}
-                            onChange={(e) => setSellerInstagram(e.target.value)}
-                            className="w-full pl-7 p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                            placeholder="instagram_id"
-                          />
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">@</span>
+                            <input
+                                type="text"
+                                value={sellerInstagram}
+                                onChange={(e) => setSellerInstagram(e.target.value.replace('@', ''))}
+                                className="w-full pl-8 p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent outline-none transition-all"
+                                placeholder="instagram_username"
+                            />
                         </div>
+                        {sellerInstagram && (
+                            <a
+                                href={`https://www.instagram.com/${sellerInstagram}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-pink-600 hover:underline flex items-center gap-1"
+                            >
+                                <i className="ri-external-link-line"></i>
+                                @{sellerInstagram} のプロフィールを確認
+                            </a>
+                        )}
                     </div>
 
                     <div className="space-y-2 md:col-span-2">
