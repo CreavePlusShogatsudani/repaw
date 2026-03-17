@@ -81,12 +81,60 @@ export default function AdminProductFormPage() {
         });
     };
 
+    // Canvas で画像を圧縮して 5MB 以下にする
+    const compressImage = (file: File): Promise<File> => {
+        return new Promise((resolve) => {
+            const MAX_BYTES = 5 * 1024 * 1024; // 5MB
+            const MAX_SIZE = 1920; // 長辺の最大px
+
+            // 5MB 未満かつ PNG/WebP 以外はそのまま返す
+            if (file.size <= MAX_BYTES && file.type === 'image/jpeg') {
+                resolve(file);
+                return;
+            }
+
+            const img = new Image();
+            const objectUrl = URL.createObjectURL(file);
+            img.onload = () => {
+                URL.revokeObjectURL(objectUrl);
+
+                // リサイズ比率を計算
+                let { width, height } = img;
+                if (width > MAX_SIZE || height > MAX_SIZE) {
+                    const ratio = Math.min(MAX_SIZE / width, MAX_SIZE / height);
+                    width = Math.round(width * ratio);
+                    height = Math.round(height * ratio);
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d')!;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // quality を下げながら 5MB 以下になるまで試行
+                const tryCompress = (quality: number) => {
+                    canvas.toBlob((blob) => {
+                        if (!blob) { resolve(file); return; }
+                        if (blob.size <= MAX_BYTES || quality <= 0.1) {
+                            resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
+                        } else {
+                            tryCompress(Math.max(quality - 0.1, 0.1));
+                        }
+                    }, 'image/jpeg', quality);
+                };
+                tryCompress(0.85);
+            };
+            img.src = objectUrl;
+        });
+    };
+
     const uploadImage = async (file: File): Promise<string> => {
-        const ext = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const compressed = await compressImage(file);
+        const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`;
         const { error } = await supabase.storage
             .from('product-images')
-            .upload(fileName, file, { upsert: true });
+            .upload(fileName, compressed, { upsert: true, contentType: 'image/jpeg' });
         if (error) throw error;
         const { data } = supabase.storage.from('product-images').getPublicUrl(fileName);
         return data.publicUrl;
