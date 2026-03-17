@@ -121,7 +121,7 @@ export default function InstallPrompt() {
                 <div className="grid grid-cols-3 gap-3 mb-6">
                   {[
                     { icon: 'ri-flashlight-line', label: '高速起動' },
-                    { icon: 'ri-notification-3-line', label: '通知対応' },
+                    { icon: 'ri-smartphone-line', label: 'アプリ感覚' },
                     { icon: 'ri-wifi-off-line', label: 'オフライン' },
                   ].map((f) => (
                     <div key={f.label} className="flex flex-col items-center gap-1.5 bg-gray-50 rounded-xl py-3">
