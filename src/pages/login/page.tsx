@@ -31,8 +31,8 @@ export default function LoginPage() {
         throw error;
       }
 
-      // ログイン成功したらホームへリダイレクト
-      navigate('/');
+      // ログイン成功したらマイページへリダイレクト
+      navigate('/mypage');
     } catch (err: any) {
       console.error('Login error:', err);
       setError('メールアドレスまたはパスワードが正しくありません');
