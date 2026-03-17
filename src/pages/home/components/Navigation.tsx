@@ -23,6 +23,12 @@ export default function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // メニュー展開中は背景スクロールを無効化
+  useEffect(() => {
+    document.body.style.overflow = isMenuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isMenuOpen]);
+
   return (
     <>
       {/* デスクトップナビゲーション */}
@@ -76,78 +82,61 @@ export default function Navigation() {
             {/* モバイルメニューボタン */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className={`md:hidden w-10 h-10 flex items-center justify-center cursor-pointer rounded-lg transition-all duration-200 text-black ${
-                isScrolled 
-                  ? 'hover:bg-gray-100 active:bg-gray-200' 
-                  : 'hover:bg-white/10 active:bg-white/20'
-              }`}
+              className="md:hidden w-10 h-10 flex items-center justify-center cursor-pointer rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-all duration-200 text-black"
             >
-              <i className={`${isMenuOpen ? 'ri-close-line' : 'ri-menu-line'} text-2xl transition-transform duration-200 ${isMenuOpen ? 'rotate-90' : ''}`}></i>
+              <i className={`${isMenuOpen ? 'ri-close-line' : 'ri-menu-line'} text-2xl`}></i>
             </button>
           </div>
         </div>
 
         {/* モバイルメニュー */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-200 shadow-lg mt-3">
-            <div className="px-6 py-4 space-y-2">
-              <Link 
-                to="/products" 
-                className="block text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 transition-all cursor-pointer px-4 py-3 rounded-lg" 
-                onClick={() => setIsMenuOpen(false)}
-              >
-                アイテム一覧
-              </Link>
-              <Link 
-                to="/system" 
-                className="block text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 transition-all cursor-pointer px-4 py-3 rounded-lg" 
-                onClick={() => setIsMenuOpen(false)}
-              >
-                買取・寄付
-              </Link>
-              <Link 
-                to="/impact" 
-                className="block text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 transition-all cursor-pointer px-4 py-3 rounded-lg" 
-                onClick={() => setIsMenuOpen(false)}
-              >
-                社会貢献
-              </Link>
-              <Link 
-                to="/about" 
-                className="block text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 transition-all cursor-pointer px-4 py-3 rounded-lg" 
-                onClick={() => setIsMenuOpen(false)}
-              >
-                About
-              </Link>
-              <Link 
-                to="/faq" 
-                className="block text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 transition-all cursor-pointer px-4 py-3 rounded-lg" 
-                onClick={() => setIsMenuOpen(false)}
-              >
-                FAQ
-              </Link>
-              <div className="flex gap-2 pt-2">
-                <Link 
-                  to="/cart" 
-                  className="flex-1 flex items-center justify-center gap-2 text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 transition-all cursor-pointer px-4 py-3 rounded-lg whitespace-nowrap" 
+          <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
+            <div className="px-4 py-4">
+              {/* ナビリンク */}
+              <div className="space-y-1 mb-4">
+                {[
+                  { to: '/products', label: 'アイテム一覧' },
+                  { to: '/buyback', label: '買取申し込み' },
+                  { to: '/system', label: '仕組みについて' },
+                  { to: '/impact', label: '社会貢献' },
+                  { to: '/about', label: 'About' },
+                  { to: '/faq', label: 'FAQ' },
+                ].map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className="block text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 transition-all px-4 py-3 rounded-lg"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+
+              {/* アカウント・カートボタン */}
+              <div className="border-t border-gray-100 pt-4 space-y-2">
+                <Link
+                  to="/cart"
+                  className="flex items-center gap-3 w-full text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 transition-all px-4 py-3 rounded-lg"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <i className="ri-shopping-cart-line text-lg"></i>
-                  カート
+                  カートを見る
                 </Link>
                 {user ? (
                   <>
                     <Link
                       to="/mypage"
-                      className="flex-1 flex items-center justify-center gap-2 text-sm font-medium text-orange-600 bg-orange-50 hover:bg-orange-100 transition-all cursor-pointer px-4 py-3 rounded-lg whitespace-nowrap"
+                      className="flex items-center gap-3 w-full text-sm font-medium text-gray-900 bg-gray-100 hover:bg-gray-200 transition-all px-4 py-3 rounded-lg"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      <i className="ri-user-fill text-lg"></i>
+                      <i className="ri-user-line text-lg"></i>
                       マイページ
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="flex-1 flex items-center justify-center gap-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all cursor-pointer px-4 py-3 rounded-lg whitespace-nowrap"
+                      className="flex items-center gap-3 w-full text-sm font-medium text-red-600 hover:bg-red-50 transition-all px-4 py-3 rounded-lg"
                     >
                       <i className="ri-logout-box-line text-lg"></i>
                       ログアウト
@@ -156,11 +145,11 @@ export default function Navigation() {
                 ) : (
                   <Link
                     to="/login"
-                    className="flex-1 flex items-center justify-center gap-2 text-sm font-medium text-orange-600 bg-orange-50 hover:bg-orange-100 transition-all cursor-pointer px-4 py-3 rounded-lg whitespace-nowrap"
+                    className="flex items-center gap-3 w-full text-sm font-medium text-gray-900 bg-gray-100 hover:bg-gray-200 transition-all px-4 py-3 rounded-lg"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <i className="ri-user-line text-lg"></i>
-                    ログイン
+                    ログイン / 新規登録
                   </Link>
                 )}
               </div>
