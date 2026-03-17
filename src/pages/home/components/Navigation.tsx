@@ -1,9 +1,19 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthContext';
+import { supabase } from '../../../lib/supabase';
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/');
+    setIsMenuOpen(false);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,11 +68,26 @@ export default function Navigation() {
               }`}>
                 <i className="ri-shopping-cart-line text-lg"></i>
               </Link>
-              <Link to="/login" className={`px-4 py-2 text-sm font-medium hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                isScrolled ? 'text-black' : 'text-white hover:bg-white/10'
-              }`}>
-                <i className="ri-user-line text-lg"></i>
-              </Link>
+              {user ? (
+                <div className="flex items-center gap-1">
+                  <Link to="/mypage" className={`px-4 py-2 text-sm font-medium hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                    isScrolled ? 'text-black' : 'text-white hover:bg-white/10'
+                  }`}>
+                    <i className="ri-user-fill text-lg"></i>
+                  </Link>
+                  <button onClick={handleLogout} className={`px-3 py-2 text-sm font-medium hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                    isScrolled ? 'text-black' : 'text-white hover:bg-white/10'
+                  }`}>
+                    <i className="ri-logout-box-line text-lg"></i>
+                  </button>
+                </div>
+              ) : (
+                <Link to="/login" className={`px-4 py-2 text-sm font-medium hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+                  isScrolled ? 'text-black' : 'text-white hover:bg-white/10'
+                }`}>
+                  <i className="ri-user-line text-lg"></i>
+                </Link>
+              )}
             </div>
 
             {/* モバイルメニューボタン */}
@@ -127,14 +152,34 @@ export default function Navigation() {
                   <i className="ri-shopping-cart-line text-lg"></i>
                   カート
                 </Link>
-                <Link 
-                  to="/login" 
-                  className="flex-1 flex items-center justify-center gap-2 text-sm font-medium text-orange-600 bg-orange-50 hover:bg-orange-100 transition-all cursor-pointer px-4 py-3 rounded-lg whitespace-nowrap" 
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <i className="ri-user-line text-lg"></i>
-                  ログイン
-                </Link>
+                {user ? (
+                  <>
+                    <Link
+                      to="/mypage"
+                      className="flex-1 flex items-center justify-center gap-2 text-sm font-medium text-orange-600 bg-orange-50 hover:bg-orange-100 transition-all cursor-pointer px-4 py-3 rounded-lg whitespace-nowrap"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <i className="ri-user-fill text-lg"></i>
+                      マイページ
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="flex-1 flex items-center justify-center gap-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all cursor-pointer px-4 py-3 rounded-lg whitespace-nowrap"
+                    >
+                      <i className="ri-logout-box-line text-lg"></i>
+                      ログアウト
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="flex-1 flex items-center justify-center gap-2 text-sm font-medium text-orange-600 bg-orange-50 hover:bg-orange-100 transition-all cursor-pointer px-4 py-3 rounded-lg whitespace-nowrap"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <i className="ri-user-line text-lg"></i>
+                    ログイン
+                  </Link>
+                )}
               </div>
             </div>
           </div>
