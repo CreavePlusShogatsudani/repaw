@@ -29,6 +29,7 @@ const AdminProductsPage = lazy(() => import('../pages/admin/products/page'));
 const AdminProductFormPage = lazy(() => import('../pages/admin/products/form'));
 const AdminOrdersPage = lazy(() => import('../pages/admin/orders/page'));
 const AdminBuybackPage = lazy(() => import('../pages/admin/buyback/page'));
+const AdminUsersPage = lazy(() => import('../pages/admin/users/page'));
 
 const routes: RouteObject[] = [
   {
@@ -134,6 +135,10 @@ const routes: RouteObject[] = [
       {
         path: 'buyback',
         element: <AdminBuybackPage />,
+      },
+      {
+        path: 'users',
+        element: <AdminUsersPage />,
       },
     ],
   },
