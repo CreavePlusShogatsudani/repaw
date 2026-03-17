@@ -3,6 +3,7 @@ import { AppRoutes } from "./router";
 import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n";
 import { useEffect } from "react";
+import InstallPrompt from "./components/InstallPrompt";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -20,6 +21,7 @@ function App() {
       <BrowserRouter basename={__BASE_PATH__}>
         <ScrollToTop />
         <AppRoutes />
+        <InstallPrompt />
       </BrowserRouter>
     </I18nextProvider>
   );
