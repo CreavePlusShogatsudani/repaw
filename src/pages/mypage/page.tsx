@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { supabase } from '../../lib/supabase';
@@ -46,8 +46,15 @@ const ORDER_STATUS_LABEL: Record<string, { label: string; color: string }> = {
 };
 
 export default function MyPage() {
-  const { user, profile, refreshProfile } = useAuth();
+  const { user, profile, refreshProfile, loading } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'favorites' | 'sell'>('profile');
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/login');
+    }
+  }, [user, loading, navigate]);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);

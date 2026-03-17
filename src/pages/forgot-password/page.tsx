@@ -2,16 +2,29 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
+import { supabase } from '../../lib/supabase';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // ここでパスワードリセットメール送信処理を実装
-    console.log('Password reset email sent to:', email);
-    setIsSubmitted(true);
+    setLoading(true);
+    setError(null);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      setIsSubmitted(true);
+    } catch (err: any) {
+      setError('メールの送信に失敗しました。メールアドレスをご確認ください。');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -34,6 +47,9 @@ export default function ForgotPasswordPage() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
+                {error && (
+                  <div className="p-4 bg-red-50 text-red-600 rounded-lg text-sm">{error}</div>
+                )}
                 {/* メールアドレス */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
@@ -46,15 +62,17 @@ export default function ForgotPasswordPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
                     placeholder="example@email.com"
+                    disabled={loading}
                   />
                 </div>
 
                 {/* 送信ボタン */}
                 <button
                   type="submit"
-                  className="w-full py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors cursor-pointer font-medium whitespace-nowrap"
+                  disabled={loading}
+                  className="w-full py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors cursor-pointer font-medium whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  リセットリンクを送信
+                  {loading ? '送信中...' : 'リセットリンクを送信'}
                 </button>
               </form>
 

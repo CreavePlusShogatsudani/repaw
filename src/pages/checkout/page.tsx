@@ -5,6 +5,7 @@ import { stripePromise } from '../../lib/stripe';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { useCart, CartItem } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { createOrder } from '../../lib/orders';
 
@@ -51,6 +52,14 @@ export default function CheckoutPage() {
     cardExpiry: '',
     cardCvv: ''
   });
+
+  // 未認証の場合はログインページへリダイレクト
+  const { user, loading: authLoading } = useAuth();
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/login');
+    }
+  }, [user, authLoading, navigate]);
 
   // カートが空の場合はカートページへリダイレクト
   useEffect(() => {

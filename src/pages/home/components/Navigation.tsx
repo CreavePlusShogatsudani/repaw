@@ -82,10 +82,12 @@ export default function Navigation() {
                   </button>
                 </div>
               ) : (
-                <Link to="/login" className={`px-4 py-2 text-sm font-medium hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                  isScrolled ? 'text-black' : 'text-white hover:bg-white/10'
+                <Link to="/login" className={`px-4 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer whitespace-nowrap border ${
+                  isScrolled
+                    ? 'text-gray-900 border-gray-900 hover:bg-gray-900 hover:text-white'
+                    : 'text-white border-white hover:bg-white hover:text-gray-900'
                 }`}>
-                  <i className="ri-user-line text-lg"></i>
+                  ログイン
                 </Link>
               )}
             </div>
