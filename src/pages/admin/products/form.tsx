@@ -22,9 +22,9 @@ export default function AdminProductFormPage() {
     const [condition, setCondition] = useState('');
     const [stock, setStock] = useState('1');
     const [status, setStatus] = useState('published');
-    const [imageUrl, setImageUrl] = useState('');
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState('');
+    // 複数画像管理
+    const [existingImages, setExistingImages] = useState<string[]>([]); // 保存済みURL
+    const [newImageFiles, setNewImageFiles] = useState<{ file: File; preview: string }[]>([]); // 追加予定
     const [uploadingImage, setUploadingImage] = useState(false);
     const [sellerInstagram, setSellerInstagram] = useState(searchParams.get('seller_instagram') || '');
     const fromBuyback = searchParams.get('from_buyback');
@@ -57,24 +57,33 @@ export default function AdminProductFormPage() {
             setCondition(data.condition || '');
             setStock(data.stock?.toString() || '0');
             setStatus(data.status || 'draft');
-            const existingUrl = data.images?.[0] || '';
-            setImageUrl(existingUrl);
-            setImagePreview(existingUrl);
+            setExistingImages(data.images || []);
             setSellerInstagram(data.seller_instagram || '');
         }
         setLoading(false);
     };
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        setImageFile(file);
-        setImagePreview(URL.createObjectURL(file));
+    const handleAddImages = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        const entries = files.map((file) => ({ file, preview: URL.createObjectURL(file) }));
+        setNewImageFiles((prev) => [...prev, ...entries]);
+        e.target.value = ''; // 同じファイルの再選択を可能にする
+    };
+
+    const removeExistingImage = (index: number) => {
+        setExistingImages((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const removeNewImage = (index: number) => {
+        setNewImageFiles((prev) => {
+            URL.revokeObjectURL(prev[index].preview);
+            return prev.filter((_, i) => i !== index);
+        });
     };
 
     const uploadImage = async (file: File): Promise<string> => {
         const ext = file.name.split('.').pop();
-        const fileName = `${Date.now()}.${ext}`;
+        const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
         const { error } = await supabase.storage
             .from('product-images')
             .upload(fileName, file, { upsert: true });
@@ -87,11 +96,11 @@ export default function AdminProductFormPage() {
         e.preventDefault();
         setSaving(true);
 
-        let finalImageUrl = imageUrl;
-        if (imageFile) {
+        let uploadedUrls: string[] = [];
+        if (newImageFiles.length > 0) {
             setUploadingImage(true);
             try {
-                finalImageUrl = await uploadImage(imageFile);
+                uploadedUrls = await Promise.all(newImageFiles.map((f) => uploadImage(f.file)));
             } catch (err) {
                 console.error('Image upload failed:', err);
                 alert('画像のアップロードに失敗しました。');
@@ -101,6 +110,8 @@ export default function AdminProductFormPage() {
             }
             setUploadingImage(false);
         }
+
+        const finalImages = [...existingImages, ...uploadedUrls];
 
         const productData = {
             name,
@@ -113,7 +124,7 @@ export default function AdminProductFormPage() {
             condition,
             stock: parseInt(stock, 10) || 0,
             status,
-            images: finalImageUrl ? [finalImageUrl] : [],
+            images: finalImages,
             seller_instagram: sellerInstagram.replace('@', '') || null,
         };
 
@@ -326,35 +337,58 @@ export default function AdminProductFormPage() {
                         )}
                     </div>
 
-                    <div className="space-y-2 md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700">商品画像</label>
-                        <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                            <div className="flex flex-col items-center text-gray-400">
-                                <i className="ri-upload-cloud-2-line text-3xl mb-1"></i>
-                                <span className="text-sm">クリックして画像を選択</span>
-                                <span className="text-xs mt-1">JPG, PNG, WebP</span>
+                    <div className="space-y-3 md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                            商品画像
+                            <span className="text-gray-400 font-normal ml-1">（複数枚可・1枚目がメイン画像）</span>
+                        </label>
+
+                        {/* サムネイル一覧 */}
+                        {(existingImages.length > 0 || newImageFiles.length > 0) && (
+                            <div className="flex flex-wrap gap-3">
+                                {existingImages.map((url, i) => (
+                                    <div key={`existing-${i}`} className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 group">
+                                        <img src={url} alt={`画像${i + 1}`} className="w-full h-full object-cover" />
+                                        {i === 0 && (
+                                            <span className="absolute top-1 left-1 bg-black/60 text-white text-[10px] px-1 rounded">メイン</span>
+                                        )}
+                                        <button
+                                            type="button"
+                                            onClick={() => removeExistingImage(i)}
+                                            className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <i className="ri-close-line text-xs"></i>
+                                        </button>
+                                    </div>
+                                ))}
+                                {newImageFiles.map((f, i) => (
+                                    <div key={`new-${i}`} className="relative w-24 h-24 rounded-lg overflow-hidden border-2 border-blue-300 group">
+                                        <img src={f.preview} alt={`新規${i + 1}`} className="w-full h-full object-cover" />
+                                        <span className="absolute top-1 left-1 bg-blue-500/80 text-white text-[10px] px-1 rounded">新規</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeNewImage(i)}
+                                            className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <i className="ri-close-line text-xs"></i>
+                                        </button>
+                                    </div>
+                                ))}
                             </div>
+                        )}
+
+                        {/* 追加ボタン */}
+                        <label className="flex items-center justify-center gap-2 w-full h-24 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                            <i className="ri-add-line text-2xl text-gray-400"></i>
+                            <span className="text-sm text-gray-500">画像を追加</span>
                             <input
                                 type="file"
                                 accept="image/*"
-                                onChange={handleImageChange}
+                                multiple
+                                onChange={handleAddImages}
                                 className="hidden"
                             />
                         </label>
-                        {imagePreview && (
-                            <div className="mt-3 flex items-center gap-4">
-                                <div className="w-32 h-32 rounded-lg bg-gray-100 overflow-hidden border border-gray-200 flex-shrink-0">
-                                    <img src={imagePreview} alt="プレビュー" className="w-full h-full object-cover" />
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => { setImageFile(null); setImagePreview(''); setImageUrl(''); }}
-                                    className="text-sm text-red-500 hover:text-red-700"
-                                >
-                                    画像を削除
-                                </button>
-                            </div>
-                        )}
                     </div>
                 </div>
 
