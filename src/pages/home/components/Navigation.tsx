@@ -26,8 +26,8 @@ export default function Navigation() {
   return (
     <>
       {/* デスクトップナビゲーション */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-4 md:py-6'
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white ${
+        isScrolled ? 'shadow-md py-3' : 'py-4 md:py-6'
       }`}>
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between">
@@ -38,54 +38,35 @@ export default function Navigation() {
 
             {/* デスクトップメニュー */}
             <div className="hidden md:flex items-center gap-2">
-              <Link to="/products" className={`px-4 py-2 text-sm font-medium hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                isScrolled ? 'text-black' : 'text-white hover:bg-white/10'
-              }`}>
+              <Link to="/products" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
                 アイテム一覧
               </Link>
-              <Link to="/system" className={`px-4 py-2 text-sm font-medium hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                isScrolled ? 'text-black' : 'text-white hover:bg-white/10'
-              }`}>
+              <Link to="/system" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
                 買取・寄付
               </Link>
-              <Link to="/impact" className={`px-4 py-2 text-sm font-medium hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                isScrolled ? 'text-black' : 'text-white hover:bg-white/10'
-              }`}>
+              <Link to="/impact" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
                 社会貢献
               </Link>
-              <Link to="/about" className={`px-4 py-2 text-sm font-medium hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                isScrolled ? 'text-black' : 'text-white hover:bg-white/10'
-              }`}>
+              <Link to="/about" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
                 About
               </Link>
-              <Link to="/faq" className={`px-4 py-2 text-sm font-medium hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                isScrolled ? 'text-black' : 'text-white hover:bg-white/10'
-              }`}>
+              <Link to="/faq" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
                 FAQ
               </Link>
-              <Link to="/cart" className={`px-4 py-2 text-sm font-medium hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                isScrolled ? 'text-black' : 'text-white hover:bg-white/10'
-              }`}>
+              <Link to="/cart" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
                 <i className="ri-shopping-cart-line text-lg"></i>
               </Link>
               {user ? (
                 <div className="flex items-center gap-1">
-                  <Link to="/mypage" className={`px-4 py-2 text-sm font-medium hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                    isScrolled ? 'text-black' : 'text-white hover:bg-white/10'
-                  }`}>
+                  <Link to="/mypage" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
                     <i className="ri-user-fill text-lg"></i>
                   </Link>
-                  <button onClick={handleLogout} className={`px-3 py-2 text-sm font-medium hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                    isScrolled ? 'text-black' : 'text-white hover:bg-white/10'
-                  }`}>
+                  <button onClick={handleLogout} className="px-3 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
                     <i className="ri-logout-box-line text-lg"></i>
                   </button>
                 </div>
               ) : (
-                <Link to="/login" className={`px-4 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer whitespace-nowrap border ${
-                  isScrolled
-                    ? 'text-gray-900 border-gray-900 hover:bg-gray-900 hover:text-white'
-                    : 'text-white border-white hover:bg-white hover:text-gray-900'
+                <Link to="/login" className={`px-4 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer whitespace-nowrap border ${'text-gray-900 border-gray-900 hover:bg-gray-900 hover:text-white'
                 }`}>
                   ログイン
                 </Link>
