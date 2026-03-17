@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { stripePromise } from '../../lib/stripe';
 import Navigation from '../home/components/Navigation';
@@ -30,6 +30,7 @@ interface FormData {
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { cartItems, totalAmount, clearCart } = useCart();
   const { user, profile, loading: authLoading } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
@@ -58,12 +59,12 @@ export default function CheckoutPage() {
     cardCvv: ''
   });
 
-  // 未認証の場合はログインページへリダイレクト
+  // 未認証の場合はログインページへリダイレクト（戻り先を渡す）
   useEffect(() => {
     if (!authLoading && !user) {
-      navigate('/login');
+      navigate('/login', { state: { from: location.pathname } });
     }
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, navigate, location.pathname]);
 
   // プロフィールデータをフォームに反映
   useEffect(() => {

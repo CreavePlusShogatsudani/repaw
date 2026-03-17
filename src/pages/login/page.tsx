@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { supabase } from '../../lib/supabase';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string })?.from || '/';
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -31,8 +33,8 @@ export default function LoginPage() {
         throw error;
       }
 
-      // ログイン成功したらマイページへリダイレクト
-      navigate('/mypage');
+      // ログイン前のページへ戻る（なければトップ）
+      navigate(from, { replace: true });
     } catch (err: any) {
       console.error('Login error:', err);
       setError('メールアドレスまたはパスワードが正しくありません');
@@ -49,7 +51,7 @@ export default function LoginPage() {
         <div className="max-w-md mx-auto px-6">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">ログイン</h1>
-            <p className="text-gray-600">RePowへようこそ</p>
+            <p className="text-gray-600">RePawへようこそ</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { supabase } from '../../lib/supabase';
@@ -10,6 +10,7 @@ import { useAuth } from '../../contexts/AuthContext';
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { addToCart: addToCartContext } = useCart();
   const { user } = useAuth();
 
@@ -105,7 +106,7 @@ export default function ProductDetail() {
 
   const toggleFavorite = async () => {
     if (!user) {
-      navigate('/login');
+      navigate('/login', { state: { from: location.pathname } });
       return;
     }
     if (isFavorite && favoriteId) {
