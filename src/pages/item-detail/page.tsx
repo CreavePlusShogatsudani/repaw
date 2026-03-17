@@ -151,7 +151,7 @@ export default function ProductDetail() {
         <div className="text-center py-32 px-4">
           <h2 className="text-2xl font-bold mb-4">商品が見つかりませんでした</h2>
           <p className="text-gray-600 mb-8">{error || '指定された商品は削除されたか、非公開になっています。'}</p>
-          <Link to="/items" className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors">
+          <Link to="/products" className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors">
             商品一覧に戻る
           </Link>
         </div>
@@ -187,7 +187,7 @@ export default function ProductDetail() {
             <ol className="flex items-center gap-2 text-gray-600">
               <li><Link to="/" className="hover:text-gray-900 cursor-pointer">ホーム</Link></li>
               <li><i className="ri-arrow-right-s-line"></i></li>
-              <li><Link to="/items" className="hover:text-gray-900 cursor-pointer">商品一覧</Link></li>
+              <li><Link to="/products" className="hover:text-gray-900 cursor-pointer">商品一覧</Link></li>
               <li><i className="ri-arrow-right-s-line"></i></li>
               <li className="text-gray-900 font-medium truncate">{product.name}</li>
             </ol>

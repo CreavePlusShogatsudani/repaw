@@ -27,7 +27,7 @@ export default function CartPage() {
               <h2 className="text-lg md:text-xl font-medium mb-3 md:mb-4">カートは空です</h2>
               <p className="text-sm md:text-base text-gray-600 mb-6 md:mb-8">お気に入りの商品を見つけて、カートに追加しましょう</p>
               <Link
-                to="/items"
+                to="/products"
                 className="inline-block px-6 md:px-8 py-2.5 md:py-3 bg-gray-900 text-white rounded-lg text-sm md:text-base font-medium hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
               >
                 商品一覧を見る
@@ -143,7 +143,7 @@ export default function CartPage() {
                 <div className="mt-6">
                   <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                     <Link
-                      to="/items"
+                      to="/products"
                       className="flex-1 px-4 md:px-6 py-2.5 md:py-3 border-2 border-gray-900 text-gray-900 rounded-lg text-sm md:text-base font-medium hover:bg-gray-50 transition-colors text-center cursor-pointer whitespace-nowrap"
                     >
                       買い物を続ける
