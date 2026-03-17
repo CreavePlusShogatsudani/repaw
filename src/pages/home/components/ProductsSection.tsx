@@ -36,7 +36,7 @@ export default function ProductsSection() {
           <p className="text-gray-600 text-sm tracking-wider">商品一覧</p>
         </div>
 
-        <div className="flex justify-center mb-12 overflow-x-auto scrollbar-hide">
+        <div className="flex mb-12 overflow-x-auto scrollbar-hide -mx-6 px-6">
           <div className="inline-flex bg-white rounded-full p-1 shadow-sm min-w-max">
             <button
               onClick={() => setSelectedCategory('all')}
