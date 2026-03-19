@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import PageMeta from '../../components/PageMeta';
 import { stripePromise } from '../../lib/stripe';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
@@ -150,6 +151,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageMeta title="チェックアウト" noindex />
       <Navigation />
 
       <main className="pt-20 md:pt-24 pb-12 md:pb-16">

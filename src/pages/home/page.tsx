@@ -1,3 +1,4 @@
+import PageMeta from '../../components/PageMeta';
 import Navigation from './components/Navigation';
 import HeroSection from './components/HeroSection';
 import ServiceSection from './components/ServiceSection';
@@ -13,6 +14,7 @@ import Footer from './components/Footer';
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
+      <PageMeta path="/" />
       <Navigation />
       <HeroSection />
       <ServiceSection />

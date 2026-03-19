@@ -1,3 +1,4 @@
+import PageMeta from '../../components/PageMeta';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 
@@ -22,6 +23,7 @@ const VALUES = [
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white font-['Noto_Sans_JP']">
+      <PageMeta title="About Us - RePawについて" description="RePawのミッションとブランドストーリー。犬服のリユースで環境保護と動物保護を支援します。" path="/about" />
       <Navigation />
 
       {/* Hero Section */}

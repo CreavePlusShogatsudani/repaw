@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { supabase } from '../../lib/supabase';
+import PageMeta from '../../components/PageMeta';
 
 interface OrderItem {
   id: string;
@@ -109,6 +110,7 @@ export default function OrderCompletePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageMeta title="ご注文完了" noindex />
       <Navigation />
 
       <main className="pt-24 pb-16">

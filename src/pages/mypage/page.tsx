@@ -5,6 +5,7 @@ import Footer from '../home/components/Footer';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import type { Product } from '../../types';
+import PageMeta from '../../components/PageMeta';
 
 interface OrderItemWithProduct {
   id: string;
@@ -188,6 +189,7 @@ export default function MyPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <PageMeta title="マイページ" noindex />
       <Navigation />
 
       <main className="pt-24 pb-16">

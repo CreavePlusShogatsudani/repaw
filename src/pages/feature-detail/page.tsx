@@ -4,6 +4,7 @@ import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { supabase } from '../../lib/supabase';
 import type { Product } from '../../types';
+import PageMeta from '../../components/PageMeta';
 
 interface Collection {
     id: string;
@@ -30,12 +31,13 @@ export default function FeatureDetailPage() {
     const navigate = useNavigate();
     const [collection, setCollection] = useState<Collection | null>(null);
     const [products, setProducts] = useState<Product[]>([]);
+    const [recommended, setRecommended] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (!id) return;
         const fetchData = async () => {
-            const [colRes, cpRes] = await Promise.all([
+            const [colRes, cpRes, recRes] = await Promise.all([
                 supabase
                     .from('collections')
                     .select('*')
@@ -47,6 +49,10 @@ export default function FeatureDetailPage() {
                     .select('sort_order, product:products(*)')
                     .eq('collection_id', id)
                     .order('sort_order', { ascending: true }),
+                supabase
+                    .from('recommended_products')
+                    .select('sort_order, product:products(*)')
+                    .order('sort_order', { ascending: true }),
             ]);
 
             if (colRes.error || !colRes.data) {
@@ -56,6 +62,8 @@ export default function FeatureDetailPage() {
             setCollection(colRes.data);
             const prods = (cpRes.data || []).map((cp: any) => cp.product).filter(Boolean);
             setProducts(prods);
+            const recProds = (recRes.data || []).map((r: any) => r.product).filter(Boolean);
+            setRecommended(recProds);
             setLoading(false);
         };
         fetchData();
@@ -73,6 +81,12 @@ export default function FeatureDetailPage() {
 
     return (
         <div className="min-h-screen bg-white">
+            <PageMeta
+                title={collection.title}
+                description={collection.description || collection.subtitle || collection.title}
+                image={collection.cover_image_url || undefined}
+                path={`/features/${collection.id}`}
+            />
             <Navigation />
 
             {/* Hero */}
@@ -185,6 +199,64 @@ export default function FeatureDetailPage() {
                     </div>
                 )}
             </div>
+
+            {/* おすすめ商品 */}
+            {recommended.length > 0 && (
+                <div className="bg-gray-50 py-16 mt-8 -mx-6 px-6">
+                    <div className="max-w-7xl mx-auto">
+                        <h2 className="text-2xl font-bold mb-8">おすすめ商品</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {recommended.map((product) => {
+                                const thumb = product.images?.[0];
+                                const discount = product.original_price
+                                    ? Math.round((1 - product.price / product.original_price) * 100)
+                                    : null;
+                                return (
+                                    <Link key={product.id} to={`/product/${product.id}`} className="group">
+                                        <div className="relative aspect-[3/4] bg-gray-100 rounded overflow-hidden mb-3">
+                                            {thumb ? (
+                                                <img
+                                                    src={thumb}
+                                                    alt={product.name}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-300">
+                                                    <i className="ri-image-line text-4xl"></i>
+                                                </div>
+                                            )}
+                                            {discount && discount > 0 && (
+                                                <div className="absolute top-3 left-3">
+                                                    <span className="px-2 py-0.5 bg-orange-500 text-white text-xs font-bold">
+                                                        -{discount}%
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {product.stock === 0 && (
+                                                <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
+                                                    <span className="text-sm font-medium text-gray-600">SOLD OUT</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <p className="text-xs text-gray-500 mb-1">{product.category}</p>
+                                        <h3 className="text-sm font-medium text-gray-900 mb-2 group-hover:underline line-clamp-2">
+                                            {product.name}
+                                        </h3>
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-base font-bold">¥{(product.price ?? 0).toLocaleString()}</span>
+                                            {product.original_price && (
+                                                <span className="text-xs text-gray-400 line-through">
+                                                    ¥{(product.original_price ?? 0).toLocaleString()}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </Link>
+                                );
+            })}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <Footer />
         </div>

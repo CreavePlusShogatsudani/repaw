@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import PageMeta from '../../components/PageMeta';
 import { useState, useEffect } from 'react';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
@@ -41,7 +42,8 @@ export default function NewsPage() {
 
     return (
         <div className="min-h-screen bg-white">
-            <Navigation />
+            <PageMeta title="ニュース・お知らせ" description="RePawからの最新情報・お知らせ・イベント情報をお届けします。" path="/news" />
+      <Navigation />
 
             <div className="pt-32 pb-24 px-6">
                 <div className="max-w-7xl mx-auto">

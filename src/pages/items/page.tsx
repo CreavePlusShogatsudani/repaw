@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import PageMeta from '../../components/PageMeta';
 import { Link } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
@@ -106,6 +107,7 @@ export default function ItemsPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <PageMeta title="アイテム一覧" description="RePawの犬服リユース商品一覧。アウター・ニット・Tシャツなど豊富なラインナップをお手頃価格でご提供。" path="/products" />
       <Navigation />
 
       <div className="pt-20 md:pt-32 pb-16 md:pb-24 px-4 md:px-6">

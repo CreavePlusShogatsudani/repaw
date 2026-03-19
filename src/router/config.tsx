@@ -36,6 +36,7 @@ const AdminCollectionFormPage = lazy(() => import('../pages/admin/collections/fo
 const AdminCollectionProductsPage = lazy(() => import('../pages/admin/collections/products'));
 const AdminNewsPage = lazy(() => import('../pages/admin/news/page'));
 const AdminNewsFormPage = lazy(() => import('../pages/admin/news/form'));
+const AdminRecommendedPage = lazy(() => import('../pages/admin/recommended/page'));
 
 const routes: RouteObject[] = [
   {
@@ -177,6 +178,10 @@ const routes: RouteObject[] = [
       {
         path: 'collections/:id',
         element: <AdminCollectionProductsPage />,
+      },
+      {
+        path: 'recommended',
+        element: <AdminRecommendedPage />,
       },
     ],
   },

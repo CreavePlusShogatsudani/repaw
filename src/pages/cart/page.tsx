@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { useCart } from '../../contexts/CartContext';
+import PageMeta from '../../components/PageMeta';
 
 export default function CartPage() {
   const { cartItems, removeFromCart, updateQuantity, totalAmount } = useCart();
@@ -11,6 +12,7 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <PageMeta title="カート" noindex />
       <Navigation />
 
       <main className="pt-20 md:pt-24 pb-12 md:pb-16">

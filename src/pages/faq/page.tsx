@@ -1,3 +1,4 @@
+import PageMeta from '../../components/PageMeta';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { useState } from 'react';
@@ -124,8 +125,21 @@ export default function FAQPage() {
 
   const currentCategory = FAQ_CATEGORIES.find(cat => cat.id === activeCategory);
 
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQ_CATEGORIES.flatMap(cat =>
+      cat.questions.map(q => ({
+        '@type': 'Question',
+        name: q.question,
+        acceptedAnswer: { '@type': 'Answer', text: q.answer },
+      }))
+    ),
+  };
+
   return (
     <div className="min-h-screen bg-white font-['Noto_Sans_JP']">
+      <PageMeta title="よくある質問" description="RePawの購入・買取・寄付についてよくある質問をまとめました。" path="/faq" jsonLd={faqJsonLd} />
       <Navigation />
 
       {/* Hero Section */}

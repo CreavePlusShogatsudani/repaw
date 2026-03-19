@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import PageMeta from '../../components/PageMeta';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 
@@ -23,6 +24,7 @@ const IMPACTS = [
 export default function ImpactPage() {
   return (
     <div className="min-h-screen bg-white">
+      <PageMeta title="社会への取り組み" description="RePawの環境保護・動物保護支援への取り組みをご紹介します。犬服のリユースが社会貢献につながる仕組みです。" path="/impact" />
       <Navigation />
 
       {/* Hero */}

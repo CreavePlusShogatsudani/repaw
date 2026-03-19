@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import PageMeta from '../../components/PageMeta';
 import { Link } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
@@ -36,6 +37,7 @@ export default function FeaturesPage() {
 
     return (
         <div className="min-h-screen bg-white">
+            <PageMeta title="特集" description="RePawの犬服リユース特集一覧。季節・ブランド・テーマ別におすすめ商品をまとめてご紹介します。" path="/features" />
             <Navigation />
 
             <div className="pt-32 pb-24 px-6">

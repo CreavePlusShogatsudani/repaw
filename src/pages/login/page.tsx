@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { supabase } from '../../lib/supabase';
+import PageMeta from '../../components/PageMeta';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -45,6 +46,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <PageMeta title="ログイン" noindex />
       <Navigation />
 
       <main className="pt-24 pb-16">

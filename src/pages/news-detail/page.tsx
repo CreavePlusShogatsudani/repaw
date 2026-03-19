@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { supabase } from '../../lib/supabase';
+import PageMeta from '../../components/PageMeta';
 
 interface NewsArticle {
     id: string;
@@ -97,8 +98,30 @@ export default function NewsDetailPage() {
 
     if (!news) return null;
 
+    const articleJsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: news.title,
+        description: news.excerpt || undefined,
+        image: news.thumbnail_url || undefined,
+        datePublished: news.published_at,
+        publisher: {
+            '@type': 'Organization',
+            name: 'RePaw',
+            url: 'https://repaw-pi.vercel.app',
+        },
+    };
+
     return (
         <div className="min-h-screen bg-white">
+            <PageMeta
+                title={news.title}
+                description={news.excerpt || news.title}
+                image={news.thumbnail_url || undefined}
+                path={`/news/${news.id}`}
+                type="article"
+                jsonLd={articleJsonLd}
+            />
             <Navigation />
 
             <div className="pt-32 pb-24 px-6">

@@ -6,6 +6,7 @@ import { supabase } from '../../lib/supabase';
 import type { Product } from '../../types';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
+import PageMeta from '../../components/PageMeta';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -160,8 +161,32 @@ export default function ProductDetail() {
     );
   }
 
+  const productJsonLd = product ? {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description || undefined,
+    image: product.images?.[0] || undefined,
+    offers: {
+      '@type': 'Offer',
+      price: product.price,
+      priceCurrency: 'JPY',
+      availability: product.status === 'sold_out' ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
+    },
+  } : undefined;
+
   return (
     <div className="min-h-screen bg-white">
+      {product && (
+        <PageMeta
+          title={product.name}
+          description={product.description || `${product.name} - サイズ: ${product.size}、状態: ${product.condition}。RePawで犬服をリユース。`}
+          image={product.images?.[0]}
+          path={`/product/${product.id}`}
+          type="product"
+          jsonLd={productJsonLd}
+        />
+      )}
       <Navigation />
 
       {/* カート追加トースト */}

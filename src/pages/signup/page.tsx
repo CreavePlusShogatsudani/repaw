@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { supabase } from '../../lib/supabase';
+import PageMeta from '../../components/PageMeta';
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -82,6 +83,7 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <PageMeta title="新規登録" noindex />
       <Navigation />
 
       <main className="pt-24 pb-16">
