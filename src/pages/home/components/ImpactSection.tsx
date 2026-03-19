@@ -11,33 +11,32 @@ export default function ImpactSection() {
           <div>
             <h3 className="text-3xl font-bold mb-6">持続可能な未来のために</h3>
             <p className="text-gray-700 leading-relaxed mb-8">
-              ReWearは、犬服のリユースを通じて、環境保護と動物保護の両立を目指しています。ペット用品の廃棄削減、循環型社会の実現、動物保護団体への継続的支援、そして飼い主の経済的負担軽減という4つの価値を提供します。
+              RePawは、犬服のリユースを通じて、環境保護と動物保護の両立を目指しています。ペット用品の廃棄削減、循環型社会の実現、動物保護団体への継続的支援、そして飼い主の経済的負担軽減という4つの価値を提供します。
             </p>
             <div className="grid grid-cols-2 gap-6">
               <div className="bg-white p-6 rounded-lg text-center">
-                <div className="text-4xl font-bold text-green-600 mb-2">12,450</div>
+                <div className="text-4xl font-bold text-green-600 mb-2">--</div>
                 <p className="text-sm text-gray-600">リユース商品数</p>
               </div>
               <div className="bg-white p-6 rounded-lg text-center">
-                <div className="text-4xl font-bold text-blue-600 mb-2">¥2.8M</div>
+                <div className="text-4xl font-bold text-blue-600 mb-2">--</div>
                 <p className="text-sm text-gray-600">累計寄付金額</p>
               </div>
               <div className="bg-white p-6 rounded-lg text-center">
-                <div className="text-4xl font-bold text-purple-600 mb-2">8,320</div>
+                <div className="text-4xl font-bold text-purple-600 mb-2">--</div>
                 <p className="text-sm text-gray-600">CO2削減量(kg)</p>
               </div>
               <div className="bg-white p-6 rounded-lg text-center">
-                <div className="text-4xl font-bold text-orange-600 mb-2">156</div>
+                <div className="text-4xl font-bold text-orange-600 mb-2">--</div>
                 <p className="text-sm text-gray-600">支援した保護犬数</p>
               </div>
             </div>
           </div>
-          <div>
-            <img 
-              src="https://readdy.ai/api/search-image?query=A%20heartwarming%20photograph%20of%20happy%20rescued%20dogs%20of%20various%20breeds%20playing%20together%20in%20a%20bright%20modern%20animal%20shelter%20with%20natural%20sunlight%2C%20clean%20white%20walls%2C%20caring%20volunteers%20in%20the%20background%2C%20hopeful%20and%20positive%20atmosphere%2C%20professional%20documentary%20photography%20style%2C%20warm%20natural%20lighting&width=800&height=600&seq=impact001&orientation=landscape"
-              alt="動物保護活動"
-              className="w-full h-[500px] object-cover object-top rounded-lg shadow-lg"
-            />
+          <div className="w-full h-[500px] bg-gray-200 rounded-lg shadow-lg flex items-center justify-center">
+            <div className="text-center text-gray-400">
+              <i className="ri-image-line text-5xl mb-3 block"></i>
+              <p className="text-sm">画像を準備中</p>
+            </div>
           </div>
         </div>
 
