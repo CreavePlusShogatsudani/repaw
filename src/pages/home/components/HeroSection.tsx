@@ -44,13 +44,13 @@ export default function HeroSection() {
 
     // 読み込み完了前は何も表示しない
     if (!loaded) {
-        return <section className="h-dvh bg-gray-900" />;
+        return <section style={{ height: '100dvh' }} className="bg-gray-900" />;
     }
 
     // バナーが登録されている場合
     if (banners.length > 0 && current) {
         return (
-            <section className="relative h-dvh flex items-center justify-center overflow-hidden">
+            <section style={{ height: '100dvh' }} className="relative flex items-center justify-center overflow-hidden">
                 {/* バナー画像 */}
                 {banners.map((banner, i) => (
                     <div
@@ -105,13 +105,9 @@ export default function HeroSection() {
                 )}
 
                 {/* スクロールインジケーター */}
-                <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2">
-                    <div className="flex flex-col items-center gap-2 animate-bounce">
-                        <div className="w-6 h-10 border-2 border-white/60 rounded-full flex items-start justify-center p-2">
-                            <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
-                        </div>
-                        <span className="text-xs text-white/80 font-light tracking-wider">SCROLL</span>
-                    </div>
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
+                    <span className="text-xs text-white/70 font-light tracking-widest">SCROLL</span>
+                    <div className="w-px h-8 bg-gradient-to-b from-white/70 to-transparent"></div>
                 </div>
             </section>
         );
@@ -119,7 +115,7 @@ export default function HeroSection() {
 
     // バナー未登録時はシンプルな静的背景
     return (
-        <section className="relative h-dvh flex items-center justify-center overflow-hidden bg-gray-900">
+        <section style={{ height: '100dvh' }} className="relative flex items-center justify-center overflow-hidden bg-gray-900">
             <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/40"></div>
 
             <div className="relative z-10 text-center px-6 max-w-4xl mx-auto w-full">
@@ -146,13 +142,9 @@ export default function HeroSection() {
                 </div>
             </div>
 
-            <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2">
-                <div className="flex flex-col items-center gap-2 animate-bounce">
-                    <div className="w-6 h-10 border-2 border-white/60 rounded-full flex items-start justify-center p-2">
-                        <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
-                    </div>
-                    <span className="text-xs text-white/80 font-light tracking-wider">SCROLL</span>
-                </div>
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
+                <span className="text-xs text-white/70 font-light tracking-widest">SCROLL</span>
+                <div className="w-px h-8 bg-gradient-to-b from-white/70 to-transparent"></div>
             </div>
         </section>
     );
