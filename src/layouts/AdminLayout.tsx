@@ -61,6 +61,7 @@ export default function AdminLayout() {
         { path: '/admin/buyback', label: '買取申込管理', icon: 'ri-price-tag-3-line' },
         { path: '/admin/users', label: '管理者アカウント', icon: 'ri-shield-user-line' },
         { path: '/admin/banners', label: 'メインビジュアル', icon: 'ri-image-line' },
+        { path: '/admin/collections', label: 'おすすめ商品グループ', icon: 'ri-folder-star-line' },
     ];
 
     return (
