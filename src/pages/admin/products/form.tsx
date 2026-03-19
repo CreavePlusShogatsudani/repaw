@@ -198,16 +198,18 @@ export default function AdminProductFormPage() {
         };
 
         if (isEdit) {
-            const { error } = await supabase
+            const { data: updatedData, error } = await supabase
                 .from('products')
                 .update(productData)
-                .eq('id', id);
+                .eq('id', id)
+                .select('images')
+                .single();
 
             if (error) {
                 console.error('Error updating product:', error);
-                alert('商品の更新に失敗しました。');
+                alert('商品の更新に失敗しました。\nエラー: ' + error.message);
             } else {
-                alert('商品を更新しました。');
+                alert('商品を更新しました。\nDB保存画像: ' + JSON.stringify(updatedData?.images));
                 navigate('/admin/products');
             }
         } else {
