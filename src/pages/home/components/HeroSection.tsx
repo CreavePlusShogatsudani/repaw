@@ -44,13 +44,13 @@ export default function HeroSection() {
 
     // 読み込み完了前は何も表示しない
     if (!loaded) {
-        return <section className="h-screen bg-gray-900" />;
+        return <section className="h-dvh bg-gray-900" />;
     }
 
     // バナーが登録されている場合
     if (banners.length > 0 && current) {
         return (
-            <section className="relative h-screen flex items-center justify-center overflow-hidden">
+            <section className="relative h-dvh flex items-center justify-center overflow-hidden">
                 {/* バナー画像 */}
                 {banners.map((banner, i) => (
                     <div
@@ -119,7 +119,7 @@ export default function HeroSection() {
 
     // バナー未登録時はシンプルな静的背景
     return (
-        <section className="relative h-screen flex items-center justify-center overflow-hidden bg-gray-900">
+        <section className="relative h-dvh flex items-center justify-center overflow-hidden bg-gray-900">
             <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/40"></div>
 
             <div className="relative z-10 text-center px-6 max-w-4xl mx-auto w-full">
