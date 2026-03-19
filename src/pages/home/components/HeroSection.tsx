@@ -17,6 +17,7 @@ export default function HeroSection() {
     const navigate = useNavigate();
     const [banners, setBanners] = useState<HeroBanner[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [loaded, setLoaded] = useState(false);
 
     useEffect(() => {
         supabase
@@ -26,6 +27,7 @@ export default function HeroSection() {
             .order('sort_order', { ascending: true })
             .then(({ data }) => {
                 if (data && data.length > 0) setBanners(data);
+                setLoaded(true);
             });
     }, []);
 
@@ -39,6 +41,11 @@ export default function HeroSection() {
     }, [banners.length]);
 
     const current = banners[currentIndex];
+
+    // 読み込み完了前は何も表示しない
+    if (!loaded) {
+        return <section className="h-screen bg-gray-900" />;
+    }
 
     // バナーが登録されている場合
     if (banners.length > 0 && current) {
@@ -110,24 +117,11 @@ export default function HeroSection() {
         );
     }
 
-    // バナー未登録時はデフォルト動画を表示
+    // バナー未登録時はシンプルな静的背景
     return (
-        <section className="relative h-screen flex items-center justify-center overflow-hidden">
-            {/* 背景動画 */}
-            <div className="absolute inset-0">
-                <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover"
-                >
-                    <source src="https://public.readdy.ai/ai/video_res/f0ac08c5-d36c-4e86-b0fd-62e0ee9c23b1.mp4" type="video/mp4" />
-                </video>
-                <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/40"></div>
-            </div>
+        <section className="relative h-screen flex items-center justify-center overflow-hidden bg-gray-900">
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/40"></div>
 
-            {/* コンテンツ */}
             <div className="relative z-10 text-center px-6 max-w-4xl mx-auto w-full">
                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
                     リユースで未来を創る
@@ -136,7 +130,6 @@ export default function HeroSection() {
                     使わなくなった犬服を買い取り、新しい飼い主へ。<br />
                     あなたの選択が、持続可能な社会を実現します。
                 </p>
-
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <button
                         onClick={() => navigate('/products')}
@@ -153,7 +146,6 @@ export default function HeroSection() {
                 </div>
             </div>
 
-            {/* スクロールインジケーター */}
             <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2">
                 <div className="flex flex-col items-center gap-2 animate-bounce">
                     <div className="w-6 h-10 border-2 border-white/60 rounded-full flex items-start justify-center p-2">
