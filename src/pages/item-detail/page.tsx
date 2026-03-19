@@ -301,6 +301,33 @@ export default function ProductDetail() {
                 </div>
               </div>
 
+              {/* 実寸サイズ */}
+              {(product.back_length_cm || product.chest_cm || product.neck_cm) && (
+                <div className="mb-6 pb-6 border-b">
+                  <h3 className="font-bold mb-3 text-sm md:text-base">実寸サイズ</h3>
+                  <div className="flex gap-6">
+                    {product.back_length_cm && (
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 mb-1">背丈</p>
+                        <p className="font-bold text-lg">{product.back_length_cm}<span className="text-xs font-normal text-gray-500 ml-0.5">cm</span></p>
+                      </div>
+                    )}
+                    {product.chest_cm && (
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 mb-1">胴回り</p>
+                        <p className="font-bold text-lg">{product.chest_cm}<span className="text-xs font-normal text-gray-500 ml-0.5">cm</span></p>
+                      </div>
+                    )}
+                    {product.neck_cm && (
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 mb-1">首回り</p>
+                        <p className="font-bold text-lg">{product.neck_cm}<span className="text-xs font-normal text-gray-500 ml-0.5">cm</span></p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* サイズ表 */}
               {product.size_chart && product.size_chart.length > 0 && (
                 <div className="mb-6 pb-6 border-b">

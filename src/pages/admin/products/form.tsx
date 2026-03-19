@@ -32,6 +32,9 @@ export default function AdminProductFormPage() {
     const [sellerInstagram, setSellerInstagram] = useState(searchParams.get('seller_instagram') || '');
     const fromBuyback = searchParams.get('from_buyback');
     const [sizeChart, setSizeChart] = useState<SizeChartRow[]>([]);
+    const [backLengthCm, setBackLengthCm] = useState('');
+    const [chestCm, setChestCm] = useState('');
+    const [neckCm, setNeckCm] = useState('');
 
     useEffect(() => {
         if (isEdit) {
@@ -64,6 +67,9 @@ export default function AdminProductFormPage() {
             setExistingImages(data.images || []);
             setSellerInstagram(data.seller_instagram || '');
             setSizeChart(data.size_chart || []);
+            setBackLengthCm(data.back_length_cm?.toString() || '');
+            setChestCm(data.chest_cm?.toString() || '');
+            setNeckCm(data.neck_cm?.toString() || '');
         }
         setLoading(false);
     };
@@ -201,6 +207,9 @@ export default function AdminProductFormPage() {
             images: finalImages,
             seller_instagram: sellerInstagram.replace('@', '') || null,
             size_chart: sizeChart.length > 0 ? sizeChart : null,
+            back_length_cm: backLengthCm ? parseFloat(backLengthCm) : null,
+            chest_cm: chestCm ? parseFloat(chestCm) : null,
+            neck_cm: neckCm ? parseFloat(neckCm) : null,
         };
 
         if (isEdit) {
@@ -375,6 +384,61 @@ export default function AdminProductFormPage() {
                             <option value="published">公開</option>
                             <option value="draft">非公開 (下書き)</option>
                         </select>
+                    </div>
+
+                    {/* 実寸サイズ */}
+                    <div className="space-y-3 md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                            実寸サイズ
+                            <span className="text-gray-400 font-normal ml-1">（任意・cm単位）</span>
+                        </label>
+                        <div className="grid grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-xs text-gray-500 mb-1">背丈</label>
+                                <div className="relative">
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.1"
+                                        value={backLengthCm}
+                                        onChange={e => setBackLengthCm(e.target.value)}
+                                        className="w-full p-3 pr-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                        placeholder="25"
+                                    />
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">cm</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs text-gray-500 mb-1">胴回り</label>
+                                <div className="relative">
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.1"
+                                        value={chestCm}
+                                        onChange={e => setChestCm(e.target.value)}
+                                        className="w-full p-3 pr-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                        placeholder="36"
+                                    />
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">cm</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs text-gray-500 mb-1">首回り</label>
+                                <div className="relative">
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.1"
+                                        value={neckCm}
+                                        onChange={e => setNeckCm(e.target.value)}
+                                        className="w-full p-3 pr-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                        placeholder="24"
+                                    />
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">cm</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* サイズ表 */}
