@@ -236,10 +236,10 @@ export default function ProductDetail() {
                   {product.name}
                 </h1>
                 <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4 flex-wrap">
-                  <span className="text-2xl md:text-3xl font-bold text-gray-900">¥{product.price.toLocaleString()}</span>
+                  <span className="text-2xl md:text-3xl font-bold text-gray-900">¥{(product.price ?? 0).toLocaleString()}</span>
                   {product.original_price && (
                     <>
-                      <span className="text-base md:text-lg text-gray-400 line-through">¥{product.original_price.toLocaleString()}</span>
+                      <span className="text-base md:text-lg text-gray-400 line-through">¥{(product.original_price ?? 0).toLocaleString()}</span>
                       <span className="px-2 md:px-3 py-1 bg-red-100 text-red-600 text-xs md:text-sm font-bold rounded-full whitespace-nowrap">
                         {getDiscountRate(product.price, product.original_price)}% OFF
                       </span>

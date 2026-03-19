@@ -531,10 +531,10 @@ export default function MyPage() {
                         </div>
                         <h3 className="font-medium mb-2">{product.name}</h3>
                         <div className="flex items-center gap-2 mb-3">
-                          <span className="font-bold">¥{product.price.toLocaleString()}</span>
+                          <span className="font-bold">¥{(product.price ?? 0).toLocaleString()}</span>
                           {product.original_price && (
                             <span className="text-sm text-gray-400 line-through">
-                              ¥{product.original_price.toLocaleString()}
+                              ¥{(product.original_price ?? 0).toLocaleString()}
                             </span>
                           )}
                         </div>

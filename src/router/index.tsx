@@ -1,4 +1,4 @@
-import { useNavigate, type NavigateFunction } from "react-router-dom";
+import { useNavigate, useLocation, type NavigateFunction } from "react-router-dom";
 import { useRoutes } from "react-router-dom";
 import { useEffect, Suspense, Component, type ReactNode } from "react";
 import routes from "./config";
@@ -40,12 +40,13 @@ export const navigatePromise = new Promise<NavigateFunction>((resolve) => {
 export function AppRoutes() {
   const element = useRoutes(routes);
   const navigate = useNavigate();
+  const location = useLocation();
   useEffect(() => {
     window.REACT_APP_NAVIGATE = navigate;
     navigateResolver(window.REACT_APP_NAVIGATE);
   });
   return (
-    <ErrorBoundary>
+    <ErrorBoundary key={location.pathname}>
       <Suspense fallback={
         <div className="min-h-screen flex items-center justify-center bg-white">
           <div className="w-8 h-8 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />

@@ -430,9 +430,9 @@ export default function ItemsPage() {
                             </div>
                             <h3 className="text-xs md:text-sm font-medium mb-1.5 md:mb-2 group-hover:underline line-clamp-1">{product.name}</h3>
                             <div className="flex items-center gap-1.5 md:gap-2">
-                              <span className="text-base md:text-lg font-bold">¥{product.price.toLocaleString()}</span>
+                              <span className="text-base md:text-lg font-bold">¥{(product.price ?? 0).toLocaleString()}</span>
                               {product.original_price && (
-                                <span className="text-xs md:text-sm text-gray-400 line-through">¥{product.original_price.toLocaleString()}</span>
+                                <span className="text-xs md:text-sm text-gray-400 line-through">¥{(product.original_price ?? 0).toLocaleString()}</span>
                               )}
                             </div>
                           </div>

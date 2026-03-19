@@ -90,9 +90,9 @@ export default function ProductsSection() {
                     )}
                     <h3 className="text-sm font-medium mb-2 group-hover:underline">{product.name}</h3>
                     <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold">¥{product.price.toLocaleString()}</span>
+                      <span className="text-lg font-bold">¥{(product.price ?? 0).toLocaleString()}</span>
                       {product.original_price && (
-                        <span className="text-sm text-gray-400 line-through">¥{product.original_price.toLocaleString()}</span>
+                        <span className="text-sm text-gray-400 line-through">¥{(product.original_price ?? 0).toLocaleString()}</span>
                       )}
                     </div>
                   </div>

@@ -369,7 +369,7 @@ export default function FeatureDetailPage() {
                   <p className="text-xs text-gray-500 mb-1">{product.brand}</p>
                   <h3 className="text-sm font-bold mb-2 group-hover:underline">{product.name}</h3>
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg font-bold text-orange-600">¥{product.price.toLocaleString()}</span>
+                    <span className="text-lg font-bold text-orange-600">¥{(product.price ?? 0).toLocaleString()}</span>
                     <span className="text-sm text-gray-400 line-through">¥{product.originalPrice.toLocaleString()}</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-gray-600">
