@@ -33,6 +33,8 @@ const AdminUsersPage = lazy(() => import('../pages/admin/users/page'));
 const AdminBannersPage = lazy(() => import('../pages/admin/banners/page'));
 const AdminCollectionsPage = lazy(() => import('../pages/admin/collections/page'));
 const AdminCollectionProductsPage = lazy(() => import('../pages/admin/collections/products'));
+const AdminNewsPage = lazy(() => import('../pages/admin/news/page'));
+const AdminNewsFormPage = lazy(() => import('../pages/admin/news/form'));
 
 const routes: RouteObject[] = [
   {
@@ -146,6 +148,18 @@ const routes: RouteObject[] = [
       {
         path: 'banners',
         element: <AdminBannersPage />,
+      },
+      {
+        path: 'news',
+        element: <AdminNewsPage />,
+      },
+      {
+        path: 'news/new',
+        element: <AdminNewsFormPage />,
+      },
+      {
+        path: 'news/:id/edit',
+        element: <AdminNewsFormPage />,
       },
       {
         path: 'collections',

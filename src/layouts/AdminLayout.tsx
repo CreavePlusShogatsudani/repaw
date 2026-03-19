@@ -57,6 +57,7 @@ export default function AdminLayout() {
     const menuItems = [
         { path: '/admin', label: 'ダッシュボード', icon: 'ri-dashboard-line' },
         { path: '/admin/products', label: '商品管理', icon: 'ri-shopping-bag-3-line' },
+        { path: '/admin/news', label: 'ニュース管理', icon: 'ri-newspaper-line' },
         { path: '/admin/orders', label: '注文管理', icon: 'ri-file-list-3-line' },
         { path: '/admin/buyback', label: '買取申込管理', icon: 'ri-price-tag-3-line' },
         { path: '/admin/users', label: '管理者アカウント', icon: 'ri-shield-user-line' },
