@@ -212,7 +212,7 @@ export default function FeatureDetailPage() {
 
             {/* おすすめ商品 */}
             {recommended.length > 0 && (
-                <div className="bg-gray-50 py-16 mt-8 -mx-6 px-6">
+                <div className="bg-gray-50 py-16 mt-8">
                     <div className="max-w-7xl mx-auto">
                         <h2 className="text-2xl font-bold mb-8">おすすめ商品</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
