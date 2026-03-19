@@ -180,7 +180,7 @@ const routes: RouteObject[] = [
         element: <AdminCollectionProductsPage />,
       },
       {
-        path: 'recommended',
+        path: 'collections/:id/recommended',
         element: <AdminRecommendedPage />,
       },
     ],

@@ -138,6 +138,12 @@ export default function AdminCollectionsPage() {
                                     >
                                         <i className="ri-shopping-bag-line mr-1"></i>商品を管理
                                     </Link>
+                                    <Link
+                                        to={`/admin/collections/${c.id}/recommended`}
+                                        className="text-xs px-3 py-1.5 bg-yellow-50 hover:bg-yellow-100 text-yellow-700 font-medium transition-colors"
+                                    >
+                                        <i className="ri-star-line mr-1"></i>おすすめ商品
+                                    </Link>
                                     <button
                                         onClick={() => toggleActive(c)}
                                         className="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"

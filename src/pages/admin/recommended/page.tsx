@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
 
 interface RecommendedProduct {
@@ -16,16 +17,16 @@ interface RecommendedProduct {
 }
 
 function extractProductId(input: string): string | null {
-    // /product/UUID  or  full URL containing /product/UUID
     const match = input.match(/\/product\/([0-9a-f-]{36})/i);
     if (match) return match[1];
-    // bare UUID
     const uuidMatch = input.trim().match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
     if (uuidMatch) return input.trim();
     return null;
 }
 
 export default function AdminRecommendedPage() {
+    const { id: collectionId } = useParams<{ id: string }>();
+    const [collectionTitle, setCollectionTitle] = useState('');
     const [items, setItems] = useState<RecommendedProduct[]>([]);
     const [loading, setLoading] = useState(true);
     const [urlInput, setUrlInput] = useState('');
@@ -33,16 +34,19 @@ export default function AdminRecommendedPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        if (!collectionId) return;
+        supabase.from('collections').select('title').eq('id', collectionId).single()
+            .then(({ data }) => setCollectionTitle(data?.title ?? ''));
         fetchItems();
-    }, []);
+    }, [collectionId]);
 
     const fetchItems = async () => {
         setLoading(true);
-        const { data, error } = await supabase
+        const { data } = await supabase
             .from('recommended_products')
             .select('id, product_id, sort_order, product:products(id, name, price, images, category, status)')
+            .eq('collection_id', collectionId)
             .order('sort_order', { ascending: true });
-        if (error) console.error(error);
         setItems((data as any) || []);
         setLoading(false);
     };
@@ -54,15 +58,12 @@ export default function AdminRecommendedPage() {
             setError('商品URLまたは商品IDを正しく入力してください（例: /product/xxxx）');
             return;
         }
-
-        // 重複チェック
         if (items.some(i => i.product_id === productId)) {
             setError('この商品はすでに登録されています。');
             return;
         }
 
         setAdding(true);
-        // 商品の存在確認
         const { data: prod, error: prodErr } = await supabase
             .from('products')
             .select('id, name')
@@ -77,7 +78,7 @@ export default function AdminRecommendedPage() {
         const nextOrder = items.length > 0 ? Math.max(...items.map(i => i.sort_order)) + 1 : 0;
         const { error: insertErr } = await supabase
             .from('recommended_products')
-            .insert({ product_id: productId, sort_order: nextOrder });
+            .insert({ collection_id: collectionId, product_id: productId, sort_order: nextOrder });
         if (insertErr) {
             setError('登録に失敗しました: ' + insertErr.message);
             setAdding(false);
@@ -107,10 +108,18 @@ export default function AdminRecommendedPage() {
 
     return (
         <div>
+            <div className="flex items-center gap-3 mb-1">
+                <Link to="/admin/collections" className="text-gray-400 hover:text-gray-700 text-sm">
+                    ← 特集記事一覧
+                </Link>
+            </div>
             <div className="mb-6">
                 <h1 className="text-2xl font-bold text-gray-900">おすすめ商品管理</h1>
-                <p className="text-sm text-gray-500 mt-1">
-                    特集記事ページに表示される「おすすめ商品」を管理します。商品URLを入力して追加してください。
+                {collectionTitle && (
+                    <p className="text-sm text-gray-500 mt-1">特集：{collectionTitle}</p>
+                )}
+                <p className="text-sm text-gray-400 mt-1">
+                    この特集記事ページに表示される「おすすめ商品」を管理します。
                 </p>
             </div>
 
@@ -154,7 +163,6 @@ export default function AdminRecommendedPage() {
                 <div className="space-y-3">
                     {items.map((item, index) => (
                         <div key={item.id} className="bg-white rounded-lg shadow flex items-center gap-4 p-4">
-                            {/* 画像 */}
                             <div className="w-16 h-16 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
                                 {item.product?.images?.[0] ? (
                                     <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover" />
@@ -164,8 +172,6 @@ export default function AdminRecommendedPage() {
                                     </div>
                                 )}
                             </div>
-
-                            {/* 情報 */}
                             <div className="flex-1 min-w-0">
                                 <p className="font-medium text-gray-900 truncate">{item.product?.name ?? '（商品が見つかりません）'}</p>
                                 <div className="flex items-center gap-3 mt-0.5">
@@ -177,8 +183,6 @@ export default function AdminRecommendedPage() {
                                 </div>
                                 <p className="text-xs text-gray-300 mt-0.5 font-mono">/product/{item.product_id}</p>
                             </div>
-
-                            {/* 操作 */}
                             <div className="flex items-center gap-1 flex-shrink-0">
                                 <button onClick={() => moveOrder(index, 'up')} disabled={index === 0}
                                     className="p-1.5 text-gray-400 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed">

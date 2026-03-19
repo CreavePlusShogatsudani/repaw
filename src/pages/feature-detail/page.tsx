@@ -52,6 +52,7 @@ export default function FeatureDetailPage() {
                 supabase
                     .from('recommended_products')
                     .select('sort_order, product:products(*)')
+                    .eq('collection_id', id)
                     .order('sort_order', { ascending: true }),
             ]);
 
