@@ -87,7 +87,7 @@ export default function AdminProductFormPage() {
             const MAX_BYTES = 5 * 1024 * 1024; // 5MB
             const MAX_SIZE = 1920; // 長辺の最大px
 
-            // 5MB 未満かつ PNG/WebP 以外はそのまま返す
+            // 5MB 未満の JPEG はそのまま返す
             if (file.size <= MAX_BYTES && file.type === 'image/jpeg') {
                 resolve(file);
                 return;
@@ -95,10 +95,16 @@ export default function AdminProductFormPage() {
 
             const img = new Image();
             const objectUrl = URL.createObjectURL(file);
+
+            // 読み込み失敗時（HEIC等の非対応フォーマット）はそのまま返す
+            img.onerror = () => {
+                URL.revokeObjectURL(objectUrl);
+                resolve(file);
+            };
+
             img.onload = () => {
                 URL.revokeObjectURL(objectUrl);
 
-                // リサイズ比率を計算
                 let { width, height } = img;
                 if (width > MAX_SIZE || height > MAX_SIZE) {
                     const ratio = Math.min(MAX_SIZE / width, MAX_SIZE / height);
@@ -109,10 +115,10 @@ export default function AdminProductFormPage() {
                 const canvas = document.createElement('canvas');
                 canvas.width = width;
                 canvas.height = height;
-                const ctx = canvas.getContext('2d')!;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) { resolve(file); return; }
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // quality を下げながら 5MB 以下になるまで試行
                 const tryCompress = (quality: number) => {
                     canvas.toBlob((blob) => {
                         if (!blob) { resolve(file); return; }
@@ -125,6 +131,7 @@ export default function AdminProductFormPage() {
                 };
                 tryCompress(0.85);
             };
+
             img.src = objectUrl;
         });
     };
