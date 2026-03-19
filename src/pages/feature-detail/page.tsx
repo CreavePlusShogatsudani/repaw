@@ -22,6 +22,15 @@ function renderContent(text: string) {
         if (line.startsWith('## ')) return <h2 key={i} className="text-2xl font-bold mt-8 mb-4">{line.slice(3)}</h2>;
         if (line.startsWith('# ')) return <h1 key={i} className="text-3xl font-bold mt-10 mb-4">{line.slice(2)}</h1>;
         if (line === '') return <div key={i} className="h-4" />;
+        // 画像 ![alt](url)
+        const imgMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+        if (imgMatch) {
+            return (
+                <div key={i} className="my-6">
+                    <img src={imgMatch[2]} alt={imgMatch[1]} className="w-full rounded-lg object-cover" />
+                </div>
+            );
+        }
         return <p key={i} className="leading-relaxed text-gray-700">{line}</p>;
     });
 }

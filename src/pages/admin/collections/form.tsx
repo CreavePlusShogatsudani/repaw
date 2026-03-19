@@ -2,6 +2,27 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
 
+interface RecommendedItem {
+    id: string;
+    product_id: string;
+    sort_order: number;
+    product: {
+        id: string;
+        name: string;
+        price: number;
+        images: string[] | null;
+        category: string;
+    } | null;
+}
+
+function extractProductId(input: string): string | null {
+    const match = input.match(/\/product\/([0-9a-f-]{36})/i);
+    if (match) return match[1];
+    const uuidMatch = input.trim().match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+    if (uuidMatch) return input.trim();
+    return null;
+}
+
 export default function AdminCollectionFormPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -22,9 +43,21 @@ export default function AdminCollectionFormPage() {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [newImageFile, setNewImageFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const contentImageInputRef = useRef<HTMLInputElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const [insertingContentImage, setInsertingContentImage] = useState(false);
+
+    // おすすめ商品
+    const [recItems, setRecItems] = useState<RecommendedItem[]>([]);
+    const [recUrlInput, setRecUrlInput] = useState('');
+    const [recAdding, setRecAdding] = useState(false);
+    const [recError, setRecError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (isEdit) fetchCollection();
+        if (isEdit) {
+            fetchCollection();
+            fetchRecommended();
+        }
     }, [id]);
 
     const fetchCollection = async () => {
@@ -47,6 +80,15 @@ export default function AdminCollectionFormPage() {
         setSortOrder(data.sort_order ?? 0);
         setIsActive(data.is_active ?? true);
         setLoading(false);
+    };
+
+    const fetchRecommended = async () => {
+        const { data } = await supabase
+            .from('recommended_products')
+            .select('id, product_id, sort_order, product:products(id, name, price, images, category)')
+            .eq('collection_id', id)
+            .order('sort_order', { ascending: true });
+        setRecItems((data as any) || []);
     };
 
     const compressImage = (file: File): Promise<File> => {
@@ -91,9 +133,9 @@ export default function AdminCollectionFormPage() {
         });
     };
 
-    const uploadImage = async (file: File): Promise<string> => {
+    const uploadImage = async (file: File, prefix = 'collection'): Promise<string> => {
         const compressed = await compressImage(file);
-        const fileName = `collection-${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`;
+        const fileName = `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`;
         const { error } = await supabase.storage
             .from('product-images')
             .upload(fileName, compressed, { upsert: true, contentType: 'image/jpeg' });
@@ -108,6 +150,36 @@ export default function AdminCollectionFormPage() {
         setNewImageFile(file);
         setPreviewUrl(URL.createObjectURL(file));
         e.target.value = '';
+    };
+
+    // 本文への画像挿入
+    const handleContentImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        e.target.value = '';
+        setInsertingContentImage(true);
+        try {
+            const url = await uploadImage(file, 'content');
+            const tag = `![](${url})`;
+            const textarea = textareaRef.current;
+            if (textarea) {
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const newContent = content.slice(0, start) + '\n' + tag + '\n' + content.slice(end);
+                setContent(newContent);
+                // カーソルを画像タグの後に移動
+                setTimeout(() => {
+                    textarea.selectionStart = textarea.selectionEnd = start + tag.length + 2;
+                    textarea.focus();
+                }, 0);
+            } else {
+                setContent(prev => prev + '\n' + tag + '\n');
+            }
+        } catch (err) {
+            alert(err instanceof Error ? err.message : '画像のアップロードに失敗しました。');
+        } finally {
+            setInsertingContentImage(false);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -152,6 +224,55 @@ export default function AdminCollectionFormPage() {
             setSaving(false);
             setUploadingImage(false);
         }
+    };
+
+    // おすすめ商品の追加
+    const handleRecAdd = async () => {
+        setRecError(null);
+        const productId = extractProductId(recUrlInput);
+        if (!productId) {
+            setRecError('商品URLまたは商品IDを正しく入力してください');
+            return;
+        }
+        if (recItems.some(i => i.product_id === productId)) {
+            setRecError('この商品はすでに登録されています。');
+            return;
+        }
+        setRecAdding(true);
+        const { data: prod, error: prodErr } = await supabase
+            .from('products').select('id, name').eq('id', productId).single();
+        if (prodErr || !prod) {
+            setRecError('商品が見つかりませんでした。');
+            setRecAdding(false);
+            return;
+        }
+        const nextOrder = recItems.length > 0 ? Math.max(...recItems.map(i => i.sort_order)) + 1 : 0;
+        const { error } = await supabase.from('recommended_products')
+            .insert({ collection_id: id, product_id: productId, sort_order: nextOrder });
+        if (error) {
+            setRecError('登録に失敗しました: ' + error.message);
+            setRecAdding(false);
+            return;
+        }
+        setRecUrlInput('');
+        setRecAdding(false);
+        await fetchRecommended();
+    };
+
+    const handleRecDelete = async (recId: string) => {
+        if (!confirm('削除しますか？')) return;
+        await supabase.from('recommended_products').delete().eq('id', recId);
+        await fetchRecommended();
+    };
+
+    const moveRecOrder = async (index: number, direction: 'up' | 'down') => {
+        const swapIndex = direction === 'up' ? index - 1 : index + 1;
+        if (swapIndex < 0 || swapIndex >= recItems.length) return;
+        const a = recItems[index];
+        const b = recItems[swapIndex];
+        await supabase.from('recommended_products').update({ sort_order: b.sort_order }).eq('id', a.id);
+        await supabase.from('recommended_products').update({ sort_order: a.sort_order }).eq('id', b.id);
+        await fetchRecommended();
     };
 
     if (loading) {
@@ -269,16 +390,108 @@ export default function AdminCollectionFormPage() {
 
                 {/* Article Content */}
                 <div className="bg-white rounded-lg shadow p-6">
-                    <h2 className="text-sm font-semibold text-gray-700 mb-4">記事本文</h2>
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-sm font-semibold text-gray-700">記事本文</h2>
+                        <button
+                            type="button"
+                            onClick={() => contentImageInputRef.current?.click()}
+                            disabled={insertingContentImage}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs transition-colors disabled:opacity-50"
+                        >
+                            <i className="ri-image-add-line"></i>
+                            {insertingContentImage ? 'アップロード中...' : '画像を挿入'}
+                        </button>
+                        <input
+                            ref={contentImageInputRef}
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleContentImageSelect}
+                        />
+                    </div>
                     <textarea
+                        ref={textareaRef}
                         value={content}
                         onChange={e => setContent(e.target.value)}
-                        placeholder="特集の紹介文や説明を入力してください。&#10;&#10;改行はそのまま反映されます。&#10;「## 見出し」で見出しを作れます。&#10;&#10;例:&#10;## この特集について&#10;寒い冬の季節、大切なワンちゃんを守る暖かくておしゃれな犬服を厳選しました。"
+                        placeholder={`特集の紹介文や説明を入力してください。\n\n## 見出し　← 見出しを作れます\n本文テキスト\n\n![](画像URL)　← 「画像を挿入」ボタンで自動挿入されます`}
                         rows={16}
                         className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-gray-900 resize-y font-mono"
                     />
-                    <p className="text-xs text-gray-400 mt-2">改行はそのまま反映。「## 見出し」で見出し、「# 大見出し」で大見出しを作れます。</p>
+                    <p className="text-xs text-gray-400 mt-2">
+                        「## 見出し」で見出し　／　「画像を挿入」ボタンで本文中に画像を配置できます
+                    </p>
                 </div>
+
+                {/* おすすめ商品（編集時のみ） */}
+                {isEdit && (
+                    <div className="bg-white rounded-lg shadow p-6">
+                        <h2 className="text-sm font-semibold text-gray-700 mb-4">
+                            <i className="ri-star-line mr-1 text-yellow-500"></i>
+                            おすすめ商品
+                            <span className="ml-2 text-xs text-gray-400 font-normal">この特集ページの下部に表示されます</span>
+                        </h2>
+
+                        {/* 追加フォーム */}
+                        <div className="flex gap-2 mb-3">
+                            <input
+                                type="text"
+                                value={recUrlInput}
+                                onChange={e => { setRecUrlInput(e.target.value); setRecError(null); }}
+                                onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleRecAdd())}
+                                placeholder="商品URLまたは商品IDを貼り付け"
+                                className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-gray-500"
+                            />
+                            <button
+                                type="button"
+                                onClick={handleRecAdd}
+                                disabled={recAdding || !recUrlInput.trim()}
+                                className="px-4 py-2 bg-gray-900 text-white text-sm hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                            >
+                                {recAdding ? '追加中...' : '追加'}
+                            </button>
+                        </div>
+                        {recError && <p className="text-red-500 text-xs mb-3">{recError}</p>}
+
+                        {/* リスト */}
+                        {recItems.length === 0 ? (
+                            <p className="text-sm text-gray-400 text-center py-4">まだ登録されていません</p>
+                        ) : (
+                            <div className="space-y-2">
+                                {recItems.map((item, index) => (
+                                    <div key={item.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded">
+                                        <div className="w-12 h-12 flex-shrink-0 bg-gray-200 rounded overflow-hidden">
+                                            {item.product?.images?.[0] ? (
+                                                <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-gray-300">
+                                                    <i className="ri-image-line"></i>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-gray-900 truncate">{item.product?.name ?? '（不明）'}</p>
+                                            <p className="text-xs text-gray-500">¥{(item.product?.price ?? 0).toLocaleString()}</p>
+                                        </div>
+                                        <div className="flex items-center gap-0.5 flex-shrink-0">
+                                            <button type="button" onClick={() => moveRecOrder(index, 'up')} disabled={index === 0}
+                                                className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-30">
+                                                <i className="ri-arrow-up-s-line"></i>
+                                            </button>
+                                            <button type="button" onClick={() => moveRecOrder(index, 'down')} disabled={index === recItems.length - 1}
+                                                className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-30">
+                                                <i className="ri-arrow-down-s-line"></i>
+                                            </button>
+                                            <button type="button" onClick={() => handleRecDelete(item.id)}
+                                                className="ml-1 p-1 text-red-400 hover:text-red-600">
+                                                <i className="ri-delete-bin-line"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Publish */}
                 <div className="bg-white rounded-lg shadow p-6">
