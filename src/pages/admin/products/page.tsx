@@ -98,10 +98,10 @@ export default function AdminProductsPage() {
                                             {product.name}
                                         </td>
                                         <td className="p-4 text-sm text-gray-500">
-                                            ¥{product.price.toLocaleString()}
+                                            ¥{(product.price ?? 0).toLocaleString()}
                                         </td>
                                         <td className="p-4 text-sm text-gray-500">
-                                            {product.stock}
+                                            {product.stock ?? 0}
                                         </td>
                                         <td className="p-4 text-sm">
                                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${product.status === 'published'
