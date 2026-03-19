@@ -83,9 +83,22 @@ export default function AdminProductFormPage() {
 
     // Canvas で画像を圧縮して 5MB 以下にする
     const compressImage = (file: File): Promise<File> => {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             const MAX_BYTES = 5 * 1024 * 1024; // 5MB
             const MAX_SIZE = 1920; // 長辺の最大px
+
+            // HEIC/HEIF は Canvas で変換できないため早期エラー
+            const lowerType = file.type.toLowerCase();
+            const lowerName = file.name.toLowerCase();
+            if (
+                lowerType === 'image/heic' ||
+                lowerType === 'image/heif' ||
+                lowerName.endsWith('.heic') ||
+                lowerName.endsWith('.heif')
+            ) {
+                reject(new Error('HEIC/HEIF形式の画像はアップロードできません。\niPhoneの設定で「フォーマット → 互換性優先」に変更するか、JPEG・PNG形式に変換してからお試しください。'));
+                return;
+            }
 
             // 5MB 未満の JPEG はそのまま返す
             if (file.size <= MAX_BYTES && file.type === 'image/jpeg') {
@@ -96,10 +109,10 @@ export default function AdminProductFormPage() {
             const img = new Image();
             const objectUrl = URL.createObjectURL(file);
 
-            // 読み込み失敗時（HEIC等の非対応フォーマット）はそのまま返す
+            // 読み込み失敗時はエラーを返す
             img.onerror = () => {
                 URL.revokeObjectURL(objectUrl);
-                resolve(file);
+                reject(new Error(`画像の読み込みに失敗しました（${file.name}）。\nJPEG・PNG・WebP形式の画像をお試しください。`));
             };
 
             img.onload = () => {
@@ -142,7 +155,7 @@ export default function AdminProductFormPage() {
         const { error } = await supabase.storage
             .from('product-images')
             .upload(fileName, compressed, { upsert: true, contentType: 'image/jpeg' });
-        if (error) throw error;
+        if (error) throw new Error(`ストレージへのアップロードに失敗しました: ${error.message}`);
         const { data } = supabase.storage.from('product-images').getPublicUrl(fileName);
         return data.publicUrl;
     };
@@ -158,7 +171,8 @@ export default function AdminProductFormPage() {
                 uploadedUrls = await Promise.all(newImageFiles.map((f) => uploadImage(f.file)));
             } catch (err) {
                 console.error('Image upload failed:', err);
-                alert('画像のアップロードに失敗しました。');
+                const msg = err instanceof Error ? err.message : '画像のアップロードに失敗しました。';
+                alert(msg);
                 setSaving(false);
                 setUploadingImage(false);
                 return;
