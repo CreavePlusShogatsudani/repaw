@@ -19,7 +19,7 @@ export async function createOrder(orderData: OrderData) {
                 total_amount: orderData.totalAmount,
                 shipping_address: orderData.shippingAddress,
                 stripe_payment_intent_id: orderData.paymentIntentId,
-                status: 'paid' // Assuming this is called after successful payment
+                status: 'paid'
             })
             .select()
             .single();
@@ -30,7 +30,7 @@ export async function createOrder(orderData: OrderData) {
         // 2. Create Order Items
         const orderItems = orderData.cartItems.map(item => ({
             order_id: order.id,
-            product_id: item.id,
+            product_id: item.productId,
             quantity: item.quantity,
             price_at_purchase: item.price
         }));
@@ -42,7 +42,7 @@ export async function createOrder(orderData: OrderData) {
         if (itemsError) throw itemsError;
 
         // 3. 購入された商品を売り切れ状態に更新（1点物のため）
-        const productIds = orderData.cartItems.map(item => item.id);
+        const productIds = orderData.cartItems.map(item => item.productId);
         await supabase
             .from('products')
             .update({ status: 'sold_out', stock: 0 })
