@@ -49,6 +49,12 @@ export default function Navigation() {
               <Link to="/products" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
                 アイテム一覧
               </Link>
+              <Link to="/features" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
+                特集
+              </Link>
+              <Link to="/news" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
+                ニュース
+              </Link>
               <Link to="/system" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
                 買取・寄付
               </Link>
@@ -104,6 +110,8 @@ export default function Navigation() {
               <div className="space-y-1 mb-4">
                 {[
                   { to: '/products', label: 'アイテム一覧' },
+                  { to: '/features', label: '特集' },
+                  { to: '/news', label: 'ニュース' },
                   { to: '/buyback', label: '買取申し込み' },
                   { to: '/system', label: '仕組みについて' },
                   { to: '/impact', label: '社会貢献' },
