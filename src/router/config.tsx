@@ -32,6 +32,7 @@ const AdminBuybackPage = lazy(() => import('../pages/admin/buyback/page'));
 const AdminUsersPage = lazy(() => import('../pages/admin/users/page'));
 const AdminBannersPage = lazy(() => import('../pages/admin/banners/page'));
 const AdminCollectionsPage = lazy(() => import('../pages/admin/collections/page'));
+const AdminCollectionFormPage = lazy(() => import('../pages/admin/collections/form'));
 const AdminCollectionProductsPage = lazy(() => import('../pages/admin/collections/products'));
 const AdminNewsPage = lazy(() => import('../pages/admin/news/page'));
 const AdminNewsFormPage = lazy(() => import('../pages/admin/news/form'));
@@ -164,6 +165,14 @@ const routes: RouteObject[] = [
       {
         path: 'collections',
         element: <AdminCollectionsPage />,
+      },
+      {
+        path: 'collections/new',
+        element: <AdminCollectionFormPage />,
+      },
+      {
+        path: 'collections/:id/edit',
+        element: <AdminCollectionFormPage />,
       },
       {
         path: 'collections/:id',

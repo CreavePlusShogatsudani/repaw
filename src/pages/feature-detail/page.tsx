@@ -10,9 +10,19 @@ interface Collection {
     title: string;
     subtitle: string | null;
     description: string | null;
+    content: string | null;
     cover_image_url: string | null;
     tag: string | null;
     is_active: boolean;
+}
+
+function renderContent(text: string) {
+    return text.split('\n').map((line, i) => {
+        if (line.startsWith('## ')) return <h2 key={i} className="text-2xl font-bold mt-8 mb-4">{line.slice(3)}</h2>;
+        if (line.startsWith('# ')) return <h1 key={i} className="text-3xl font-bold mt-10 mb-4">{line.slice(2)}</h1>;
+        if (line === '') return <div key={i} className="h-4" />;
+        return <p key={i} className="leading-relaxed text-gray-700">{line}</p>;
+    });
 }
 
 export default function FeatureDetailPage() {
@@ -92,10 +102,14 @@ export default function FeatureDetailPage() {
             </div>
 
             <div className="max-w-7xl mx-auto px-6 py-16">
-                {/* Description */}
-                {collection.description && (
+                {/* Description / Content */}
+                {(collection.content || collection.description) && (
                     <div className="max-w-2xl mb-12">
-                        <p className="text-gray-700 leading-relaxed text-lg">{collection.description}</p>
+                        {collection.content ? (
+                            <div className="text-base space-y-2">{renderContent(collection.content)}</div>
+                        ) : (
+                            <p className="text-gray-700 leading-relaxed text-lg">{collection.description}</p>
+                        )}
                     </div>
                 )}
 
