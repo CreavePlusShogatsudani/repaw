@@ -1,25 +1,25 @@
 const IMPACT_STATS = [
   {
     icon: 'ri-recycle-line',
-    value: '15,000+',
+    value: '--',
     label: '買取実績',
     description: '累計買取点数'
   },
   {
     icon: 'ri-leaf-line',
-    value: '8,500kg',
+    value: '--',
     label: 'CO2削減',
     description: '環境負荷軽減'
   },
   {
     icon: 'ri-heart-line',
-    value: '¥2.5M',
+    value: '--',
     label: '寄付総額',
     description: '動物保護支援'
   },
   {
     icon: 'ri-team-line',
-    value: '12,000+',
+    value: '--',
     label: 'ユーザー数',
     description: '参加メンバー'
   }
