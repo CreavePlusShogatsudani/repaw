@@ -141,9 +141,10 @@ export default function AdminNewsFormPage() {
                 if (error) throw error;
             }
             navigate('/admin/news');
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            alert(err instanceof Error ? err.message : '保存に失敗しました。');
+            const msg = err?.message || err?.error_description || JSON.stringify(err);
+            alert(`保存に失敗しました。\n\n${msg}`);
         } finally {
             setSaving(false);
             setUploadingImage(false);
