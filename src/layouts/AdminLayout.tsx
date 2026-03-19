@@ -60,6 +60,7 @@ export default function AdminLayout() {
         { path: '/admin/orders', label: '注文管理', icon: 'ri-file-list-3-line' },
         { path: '/admin/buyback', label: '買取申込管理', icon: 'ri-price-tag-3-line' },
         { path: '/admin/users', label: '管理者アカウント', icon: 'ri-shield-user-line' },
+        { path: '/admin/banners', label: 'メインビジュアル', icon: 'ri-image-line' },
     ];
 
     return (
