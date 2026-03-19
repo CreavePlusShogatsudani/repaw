@@ -32,8 +32,17 @@ export interface Product {
     status: string | null;
     seller_id: string | null;
     seller_instagram: string | null;
+    size_chart: SizeChartRow[] | null;
     created_at: string;
     updated_at: string;
+}
+
+export interface SizeChartRow {
+    size: string;
+    back_length: string;
+    chest: string;
+    neck: string;
+    weight: string;
 }
 
 export interface Order {
