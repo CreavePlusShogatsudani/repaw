@@ -3,16 +3,41 @@ import { useRoutes } from "react-router-dom";
 import { useEffect, Suspense, Component, type ReactNode } from "react";
 import routes from "./config";
 
+function isChunkLoadError(error: Error) {
+  return (
+    error.name === 'ChunkLoadError' ||
+    error.message.includes('Failed to fetch dynamically imported module') ||
+    error.message.includes('Importing a module script failed') ||
+    error.message.includes('Unable to preload CSS')
+  );
+}
+
 class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
   state = { error: null };
   static getDerivedStateFromError(error: Error) { return { error }; }
+  componentDidUpdate(_: any, prev: { error: Error | null }) {
+    const { error } = this.state;
+    if (error && !prev.error && isChunkLoadError(error)) {
+      // チャンクロードエラーは自動でリロード
+      window.location.reload();
+    }
+  }
   render() {
-    if (this.state.error) {
+    const { error } = this.state;
+    if (error) {
+      if (isChunkLoadError(error)) {
+        // リロード中はスピナーを表示
+        return (
+          <div className="min-h-screen flex items-center justify-center bg-white">
+            <div className="w-8 h-8 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
+          </div>
+        );
+      }
       return (
         <div className="min-h-screen flex items-center justify-center bg-white p-8">
           <div className="text-center">
             <p className="text-red-600 font-medium mb-2">エラーが発生しました</p>
-            <p className="text-sm text-gray-500 mb-4">{(this.state.error as Error).message}</p>
+            <p className="text-sm text-gray-500 mb-4">{error.message}</p>
             <button onClick={() => { this.setState({ error: null }); window.location.reload(); }}
               className="px-4 py-2 bg-gray-900 text-white text-sm rounded hover:bg-gray-800">
               再読み込み

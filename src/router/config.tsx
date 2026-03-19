@@ -1,42 +1,52 @@
 import { lazy } from 'react';
 import type { RouteObject } from 'react-router-dom';
 
-const HomePage = lazy(() => import('../pages/home/page'));
-const ItemsPage = lazy(() => import('../pages/items/page'));
-const ItemDetailPage = lazy(() => import('../pages/item-detail/page'));
-const CartPage = lazy(() => import('../pages/cart/page'));
-const CheckoutPage = lazy(() => import('../pages/checkout/page'));
-const OrderCompletePage = lazy(() => import('../pages/order-complete/page'));
-const MyPage = lazy(() => import('../pages/mypage/page'));
-const LoginPage = lazy(() => import('../pages/login/page'));
-const SignupPage = lazy(() => import('../pages/signup/page'));
-const ForgotPasswordPage = lazy(() => import('../pages/forgot-password/page'));
-const ImpactPage = lazy(() => import('../pages/impact/page'));
-const SystemPage = lazy(() => import('../pages/system/page'));
-const BuybackPage = lazy(() => import('../pages/buyback/page'));
-const NewsPage = lazy(() => import('../pages/news/page'));
-const NewsDetailPage = lazy(() => import('../pages/news-detail/page'));
-const FeaturesPage = lazy(() => import('../pages/features/page'));
-const FeatureDetailPage = lazy(() => import('../pages/feature-detail/page'));
-const AboutPage = lazy(() => import('../pages/about/page'));
-const FAQPage = lazy(() => import('../pages/faq/page'));
-const NotFound = lazy(() => import('../pages/NotFound'));
+// チャンクロード失敗時に1回だけリロードして再試行する
+function lazyWithRetry(factory: () => Promise<{ default: React.ComponentType<any> }>) {
+  return lazy(() =>
+    factory().catch(() => {
+      window.location.reload();
+      return new Promise<never>(() => {});
+    })
+  );
+}
+
+const HomePage = lazyWithRetry(() => import('../pages/home/page'));
+const ItemsPage = lazyWithRetry(() => import('../pages/items/page'));
+const ItemDetailPage = lazyWithRetry(() => import('../pages/item-detail/page'));
+const CartPage = lazyWithRetry(() => import('../pages/cart/page'));
+const CheckoutPage = lazyWithRetry(() => import('../pages/checkout/page'));
+const OrderCompletePage = lazyWithRetry(() => import('../pages/order-complete/page'));
+const MyPage = lazyWithRetry(() => import('../pages/mypage/page'));
+const LoginPage = lazyWithRetry(() => import('../pages/login/page'));
+const SignupPage = lazyWithRetry(() => import('../pages/signup/page'));
+const ForgotPasswordPage = lazyWithRetry(() => import('../pages/forgot-password/page'));
+const ImpactPage = lazyWithRetry(() => import('../pages/impact/page'));
+const SystemPage = lazyWithRetry(() => import('../pages/system/page'));
+const BuybackPage = lazyWithRetry(() => import('../pages/buyback/page'));
+const NewsPage = lazyWithRetry(() => import('../pages/news/page'));
+const NewsDetailPage = lazyWithRetry(() => import('../pages/news-detail/page'));
+const FeaturesPage = lazyWithRetry(() => import('../pages/features/page'));
+const FeatureDetailPage = lazyWithRetry(() => import('../pages/feature-detail/page'));
+const AboutPage = lazyWithRetry(() => import('../pages/about/page'));
+const FAQPage = lazyWithRetry(() => import('../pages/faq/page'));
+const NotFound = lazyWithRetry(() => import('../pages/NotFound'));
 
 // Admin Pages
-const AdminLayout = lazy(() => import('../layouts/AdminLayout'));
-const AdminDashboardPage = lazy(() => import('../pages/admin/dashboard/page'));
-const AdminProductsPage = lazy(() => import('../pages/admin/products/page'));
-const AdminProductFormPage = lazy(() => import('../pages/admin/products/form'));
-const AdminOrdersPage = lazy(() => import('../pages/admin/orders/page'));
-const AdminBuybackPage = lazy(() => import('../pages/admin/buyback/page'));
-const AdminUsersPage = lazy(() => import('../pages/admin/users/page'));
-const AdminBannersPage = lazy(() => import('../pages/admin/banners/page'));
-const AdminCollectionsPage = lazy(() => import('../pages/admin/collections/page'));
-const AdminCollectionFormPage = lazy(() => import('../pages/admin/collections/form'));
-const AdminCollectionProductsPage = lazy(() => import('../pages/admin/collections/products'));
-const AdminNewsPage = lazy(() => import('../pages/admin/news/page'));
-const AdminNewsFormPage = lazy(() => import('../pages/admin/news/form'));
-const AdminRecommendedPage = lazy(() => import('../pages/admin/recommended/page'));
+const AdminLayout = lazyWithRetry(() => import('../layouts/AdminLayout'));
+const AdminDashboardPage = lazyWithRetry(() => import('../pages/admin/dashboard/page'));
+const AdminProductsPage = lazyWithRetry(() => import('../pages/admin/products/page'));
+const AdminProductFormPage = lazyWithRetry(() => import('../pages/admin/products/form'));
+const AdminOrdersPage = lazyWithRetry(() => import('../pages/admin/orders/page'));
+const AdminBuybackPage = lazyWithRetry(() => import('../pages/admin/buyback/page'));
+const AdminUsersPage = lazyWithRetry(() => import('../pages/admin/users/page'));
+const AdminBannersPage = lazyWithRetry(() => import('../pages/admin/banners/page'));
+const AdminCollectionsPage = lazyWithRetry(() => import('../pages/admin/collections/page'));
+const AdminCollectionFormPage = lazyWithRetry(() => import('../pages/admin/collections/form'));
+const AdminCollectionProductsPage = lazyWithRetry(() => import('../pages/admin/collections/products'));
+const AdminNewsPage = lazyWithRetry(() => import('../pages/admin/news/page'));
+const AdminNewsFormPage = lazyWithRetry(() => import('../pages/admin/news/form'));
+const AdminRecommendedPage = lazyWithRetry(() => import('../pages/admin/recommended/page'));
 
 const routes: RouteObject[] = [
   {
