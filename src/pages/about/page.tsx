@@ -36,7 +36,7 @@ export default function AboutPage() {
         </div>
 
         <div className="relative z-10 text-center text-white px-6">
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">About Us</h1>
+          <h1 className="text-5xl md:text-6xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>About Us</h1>
           <p className="text-lg font-light">RePawについて</p>
         </div>
       </section>
@@ -44,7 +44,7 @@ export default function AboutPage() {
       {/* Mission Section */}
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">私たちのミッション</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-6">私たちのミッション</h2>
           <p className="text-gray-600 text-lg leading-relaxed mb-8 font-light">
             犬服のリユースを通じて、<br />
             <strong className="text-orange-600 font-bold">環境</strong>と<strong className="text-orange-600 font-bold">動物</strong>、どちらにも優しい選択肢をつくる。
@@ -61,7 +61,7 @@ export default function AboutPage() {
       <section className="py-24 px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">大切にしていること</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">大切にしていること</h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -70,7 +70,7 @@ export default function AboutPage() {
                 <div className="w-20 h-20 flex items-center justify-center bg-orange-50 text-orange-600 rounded-full mx-auto mb-6">
                   <i className={`${value.icon} text-4xl`}></i>
                 </div>
-                <h3 className="text-2xl font-bold mb-4">{value.title}</h3>
+                <h3 className="text-xl font-bold mb-4">{value.title}</h3>
                 <p className="text-gray-600 text-sm leading-relaxed font-light">{value.description}</p>
               </div>
             ))}
@@ -82,7 +82,7 @@ export default function AboutPage() {
       <section className="py-20 px-6 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Our Story</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">Our Story</h2>
             <p className="text-gray-600 text-lg">RePaw誕生のきっかけ</p>
           </div>
 
@@ -105,7 +105,7 @@ export default function AboutPage() {
       {/* CTA Section */}
       <section className="py-24 px-6 bg-gray-50">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6">
             一緒に取り組んでみませんか？
           </h2>
           <p className="text-gray-600 mb-8 font-light">

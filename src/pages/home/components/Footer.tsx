@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           <div>
-            <h3 className="text-2xl font-bold mb-4">PePaw</h3>
+            <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>RePaw</h3>
             <p className="text-sm text-white/80 leading-relaxed">
               犬服のリユースで、環境保護と動物保護を支援する新しいエコシステム
             </p>

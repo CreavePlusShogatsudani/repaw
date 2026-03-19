@@ -77,7 +77,7 @@ export default function SystemPage() {
         </div>
         
         <div className="relative z-10 text-center text-white px-6">
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">
+          <h1 className="text-5xl md:text-6xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
             Buy & Donate System
           </h1>
           <p className="text-lg font-light">買取・寄付の仕組み</p>
@@ -88,7 +88,7 @@ export default function SystemPage() {
       <section className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">買取の流れ</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">買取の流れ</h2>
             <p className="text-gray-600 text-sm font-light">簡単4ステップで買取完了</p>
           </div>
 
@@ -98,7 +98,7 @@ export default function SystemPage() {
                 <div className="w-20 h-20 flex items-center justify-center bg-orange-50 text-orange-600 rounded-full mx-auto mb-6">
                   <i className={`${step.icon} text-4xl`}></i>
                 </div>
-                <div className="text-4xl font-bold text-gray-200 mb-2">{step.number}</div>
+                <div className="text-2xl md:text-3xl font-bold text-gray-200 mb-2">{step.number}</div>
                 <h3 className="text-xl font-bold mb-3">{step.title}</h3>
                 <p className="text-sm text-gray-600 leading-relaxed font-light">{step.description}</p>
               </div>
@@ -111,7 +111,7 @@ export default function SystemPage() {
       <section className="py-24 px-6 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">買取価格の目安</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">買取価格の目安</h2>
             <p className="text-gray-600 text-sm font-light">状態とブランドに応じて適正価格で買取</p>
           </div>
 
@@ -153,7 +153,7 @@ export default function SystemPage() {
       <section className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">寄付の仕組み</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">寄付の仕組み</h2>
             <p className="text-gray-600 text-sm font-light">あなたの選択が動物保護活動を支えます</p>
           </div>
 
@@ -280,7 +280,7 @@ export default function SystemPage() {
       <section className="py-24 px-6 bg-gray-50">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">よくある質問</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">よくある質問</h2>
             <p className="text-gray-600 text-sm font-light">FAQ</p>
           </div>
 
@@ -315,7 +315,7 @@ export default function SystemPage() {
       {/* CTA Section */}
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6">
             今すぐ買取申し込み
           </h2>
           <p className="text-gray-600 mb-8 font-light">

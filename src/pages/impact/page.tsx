@@ -36,7 +36,7 @@ export default function ImpactPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/40"></div>
         </div>
         <div className="relative z-10 text-center text-white px-6">
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">Our Impact</h1>
+          <h1 className="text-5xl md:text-6xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Our Impact</h1>
           <p className="text-lg font-light">RePawの社会への取り組み</p>
         </div>
       </section>
@@ -44,7 +44,7 @@ export default function ImpactPage() {
       {/* Intro */}
       <section className="py-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">服を売り買いすることが、社会への貢献になる</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-6">服を売り買いすることが、社会への貢献になる</h2>
           <p className="text-gray-600 leading-relaxed">
             RePawは、犬服のリユースを通じて「環境」と「動物保護」という2つの課題に取り組んでいます。特別なことをしなくても、日常の買い物のなかで社会に貢献できる仕組みをつくりたい。それがRePawを始めた理由のひとつです。
           </p>
@@ -71,7 +71,7 @@ export default function ImpactPage() {
       {/* 寄付の仕組み */}
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold mb-4 text-center">寄付の仕組み</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center">寄付の仕組み</h2>
           <p className="text-center text-gray-600 mb-16">RePawでのお買い物が、そのまま支援につながります</p>
 
           <div className="grid md:grid-cols-3 gap-6 text-center">
@@ -97,7 +97,7 @@ export default function ImpactPage() {
       {/* CTA */}
       <section className="py-24 px-6 bg-gray-50">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">あなたの選択が、誰かの力になる</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-6">あなたの選択が、誰かの力になる</h2>
           <p className="text-gray-600 mb-8">
             使わなくなった犬服を手放すだけで、環境にも動物にも優しい選択になります。
           </p>

@@ -140,7 +140,7 @@ export default function FAQPage() {
         </div>
         
         <div className="relative z-10 text-center text-white px-6">
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">
+          <h1 className="text-5xl md:text-6xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
             よくある質問
           </h1>
           <p className="text-lg font-light">Frequently Asked Questions</p>
@@ -151,7 +151,7 @@ export default function FAQPage() {
       <section className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">お困りのことはありませんか？</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">お困りのことはありませんか？</h2>
             <p className="text-gray-600 text-sm font-light">カテゴリーから質問を選んでください</p>
           </div>
 
@@ -230,7 +230,7 @@ export default function FAQPage() {
           <div className="w-20 h-20 flex items-center justify-center bg-orange-500 text-white rounded-full mx-auto mb-6">
             <i className="ri-customer-service-2-line text-4xl"></i>
           </div>
-          <h2 className="text-4xl font-bold mb-6">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6">
             解決しない場合は
           </h2>
           <p className="text-gray-600 mb-8 font-light leading-relaxed">

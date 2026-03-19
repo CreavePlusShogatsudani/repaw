@@ -111,7 +111,7 @@ export default function ItemsPage() {
       <div className="pt-20 md:pt-32 pb-16 md:pb-24 px-4 md:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8 md:mb-12">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>All Items</h1>
+            <h1 className="text-5xl md:text-6xl font-bold mb-3 md:mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>All Items</h1>
             <p className="text-gray-600 text-xs md:text-sm tracking-wider">全{filteredProducts.length}点の商品</p>
           </div>
 
