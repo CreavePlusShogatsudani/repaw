@@ -451,8 +451,8 @@ export default function ProductDetail() {
                 <div className="flex items-start gap-3">
                   <i className="ri-arrow-go-back-line text-lg md:text-xl text-gray-700"></i>
                   <div>
-                    <p className="text-xs md:text-sm font-medium mb-1">30日間返品保証</p>
-                    <p className="text-xs text-gray-600">商品到着後30日以内なら返品可能</p>
+                    <p className="text-xs md:text-sm font-medium mb-1">返品について</p>
+                    <p className="text-xs text-gray-600">商品に重大な欠陥がある場合のみ対応</p>
                   </div>
                 </div>
               </div>
