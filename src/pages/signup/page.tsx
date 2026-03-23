@@ -90,7 +90,7 @@ export default function SignupPage() {
         <div className="max-w-md mx-auto px-6">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">新規登録</h1>
-            <p className="text-gray-600">RePowへようこそ</p>
+            <p className="text-gray-600">RePawへようこそ</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">

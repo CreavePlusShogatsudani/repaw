@@ -230,7 +230,7 @@ export default function SystemPage() {
             <div>
               <h3 className="text-3xl font-bold mb-6">寄付が支える活動</h3>
               <p className="text-gray-600 text-sm leading-relaxed mb-8 font-light">
-                RePowでは、2つのルートから集まった寄付金を動物保護団体へ届けています。
+                RePawでは、2つのルートから集まった寄付金を動物保護団体へ届けています。
                 あなたの選択が、保護犬・保護猫の医療費、食費、シェルター運営費として活用され、
                 多くの命を救う活動に繋がります。
               </p>
