@@ -46,6 +46,7 @@ const AdminProductFormPage = lazyWithRetry(() => import('../pages/admin/products
 const AdminOrdersPage = lazyWithRetry(() => import('../pages/admin/orders/page'));
 const AdminBuybackPage = lazyWithRetry(() => import('../pages/admin/buyback/page'));
 const AdminUsersPage = lazyWithRetry(() => import('../pages/admin/users/page'));
+const AdminMembersPage = lazyWithRetry(() => import('../pages/admin/members/page'));
 const AdminBannersPage = lazyWithRetry(() => import('../pages/admin/banners/page'));
 const AdminCollectionsPage = lazyWithRetry(() => import('../pages/admin/collections/page'));
 const AdminCollectionFormPage = lazyWithRetry(() => import('../pages/admin/collections/form'));
@@ -158,6 +159,10 @@ const routes: RouteObject[] = [
       {
         path: 'buyback',
         element: <AdminBuybackPage />,
+      },
+      {
+        path: 'members',
+        element: <AdminMembersPage />,
       },
       {
         path: 'users',
