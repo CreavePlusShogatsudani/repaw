@@ -33,8 +33,9 @@ interface BuybackRequest {
   item_type: string | null;
   item_description: string | null;
   condition: string | null;
-  status: 'pending' | 'reviewing' | 'completed' | 'rejected';
+  status: 'pending' | 'reviewing' | 'quoted' | 'accepted' | 'completed' | 'rejected';
   estimated_price: number | null;
+  payout_method: 'donate' | 'transfer' | null;
   created_at: string;
 }
 
@@ -122,7 +123,7 @@ export default function MyPage() {
     setBuybackLoading(true);
     supabase
       .from('buyback_requests')
-      .select('id, item_type, item_description, condition, status, estimated_price, created_at')
+      .select('id, item_type, item_description, condition, status, estimated_price, payout_method, created_at')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
@@ -570,6 +571,25 @@ export default function MyPage() {
           {/* 買取申込履歴タブ */}
           {activeTab === 'sell' && (
             <div>
+              {/* 寄付合計 */}
+              {!buybackLoading && buybackRequests.some(r => r.payout_method === 'donate' && r.estimated_price) && (
+                <div className="mb-6 p-5 bg-orange-50 border border-orange-200 rounded-xl flex items-center gap-4">
+                  <div className="w-12 h-12 flex items-center justify-center bg-orange-500 text-white rounded-full flex-shrink-0">
+                    <i className="ri-heart-line text-xl"></i>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 mb-0.5">あなたが寄付した合計金額</p>
+                    <p className="text-2xl font-bold text-orange-600">
+                      ¥{buybackRequests
+                          .filter(r => r.payout_method === 'donate' && r.estimated_price)
+                          .reduce((sum, r) => sum + (r.estimated_price ?? 0), 0)
+                          .toLocaleString()}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5">保護犬・保護猫の支援に使われています</p>
+                  </div>
+                </div>
+              )}
+
               {buybackLoading ? (
                 <div className="text-center py-16 text-gray-500">読み込み中...</div>
               ) : buybackRequests.length > 0 ? (
