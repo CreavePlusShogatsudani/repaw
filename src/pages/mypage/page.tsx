@@ -50,7 +50,9 @@ export default function MyPage() {
   const { user, profile, refreshProfile, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'favorites' | 'sell'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'favorites' | 'sell'>(
+    (location.state as any)?.tab || 'profile'
+  );
 
   useEffect(() => {
     if (!loading && !user) {
