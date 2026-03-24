@@ -30,6 +30,7 @@ const ForgotPasswordPage = lazyWithRetry(() => import('../pages/forgot-password/
 const ImpactPage = lazyWithRetry(() => import('../pages/impact/page'));
 const SystemPage = lazyWithRetry(() => import('../pages/system/page'));
 const BuybackPage = lazyWithRetry(() => import('../pages/buyback/page'));
+const BuybackResponsePage = lazyWithRetry(() => import('../pages/buyback/response'));
 const NewsPage = lazyWithRetry(() => import('../pages/news/page'));
 const NewsDetailPage = lazyWithRetry(() => import('../pages/news-detail/page'));
 const FeaturesPage = lazyWithRetry(() => import('../pages/features/page'));
@@ -107,6 +108,10 @@ const routes: RouteObject[] = [
   {
     path: '/buyback',
     element: <BuybackPage />,
+  },
+  {
+    path: '/buyback/response/:id',
+    element: <BuybackResponsePage />,
   },
   {
     path: '/news',

@@ -14,18 +14,27 @@ interface BuybackRequest {
   condition: string | null;
   purchase_date: string | null;
   message: string | null;
-  status: 'pending' | 'reviewing' | 'completed' | 'rejected';
+  status: 'pending' | 'reviewing' | 'quoted' | 'accepted' | 'completed' | 'rejected';
   estimated_price: number | null;
   admin_note: string | null;
   instagram: string | null;
   created_at: string;
+  payout_method: 'donate' | 'transfer' | null;
+  bank_name: string | null;
+  bank_branch: string | null;
+  bank_account_type: string | null;
+  bank_account_number: string | null;
+  bank_account_holder: string | null;
+  user_responded_at: string | null;
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  pending:   { label: '未対応',   color: 'bg-yellow-100 text-yellow-800' },
-  reviewing: { label: '査定中',   color: 'bg-blue-100 text-blue-800' },
-  completed: { label: '査定完了', color: 'bg-green-100 text-green-800' },
-  rejected:  { label: '対応不可', color: 'bg-red-100 text-red-800' },
+  pending:   { label: '未対応',       color: 'bg-yellow-100 text-yellow-800' },
+  reviewing: { label: '査定中',       color: 'bg-blue-100 text-blue-800' },
+  quoted:    { label: '査定額提示済み', color: 'bg-orange-100 text-orange-800' },
+  accepted:  { label: 'ユーザー回答済み', color: 'bg-purple-100 text-purple-800' },
+  completed: { label: '完了',         color: 'bg-green-100 text-green-800' },
+  rejected:  { label: '対応不可',     color: 'bg-red-100 text-red-800' },
 };
 
 export default function AdminBuybackPage() {
@@ -238,6 +247,33 @@ export default function AdminBuybackPage() {
                             <p><span className="text-gray-500">その他ご要望:</span> {req.message || '-'}</p>
                           </div>
                         </div>
+
+                        {/* ユーザー回答・口座情報 */}
+                        {req.payout_method && (
+                          <div className="mt-4 pt-4 border-t border-gray-200">
+                            <p className="text-sm font-bold mb-3">ユーザーの回答</p>
+                            <div className="space-y-2 text-sm">
+                              <p>
+                                <span className="text-gray-500">受け取り方法: </span>
+                                {req.payout_method === 'donate'
+                                  ? <span className="font-medium text-orange-600">全額寄付</span>
+                                  : <span className="font-medium text-blue-600">口座振込</span>}
+                              </p>
+                              {req.payout_method === 'transfer' && (
+                                <div className="bg-blue-50 rounded-lg p-4 space-y-1.5">
+                                  <p><span className="text-gray-500">銀行名:</span> {req.bank_name}</p>
+                                  <p><span className="text-gray-500">支店名:</span> {req.bank_branch}</p>
+                                  <p><span className="text-gray-500">口座種別:</span> {req.bank_account_type}</p>
+                                  <p><span className="text-gray-500">口座番号:</span> {req.bank_account_number}</p>
+                                  <p><span className="text-gray-500">口座名義:</span> {req.bank_account_holder}</p>
+                                </div>
+                              )}
+                              {req.user_responded_at && (
+                                <p className="text-xs text-gray-400">回答日時: {new Date(req.user_responded_at).toLocaleString('ja-JP')}</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
 
                         {/* 査定完了時：商品登録ボタン */}
                         {req.status === 'completed' && (

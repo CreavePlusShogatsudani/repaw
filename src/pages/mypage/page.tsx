@@ -574,10 +574,12 @@ export default function MyPage() {
                 <div className="space-y-4">
                   {buybackRequests.map((req) => {
                     const statusMap: Record<string, { label: string; color: string }> = {
-                      pending:   { label: '未対応',   color: 'bg-gray-100 text-gray-700' },
-                      reviewing: { label: '査定中',   color: 'bg-yellow-100 text-yellow-700' },
-                      completed: { label: '査定完了', color: 'bg-green-100 text-green-700' },
-                      rejected:  { label: '対応不可', color: 'bg-red-100 text-red-700' },
+                      pending:   { label: '受付済み',         color: 'bg-gray-100 text-gray-700' },
+                      reviewing: { label: '査定中',           color: 'bg-yellow-100 text-yellow-700' },
+                      quoted:    { label: '査定額が届いています', color: 'bg-orange-100 text-orange-700' },
+                      accepted:  { label: '回答済み',         color: 'bg-blue-100 text-blue-700' },
+                      completed: { label: '完了',             color: 'bg-green-100 text-green-700' },
+                      rejected:  { label: '対応不可',         color: 'bg-red-100 text-red-700' },
                     };
                     const statusInfo = statusMap[req.status] || statusMap.pending;
                     const date = new Date(req.created_at).toLocaleDateString('ja-JP', {
@@ -614,6 +616,17 @@ export default function MyPage() {
                             </p>
                           </div>
                         </div>
+                        {req.status === 'quoted' && (
+                          <div className="mt-4 pt-4 border-t border-orange-200">
+                            <p className="text-sm text-orange-700 mb-3">査定額が確定しました。受け取り方法をお選びください。</p>
+                            <Link
+                              to={`/buyback/response/${req.id}`}
+                              className="inline-block px-6 py-3 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 transition-colors"
+                            >
+                              査定結果を確認して回答する →
+                            </Link>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
