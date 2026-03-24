@@ -420,7 +420,7 @@ export default function ProductDetail() {
                     このお洋服の元のオーナー
                   </h3>
                   <a
-                    href={`https://www.instagram.com/${product.seller_instagram}`}
+                    href={`https://www.instagram.com/${product.seller_instagram.trim().replace(/^@/, '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 p-3 bg-gradient-to-r from-pink-50 to-purple-50 border border-pink-100 rounded-xl hover:from-pink-100 hover:to-purple-100 transition-colors group"

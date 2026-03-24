@@ -527,7 +527,7 @@ export default function AdminProductFormPage() {
                         </div>
                         {sellerInstagram && (
                             <a
-                                href={`https://www.instagram.com/${sellerInstagram}`}
+                                href={`https://www.instagram.com/${sellerInstagram.trim().replace(/^@/, '')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-xs text-pink-600 hover:underline flex items-center gap-1"
