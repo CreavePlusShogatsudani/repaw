@@ -572,23 +572,35 @@ export default function MyPage() {
           {activeTab === 'sell' && (
             <div>
               {/* 寄付合計 */}
-              {!buybackLoading && buybackRequests.some(r => r.payout_method === 'donate' && r.estimated_price) && (
-                <div className="mb-6 p-5 bg-orange-50 border border-orange-200 rounded-xl flex items-center gap-4">
-                  <div className="w-12 h-12 flex items-center justify-center bg-orange-500 text-white rounded-full flex-shrink-0">
-                    <i className="ri-heart-line text-xl"></i>
+              {!buybackLoading && buybackRequests.some(r => r.payout_method && r.estimated_price) && (() => {
+                const donateTotal = buybackRequests
+                  .filter(r => r.payout_method === 'donate' && r.estimated_price)
+                  .reduce((sum, r) => sum + (r.estimated_price ?? 0), 0);
+                const transferDonation = buybackRequests
+                  .filter(r => r.payout_method === 'transfer' && r.estimated_price)
+                  .reduce((sum, r) => sum + Math.floor((r.estimated_price ?? 0) * 0.05), 0);
+                const total = donateTotal + transferDonation;
+                return (
+                  <div className="mb-6 p-5 bg-orange-50 border border-orange-200 rounded-xl flex items-center gap-4">
+                    <div className="w-12 h-12 flex items-center justify-center bg-orange-500 text-white rounded-full flex-shrink-0">
+                      <i className="ri-heart-line text-xl"></i>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 mb-0.5">あなたの寄付合計</p>
+                      <p className="text-2xl font-bold text-orange-600">¥{total.toLocaleString()}</p>
+                      <div className="flex gap-3 mt-1">
+                        {donateTotal > 0 && (
+                          <p className="text-xs text-gray-400">全額寄付 ¥{donateTotal.toLocaleString()}</p>
+                        )}
+                        {transferDonation > 0 && (
+                          <p className="text-xs text-gray-400">振込5% ¥{transferDonation.toLocaleString()}</p>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">保護犬・保護猫の支援に使われています</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-600 mb-0.5">あなたが寄付した合計金額</p>
-                    <p className="text-2xl font-bold text-orange-600">
-                      ¥{buybackRequests
-                          .filter(r => r.payout_method === 'donate' && r.estimated_price)
-                          .reduce((sum, r) => sum + (r.estimated_price ?? 0), 0)
-                          .toLocaleString()}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-0.5">保護犬・保護猫の支援に使われています</p>
-                  </div>
-                </div>
-              )}
+                );
+              })()}
 
               {buybackLoading ? (
                 <div className="text-center py-16 text-gray-500">読み込み中...</div>
