@@ -167,6 +167,7 @@ export default function ProductDetail() {
     name: product.name,
     description: product.description || undefined,
     image: product.images?.[0] || undefined,
+    ...(product.brand ? { brand: { '@type': 'Brand', name: product.brand } } : {}),
     offers: {
       '@type': 'Offer',
       price: product.price,
@@ -179,8 +180,8 @@ export default function ProductDetail() {
     <div className="min-h-screen bg-white">
       {product && (
         <PageMeta
-          title={product.name}
-          description={product.description || `${product.name} - サイズ: ${product.size}、状態: ${product.condition}。RePawで犬服をリユース。`}
+          title={product.brand ? `${product.name}【${product.brand}】` : product.name}
+          description={product.description || `${product.brand ? `${product.brand} ` : ''}${product.name} - サイズ: ${product.size}、状態: ${product.condition}ランク。RePawで犬服をリユース。`}
           image={product.images?.[0]}
           path={`/product/${product.id}`}
           type="product"
