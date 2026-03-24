@@ -5,18 +5,18 @@ import Footer from '../home/components/Footer';
 const VALUES = [
   {
     icon: 'ri-recycle-line',
-    title: 'サステナビリティ',
-    description: '犬服をリユースすることで、まだ使えるものを捨てない文化をつくっていきたいと思っています。小さな選択が、環境への大きな一歩になると信じています。'
+    title: 'もったいないをなくす',
+    description: 'サイズアウト、飽き、お別れ——理由はさまざまでも、まだ着られる服が毎日捨てられています。RePawは「次の子に着てもらう」という選択肢をつくります。'
   },
   {
     icon: 'ri-heart-line',
-    title: '動物愛護',
-    description: '売上の一部は動物保護団体への寄付にあてています。服を売り買いするだけで、保護犬・保護猫の支援につながる仕組みです。'
+    title: '買うだけで支援になる',
+    description: '商品が売れるたびに、売上の一部が動物保護団体へ届きます。特別なことをしなくていい。好きな服を選ぶだけで、保護犬・保護猫の医療費や食費を支えられます。'
   },
   {
-    icon: 'ri-team-line',
-    title: 'コミュニティ',
-    description: '犬を愛する人同士がつながれる場所でありたい。使わなくなった服を、大切にしてくれる次の飼い主へ。そんな循環を一緒につくっていければと思っています。'
+    icon: 'ri-instagram-line',
+    title: '前のオーナーが見える',
+    description: '商品ページには元のオーナーのInstagramアカウントを掲載しています。どんな子が着ていたか、どんな人が大切にしていたか。その背景ごと、次の子へ受け継ぎます。'
   }
 ];
 
@@ -46,15 +46,18 @@ export default function AboutPage() {
       {/* Mission Section */}
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-6">私たちのミッション</h2>
-          <p className="text-gray-600 text-lg leading-relaxed mb-8 font-light">
-            犬服のリユースを通じて、<br />
-            <strong className="text-orange-600 font-bold">環境</strong>と<strong className="text-orange-600 font-bold">動物</strong>、どちらにも優しい選択肢をつくる。
+          <h2 className="text-2xl md:text-3xl font-bold mb-8">RePawとは</h2>
+          <p className="text-gray-700 text-lg leading-relaxed mb-6 font-light">
+            犬服の<strong className="text-orange-600 font-bold">リユースEC</strong>です。
+          </p>
+          <p className="text-gray-600 text-sm leading-relaxed font-light mb-6">
+            愛犬がサイズアウトした服、着せる機会がなかった服、旅立った子が残した服——<br />
+            そういった服を買取り、新しいオーナーへ届けます。
           </p>
           <p className="text-gray-600 text-sm leading-relaxed font-light">
-            使わなくなった犬服を次の飼い主へつなぐことで、まだ使えるものが捨てられる現状を変えたい。<br />
-            そして、その売上の一部を動物保護団体に寄付することで、<br />
-            保護犬・保護猫の支援にもつなげていきたいと考えています。
+            そして商品が売れるたびに、売上の一部を<strong className="font-bold text-gray-800">動物保護団体へ寄付</strong>します。<br />
+            服を循環させることが、そのまま保護犬・保護猫への支援になる。<br />
+            RePawはその仕組みをシンプルに実現するプラットフォームです。
           </p>
         </div>
       </section>
@@ -85,19 +88,22 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">Our Story</h2>
-            <p className="text-gray-600 text-lg">RePaw誕生のきっかけ</p>
+            <p className="text-gray-600 text-lg font-light">なぜ、犬服のリユースなのか</p>
           </div>
 
           <div className="bg-gray-50 rounded-2xl p-10">
             <div className="space-y-6">
               <p className="text-gray-600 text-sm leading-relaxed font-light">
-                日本では毎年、大量の犬服が捨てられています。サイズが合わなくなった、デザインに飽きた、愛犬が亡くなった——理由はさまざまですが、まだ十分に使える服が廃棄されているのが現実です。
+                犬を飼っていると、服が余ります。子犬のうちに買ったけどすぐサイズアウトした服、プレゼントでもらったけど好みじゃなかった服、愛犬が旅立ってクローゼットに残ってしまった服。
               </p>
               <p className="text-gray-600 text-sm leading-relaxed font-light">
-                一方で、保護犬たちには医療費や食費など、継続的な支援が必要です。でも「何か力になりたい」と思っていても、日常の中でできることは限られていると感じる方も多いのではないでしょうか。
+                捨てるには惜しい。でも売る手間もかかる。そのまま引き出しの奥へ——そんな経験をした飼い主さんは多いはずです。
               </p>
               <p className="text-gray-600 text-sm leading-relaxed font-light">
-                そんな2つの課題をつなげられないか、という考えから<strong className="font-bold">RePaw</strong>は生まれました。犬服を売る・買うという普通のことが、環境への配慮にも、動物への支援にもなる。そういう仕組みをつくりたいと思っています。
+                一方で「保護犬を助けたい」という気持ちはあっても、日常の中で継続的に支援できている人はまだ少ない。特別なアクションを起こさないといけない、という心理的なハードルがあります。
+              </p>
+              <p className="text-gray-600 text-sm leading-relaxed font-light">
+                その2つをつなごうと思いました。<strong className="font-bold text-gray-800">服を手放す人</strong>と<strong className="font-bold text-gray-800">服を必要としている人</strong>をつなぎ、その取引の中に<strong className="font-bold text-gray-800">動物保護への寄付</strong>を組み込む。それが<strong className="font-bold">RePaw</strong>の出発点です。
               </p>
             </div>
           </div>
@@ -108,10 +114,13 @@ export default function AboutPage() {
       <section className="py-24 px-6 bg-gray-50">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-6">
-            一緒に取り組んでみませんか？
+            あなたの服を、次の子へ。
           </h2>
-          <p className="text-gray-600 mb-8 font-light">
-            使わなくなった犬服があれば、ぜひRePawへ。
+          <p className="text-gray-600 mb-2 font-light">
+            眠っている犬服があれば、RePawで次のオーナーへつなぎましょう。
+          </p>
+          <p className="text-gray-500 text-sm mb-10 font-light">
+            売れるたびに、保護犬・保護猫への支援になります。
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="/products" className="px-8 py-4 bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors whitespace-nowrap cursor-pointer">
