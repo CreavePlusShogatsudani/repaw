@@ -107,10 +107,19 @@ export default function AdminBuybackPage() {
     setEditingId(null);
   };
 
+  const needsAction = requests.filter(r => r.status === 'pending' || r.status === 'accepted');
+
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold">買取申込管理</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold">買取申込管理</h1>
+          {needsAction.length > 0 && (
+            <span className="px-2.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full">
+              {needsAction.length}件 要対応
+            </span>
+          )}
+        </div>
         <button
           onClick={fetchRequests}
           className="p-2 text-gray-500 hover:text-gray-900 transition-colors"
@@ -119,6 +128,43 @@ export default function AdminBuybackPage() {
           <i className="ri-refresh-line text-xl"></i>
         </button>
       </div>
+
+      {/* 要対応セクション */}
+      {!loading && needsAction.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            <h2 className="text-sm font-bold text-red-600">要対応 ({needsAction.length}件)</h2>
+          </div>
+          <div className="space-y-2">
+            {needsAction.map(req => (
+              <div key={req.id} className={`flex items-center justify-between px-4 py-3 rounded-lg border-l-4 bg-white shadow-sm ${req.status === 'accepted' ? 'border-purple-500' : 'border-red-400'}`}>
+                <div className="flex items-center gap-3">
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_LABELS[req.status]?.color}`}>
+                    {STATUS_LABELS[req.status]?.label}
+                  </span>
+                  <span className="text-sm font-medium">{req.name}</span>
+                  <span className="text-xs text-gray-400">{req.item_type || '-'}</span>
+                  {req.status === 'accepted' && req.payout_method && (
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${req.payout_method === 'donate' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>
+                      {req.payout_method === 'donate' ? '寄付希望' : '振込希望'}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-gray-400">{new Date(req.created_at).toLocaleDateString('ja-JP')}</span>
+                  <button
+                    onClick={() => { setExpandedId(req.id); document.getElementById(`req-${req.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }}
+                    className="text-xs px-3 py-1 bg-gray-900 text-white rounded hover:bg-gray-700 transition-colors whitespace-nowrap"
+                  >
+                    対応する
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div className="text-center py-16 text-gray-500">読み込み中...</div>
@@ -141,7 +187,7 @@ export default function AdminBuybackPage() {
             <tbody className="divide-y">
               {requests.map((req) => (
                 <>
-                  <tr key={req.id} className="hover:bg-gray-50">
+                  <tr key={req.id} id={`req-${req.id}`} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
                       {new Date(req.created_at).toLocaleDateString('ja-JP')}
                     </td>

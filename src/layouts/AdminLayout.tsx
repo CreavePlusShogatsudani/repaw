@@ -54,12 +54,22 @@ export default function AdminLayout() {
         return null; // Will redirect in useEffect
     }
 
+    const [buybackBadge, setBuybackBadge] = useState(0);
+
+    useEffect(() => {
+        supabase
+            .from('buyback_requests')
+            .select('id', { count: 'exact', head: true })
+            .in('status', ['pending', 'accepted'])
+            .then(({ count }) => setBuybackBadge(count ?? 0));
+    }, [location.pathname]);
+
     const menuItems = [
         { path: '/admin', label: 'ダッシュボード', icon: 'ri-dashboard-line' },
         { path: '/admin/products', label: '商品管理', icon: 'ri-shopping-bag-3-line' },
         { path: '/admin/news', label: 'ニュース管理', icon: 'ri-newspaper-line' },
         { path: '/admin/orders', label: '注文管理', icon: 'ri-file-list-3-line' },
-        { path: '/admin/buyback', label: '買取申込管理', icon: 'ri-price-tag-3-line' },
+        { path: '/admin/buyback', label: '買取申込管理', icon: 'ri-price-tag-3-line', badge: buybackBadge },
         { path: '/admin/members', label: 'ユーザー一覧', icon: 'ri-group-line' },
         { path: '/admin/users', label: '管理者アカウント', icon: 'ri-shield-user-line' },
         { path: '/admin/banners', label: 'メインビジュアル', icon: 'ri-image-line' },
@@ -84,7 +94,12 @@ export default function AdminLayout() {
                                 }`}
                         >
                             <i className={`${item.icon} mr-3 text-lg`}></i>
-                            {item.label}
+                            <span className="flex-1">{item.label}</span>
+                            {item.badge ? (
+                                <span className="ml-2 px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
+                                    {item.badge}
+                                </span>
+                            ) : null}
                         </Link>
                     ))}
                     <div className="mt-8 px-6">
