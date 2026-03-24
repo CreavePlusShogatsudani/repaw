@@ -320,13 +320,16 @@ export default function AdminProductFormPage() {
 
                     <div className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">サイズ</label>
-                        <input
-                            type="text"
+                        <select
                             value={size}
                             onChange={(e) => setSize(e.target.value)}
-                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                            placeholder="例: S, M, L"
-                        />
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                        >
+                            <option value="">選択してください</option>
+                            {['XS', 'SS', 'S', 'SM', 'M', 'ML', 'L', 'XL', 'XXL', 'フリーサイズ'].map(s => (
+                                <option key={s} value={s}>{s}</option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="space-y-2">
