@@ -7,6 +7,7 @@ export default function AdminLayout() {
     const location = useLocation();
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
     const [loading, setLoading] = useState(true);
+    const [buybackBadge, setBuybackBadge] = useState(0);
 
     useEffect(() => {
         const checkAdmin = async () => {
@@ -42,6 +43,14 @@ export default function AdminLayout() {
         checkAdmin();
     }, [navigate]);
 
+    useEffect(() => {
+        supabase
+            .from('buyback_requests')
+            .select('id', { count: 'exact', head: true })
+            .in('status', ['pending', 'accepted'])
+            .then(({ count }) => setBuybackBadge(count ?? 0));
+    }, [location.pathname]);
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -53,16 +62,6 @@ export default function AdminLayout() {
     if (!isAdmin) {
         return null; // Will redirect in useEffect
     }
-
-    const [buybackBadge, setBuybackBadge] = useState(0);
-
-    useEffect(() => {
-        supabase
-            .from('buyback_requests')
-            .select('id', { count: 'exact', head: true })
-            .in('status', ['pending', 'accepted'])
-            .then(({ count }) => setBuybackBadge(count ?? 0));
-    }, [location.pathname]);
 
     const menuItems = [
         { path: '/admin', label: 'ダッシュボード', icon: 'ri-dashboard-line' },
