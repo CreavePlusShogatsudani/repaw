@@ -285,6 +285,12 @@ export default function ProductDetail() {
               {/* 商品詳細情報 */}
               <div className="mb-6 pb-6 border-b">
                 <div className="grid grid-cols-2 gap-3 md:gap-4 text-xs md:text-sm">
+                  {product.brand && (
+                    <div className="col-span-2">
+                      <span className="text-gray-600">ブランド：</span>
+                      <span className="font-medium">{product.brand}</span>
+                    </div>
+                  )}
                   <div>
                     <span className="text-gray-600">サイズ：</span>
                     <span className="font-medium">{product.size}</span>
@@ -297,7 +303,6 @@ export default function ProductDetail() {
                     <span className="text-gray-600">カラー：</span>
                     <span className="font-medium">{product.color}</span>
                   </div>
-                  {/* ブランドと素材はDBスキーマにないので一旦削除、必要なら追加 */}
                 </div>
               </div>
 

@@ -2,6 +2,44 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
 
+const BRAND_OPTIONS = [
+  { group: 'ノーブランド', brands: ['ノーブランド'] },
+  { group: 'アパレル・ライフスタイル発', brands: [
+    'LAURA ASHLEY（ローラ アシュレイ）',
+    'gelato pique CAT&DOG（ジェラートピケ）',
+    'BEAMS DESIGN（ビームス デザイン）',
+    'ROPÉ PICNIC（ロペピクニック）',
+    'X-girl（エックスガール）',
+    'Arnold Palmer（アーノルドパーマー）',
+  ]},
+  { group: '定番・カジュアル・デイリー', brands: [
+    'iDog & iCat（アイドッグ・アイキャット）',
+    'RADICA（ラディカ）',
+    'monchéri（モンシェリ）',
+    'PET PARADISE（ペットパラダイス）',
+    'LIFELIKE（ライフライク）',
+  ]},
+  { group: 'エレガント・ガーリー系', brands: [
+    'GODPIVA（ゴッドピヴァ）',
+    'CRAZYBOO（クレイジーブー）',
+    'circus circus（サーカスサーカス）',
+    'CanNana（きゃんナナ）',
+    'BUL BU-BU（ブルブブ）',
+  ]},
+  { group: 'スタイリッシュ・シンプル系', brands: [
+    'MANDARINE BROTHERS（マンダリンブラザーズ）',
+    'free stitch（フリーステッチ）',
+    'WANDAWAY（ワンダウェイ）',
+  ]},
+  { group: 'アウトドア・スポーツ・高機能', brands: [
+    'ALPHAICON（アルファアイコン）',
+    'LOGOS（ロゴス）',
+    'snow peak（スノーピーク）',
+    'Hurtta（フルッタ）',
+    'DOG DEPT（ドッグデプト）',
+  ]},
+];
+
 export default function AdminProductFormPage() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -27,6 +65,7 @@ export default function AdminProductFormPage() {
     const [newImageFiles, setNewImageFiles] = useState<{ file: File; preview: string }[]>([]); // 追加予定
     const [uploadingImage, setUploadingImage] = useState(false);
     const [sellerInstagram, setSellerInstagram] = useState(searchParams.get('seller_instagram') || '');
+    const [brand, setBrand] = useState('');
     const fromBuyback = searchParams.get('from_buyback');
 
     useEffect(() => {
@@ -59,6 +98,7 @@ export default function AdminProductFormPage() {
             setStatus(data.status || 'draft');
             setExistingImages(data.images || []);
             setSellerInstagram(data.seller_instagram || '');
+            setBrand(data.brand || '');
         }
         setLoading(false);
     };
@@ -195,6 +235,7 @@ export default function AdminProductFormPage() {
             status,
             images: finalImages,
             seller_instagram: sellerInstagram.replace('@', '') || null,
+            brand: brand || null,
         };
 
         if (isEdit) {
@@ -319,6 +360,24 @@ export default function AdminProductFormPage() {
                             <option value="">選択してください</option>
                             {['XS', 'SS', 'S', 'SM', 'M', 'ML', 'L', 'XL', 'XXL', 'フリーサイズ'].map(s => (
                                 <option key={s} value={s}>{s}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">ブランド</label>
+                        <select
+                            value={brand}
+                            onChange={(e) => setBrand(e.target.value)}
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                        >
+                            <option value="">選択してください</option>
+                            {BRAND_OPTIONS.map(group => (
+                                <optgroup key={group.group} label={group.group}>
+                                    {group.brands.map(b => (
+                                        <option key={b} value={b}>{b}</option>
+                                    ))}
+                                </optgroup>
                             ))}
                         </select>
                     </div>

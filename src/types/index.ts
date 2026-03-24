@@ -32,6 +32,7 @@ export interface Product {
     status: string | null;
     seller_id: string | null;
     seller_instagram: string | null;
+    brand: string | null;
     size_chart: SizeChartRow[] | null;
     back_length_cm: number | null;
     chest_cm: number | null;
