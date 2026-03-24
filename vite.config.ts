@@ -50,11 +50,22 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
+        // HTML は precache せず常にネットワークから取得（チャンクハッシュ不一致を防ぐ）
+        globPatterns: ['**/*.{js,css,ico,png,svg,webp}'],
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
         runtimeCaching: [
+          {
+            // ナビゲーションリクエスト（HTML）は常にネットワーク優先
+            urlPattern: ({ request }: { request: Request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'pages-cache',
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 },
+            },
+          },
           {
             urlPattern: /^https:\/\/mrmixfzxreigbfbnires\.supabase\.co\/.*/i,
             handler: 'NetworkFirst',

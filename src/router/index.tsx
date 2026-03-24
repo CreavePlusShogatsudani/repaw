@@ -69,7 +69,9 @@ export function AppRoutes() {
   useEffect(() => {
     window.REACT_APP_NAVIGATE = navigate;
     navigateResolver(window.REACT_APP_NAVIGATE);
-  });
+    // 正常起動できたのでリロードフラグをリセット
+    sessionStorage.removeItem('chunk_reload_attempted');
+  }, []);
   return (
     <ErrorBoundary key={location.pathname}>
       <Suspense fallback={

@@ -1,12 +1,18 @@
 import { lazy } from 'react';
 import type { RouteObject } from 'react-router-dom';
 
-// チャンクロード失敗時に1回だけリロードして再試行する
+// チャンクロード失敗時に1回だけリロードして再試行する（ループ防止付き）
 function lazyWithRetry(factory: () => Promise<{ default: React.ComponentType<any> }>) {
   return lazy(() =>
-    factory().catch(() => {
-      window.location.reload();
-      return new Promise<never>(() => {});
+    factory().catch((err) => {
+      const reloadKey = 'chunk_reload_attempted';
+      if (!sessionStorage.getItem(reloadKey)) {
+        sessionStorage.setItem(reloadKey, '1');
+        window.location.reload();
+        return new Promise<never>(() => {});
+      }
+      // 既にリロード済みなら諦めてエラーを再スロー
+      return Promise.reject(err);
     })
   );
 }
