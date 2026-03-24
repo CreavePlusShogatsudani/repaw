@@ -8,6 +8,7 @@ export default function AdminLayout() {
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
     const [loading, setLoading] = useState(true);
     const [buybackBadge, setBuybackBadge] = useState(0);
+    const [mobileOpen, setMobileOpen] = useState(false);
 
     useEffect(() => {
         const checkAdmin = async () => {
@@ -75,45 +76,69 @@ export default function AdminLayout() {
         { path: '/admin/collections', label: '特集記事', icon: 'ri-folder-star-line' },
     ];
 
+    const navContent = (
+        <nav className="mt-6">
+            {menuItems.map((item) => (
+                <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center px-6 py-3 text-sm font-medium transition-colors ${location.pathname === item.path || (item.path !== '/admin' && location.pathname.startsWith(item.path))
+                            ? 'bg-gray-800 text-white border-l-4 border-orange-500'
+                            : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                        }`}
+                >
+                    <i className={`${item.icon} mr-3 text-lg`}></i>
+                    <span className="flex-1">{item.label}</span>
+                    {item.badge ? (
+                        <span className="ml-2 px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
+                            {item.badge}
+                        </span>
+                    ) : null}
+                </Link>
+            ))}
+            <div className="mt-8 px-6">
+                <button
+                    onClick={async () => {
+                        await supabase.auth.signOut();
+                        navigate('/login');
+                    }}
+                    className="flex items-center text-sm font-medium text-red-400 hover:text-red-300 transition-colors cursor-pointer"
+                >
+                    <i className="ri-logout-box-line mr-3 text-lg"></i>
+                    ログアウト
+                </button>
+            </div>
+        </nav>
+    );
+
     return (
         <div className="min-h-screen bg-gray-100 flex">
-            {/* Sidebar */}
+            {/* Desktop Sidebar */}
             <aside className="w-64 bg-gray-900 text-white flex-shrink-0 hidden md:block">
                 <div className="p-6">
                     <Link to="/" className="text-2xl font-playfair font-bold">RePaw Admin</Link>
                 </div>
-                <nav className="mt-6">
-                    {menuItems.map((item) => (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`flex items-center px-6 py-3 text-sm font-medium transition-colors ${location.pathname === item.path || (item.path !== '/admin' && location.pathname.startsWith(item.path))
-                                    ? 'bg-gray-800 text-white border-l-4 border-orange-500'
-                                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                                }`}
-                        >
-                            <i className={`${item.icon} mr-3 text-lg`}></i>
-                            <span className="flex-1">{item.label}</span>
-                            {item.badge ? (
-                                <span className="ml-2 px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
-                                    {item.badge}
-                                </span>
-                            ) : null}
-                        </Link>
-                    ))}
-                    <div className="mt-8 px-6">
-                        <button
-                            onClick={async () => {
-                                await supabase.auth.signOut();
-                                navigate('/login');
-                            }}
-                            className="flex items-center text-sm font-medium text-red-400 hover:text-red-300 transition-colors cursor-pointer"
-                        >
-                            <i className="ri-logout-box-line mr-3 text-lg"></i>
-                            ログアウト
-                        </button>
-                    </div>
-                </nav>
+                {navContent}
+            </aside>
+
+            {/* Mobile Drawer Overlay */}
+            {mobileOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                    onClick={() => setMobileOpen(false)}
+                />
+            )}
+
+            {/* Mobile Drawer */}
+            <aside className={`fixed inset-y-0 left-0 w-64 bg-gray-900 text-white z-50 transform transition-transform duration-300 md:hidden ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className="p-6 flex items-center justify-between">
+                    <Link to="/" className="text-2xl font-playfair font-bold" onClick={() => setMobileOpen(false)}>RePaw Admin</Link>
+                    <button onClick={() => setMobileOpen(false)} className="text-gray-400 hover:text-white">
+                        <i className="ri-close-line text-2xl"></i>
+                    </button>
+                </div>
+                {navContent}
             </aside>
 
             {/* Main Content */}
@@ -121,7 +146,7 @@ export default function AdminLayout() {
                 {/* Mobile Header */}
                 <header className="bg-white shadow-sm md:hidden flex items-center justify-between p-4">
                     <span className="text-xl font-bold">RePaw Admin</span>
-                    <button className="text-gray-600">
+                    <button onClick={() => setMobileOpen(true)} className="text-gray-600">
                         <i className="ri-menu-line text-2xl"></i>
                     </button>
                 </header>
