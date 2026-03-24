@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
-import type { SizeChartRow } from '../../../types';
-
-const EMPTY_ROW = (): SizeChartRow => ({ size: '', back_length: '', chest: '', neck: '', weight: '' });
 
 export default function AdminProductFormPage() {
     const { id } = useParams();
@@ -31,7 +28,6 @@ export default function AdminProductFormPage() {
     const [uploadingImage, setUploadingImage] = useState(false);
     const [sellerInstagram, setSellerInstagram] = useState(searchParams.get('seller_instagram') || '');
     const fromBuyback = searchParams.get('from_buyback');
-    const [sizeChart, setSizeChart] = useState<SizeChartRow[]>([]);
     const [backLengthCm, setBackLengthCm] = useState('');
     const [chestCm, setChestCm] = useState('');
     const [neckCm, setNeckCm] = useState('');
@@ -66,7 +62,6 @@ export default function AdminProductFormPage() {
             setStatus(data.status || 'draft');
             setExistingImages(data.images || []);
             setSellerInstagram(data.seller_instagram || '');
-            setSizeChart(data.size_chart || []);
             setBackLengthCm(data.back_length_cm?.toString() || '');
             setChestCm(data.chest_cm?.toString() || '');
             setNeckCm(data.neck_cm?.toString() || '');
@@ -206,7 +201,6 @@ export default function AdminProductFormPage() {
             status,
             images: finalImages,
             seller_instagram: sellerInstagram.replace('@', '') || null,
-            size_chart: sizeChart.length > 0 ? sizeChart : null,
             back_length_cm: backLengthCm ? parseFloat(backLengthCm) : null,
             chest_cm: chestCm ? parseFloat(chestCm) : null,
             neck_cm: neckCm ? parseFloat(neckCm) : null,
@@ -441,67 +435,6 @@ export default function AdminProductFormPage() {
                         </div>
                     </div>
 
-                    {/* サイズ表 */}
-                    <div className="space-y-3 md:col-span-2">
-                        <div className="flex items-center justify-between">
-                            <label className="block text-sm font-medium text-gray-700">
-                                サイズ表
-                                <span className="text-gray-400 font-normal ml-1">（任意・犬服のサイズガイド）</span>
-                            </label>
-                            <button
-                                type="button"
-                                onClick={() => setSizeChart(prev => [...prev, EMPTY_ROW()])}
-                                className="flex items-center gap-1 text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                            >
-                                <i className="ri-add-line"></i> 行を追加
-                            </button>
-                        </div>
-                        {sizeChart.length > 0 && (
-                            <div className="overflow-x-auto border border-gray-200 rounded-lg">
-                                <table className="w-full text-sm">
-                                    <thead className="bg-gray-50">
-                                        <tr>
-                                            {['サイズ', '背丈(cm)', '胸回り(cm)', '首回り(cm)', '体重目安'].map(h => (
-                                                <th key={h} className="px-3 py-2 text-left text-xs font-medium text-gray-500">{h}</th>
-                                            ))}
-                                            <th className="px-2 py-2 w-8"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-100">
-                                        {sizeChart.map((row, i) => (
-                                            <tr key={i}>
-                                                {(['size', 'back_length', 'chest', 'neck', 'weight'] as const).map(field => (
-                                                    <td key={field} className="px-2 py-1">
-                                                        <input
-                                                            type="text"
-                                                            value={row[field]}
-                                                            onChange={(e) => setSizeChart(prev => prev.map((r, idx) =>
-                                                                idx === i ? { ...r, [field]: e.target.value } : r
-                                                            ))}
-                                                            placeholder={field === 'size' ? 'SS' : field === 'weight' ? '〜1kg' : '20'}
-                                                            className="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:ring-1 focus:ring-blue-400 outline-none"
-                                                        />
-                                                    </td>
-                                                ))}
-                                                <td className="px-2 py-1 text-center">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setSizeChart(prev => prev.filter((_, idx) => idx !== i))}
-                                                        className="text-red-400 hover:text-red-600"
-                                                    >
-                                                        <i className="ri-delete-bin-line text-sm"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                        {sizeChart.length === 0 && (
-                            <p className="text-xs text-gray-400 py-2">「行を追加」からサイズ情報を入力できます</p>
-                        )}
-                    </div>
 
                     <div className="space-y-2 md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">

@@ -328,37 +328,6 @@ export default function ProductDetail() {
                 </div>
               )}
 
-              {/* サイズ表 */}
-              {product.size_chart && product.size_chart.length > 0 && (
-                <div className="mb-6 pb-6 border-b">
-                  <h3 className="font-bold mb-3 text-sm md:text-base">サイズ表</h3>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs md:text-sm border-collapse">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="border border-gray-200 px-3 py-2 text-left font-medium text-gray-600">サイズ</th>
-                          <th className="border border-gray-200 px-3 py-2 text-center font-medium text-gray-600">背丈<span className="text-gray-400 font-normal">(cm)</span></th>
-                          <th className="border border-gray-200 px-3 py-2 text-center font-medium text-gray-600">胸回り<span className="text-gray-400 font-normal">(cm)</span></th>
-                          <th className="border border-gray-200 px-3 py-2 text-center font-medium text-gray-600">首回り<span className="text-gray-400 font-normal">(cm)</span></th>
-                          <th className="border border-gray-200 px-3 py-2 text-center font-medium text-gray-600">体重目安</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {product.size_chart.map((row, i) => (
-                          <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                            <td className="border border-gray-200 px-3 py-2 font-medium">{row.size}</td>
-                            <td className="border border-gray-200 px-3 py-2 text-center">{row.back_length}</td>
-                            <td className="border border-gray-200 px-3 py-2 text-center">{row.chest}</td>
-                            <td className="border border-gray-200 px-3 py-2 text-center">{row.neck}</td>
-                            <td className="border border-gray-200 px-3 py-2 text-center">{row.weight}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  <p className="text-xs text-gray-400 mt-2">※ サイズは目安です。個体差がある場合があります。</p>
-                </div>
-              )}
 
               {/* 商品説明 */}
               <div className="mb-6 pb-6 border-b">
