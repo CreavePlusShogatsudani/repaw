@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white font-['Noto_Sans_JP']">
+    <div className="min-h-screen bg-white">
       <Navigation />
       
       <main className="pt-24 pb-16">

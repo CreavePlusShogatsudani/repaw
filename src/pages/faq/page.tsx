@@ -138,7 +138,7 @@ export default function FAQPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white font-['Noto_Sans_JP']">
+    <div className="min-h-screen bg-white">
       <PageMeta title="よくある質問" description="RePawの購入・買取・寄付についてよくある質問をまとめました。" path="/faq" jsonLd={faqJsonLd} />
       <Navigation />
 

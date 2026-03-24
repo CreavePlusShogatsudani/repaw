@@ -22,7 +22,7 @@ const VALUES = [
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-white font-['Noto_Sans_JP']">
+    <div className="min-h-screen bg-white">
       <PageMeta title="About Us - RePawについて" description="RePawのミッションとブランドストーリー。犬服のリユースで環境保護と動物保護を支援します。" path="/about" />
       <Navigation />
 

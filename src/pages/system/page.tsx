@@ -63,7 +63,7 @@ export default function SystemPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white font-['Noto_Sans_JP']">
+    <div className="min-h-screen bg-white">
       <PageMeta title="買取・寄付の仕組み" description="RePawの犬服買取から動物保護団体への寄付までの流れをご説明します。" path="/system" />
       <Navigation />
 
