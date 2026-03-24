@@ -50,8 +50,8 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // HTML は precache せず常にネットワークから取得（チャンクハッシュ不一致を防ぐ）
-        globPatterns: ['**/*.{js,css,ico,png,svg,webp}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
+        navigateFallback: null,
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
