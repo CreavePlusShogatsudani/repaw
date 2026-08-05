@@ -150,13 +150,16 @@ export default function CartPage() {
                     >
                       買い物を続ける
                     </Link>
-                    <Link
-                      to="/checkout"
-                      className="flex-1 px-4 md:px-6 py-2.5 md:py-3 bg-orange-600 text-white rounded-lg text-sm md:text-base font-medium hover:bg-orange-700 transition-colors text-center cursor-pointer whitespace-nowrap"
+                    <button
+                      disabled
+                      className="flex-1 px-4 md:px-6 py-2.5 md:py-3 bg-gray-300 text-gray-500 rounded-lg text-sm md:text-base font-medium text-center cursor-not-allowed whitespace-nowrap"
                     >
                       購入手続きへ進む
-                    </Link>
+                    </button>
                   </div>
+                  <p className="mt-3 text-xs md:text-sm text-gray-500 text-center sm:text-right">
+                    オンライン決済は現在準備中です
+                  </p>
                 </div>
               </div>
 

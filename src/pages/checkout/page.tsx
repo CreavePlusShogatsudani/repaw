@@ -10,6 +10,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import { createOrder } from '../../lib/orders';
 
+// 決済システム（Stripe）接続後に true へ変更する
+const CHECKOUT_ENABLED = false;
+
 interface FormData {
   email: string;
   lastName: string;
@@ -123,6 +126,30 @@ export default function CheckoutPage() {
       createPaymentIntent();
     }
   }, [currentStep, formData.paymentMethod, total]);
+
+  // 決済システム接続まではオンライン購入を停止（CHECKOUT_ENABLED を true にすると再開）
+  if (!CHECKOUT_ENABLED) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <PageMeta title="チェックアウト" noindex />
+        <Navigation />
+        <main className="pt-32 pb-24 px-4 text-center">
+          <i className="ri-tools-line text-5xl text-gray-400"></i>
+          <h1 className="mt-4 text-2xl md:text-3xl font-bold">オンライン決済は準備中です</h1>
+          <p className="mt-3 text-sm md:text-base text-gray-600">
+            決済システムの準備が整い次第、ご購入いただけるようになります。
+          </p>
+          <Link
+            to="/products"
+            className="inline-block mt-8 px-8 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
+          >
+            商品一覧へ戻る
+          </Link>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
