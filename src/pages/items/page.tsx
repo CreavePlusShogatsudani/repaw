@@ -37,7 +37,7 @@ export default function ItemsPage() {
         const { data, error } = await supabase
           .from('products')
           .select('*')
-          .neq('status', 'hidden'); // 非公開以外を取得
+          .in('status', ['published', 'reserved', 'sold_out']); // draft・hidden は公開しない
 
         if (error) throw error;
         setProducts(data || []);
@@ -403,7 +403,12 @@ export default function ItemsPage() {
                                 <span className="px-4 md:px-6 py-2 md:py-3 bg-white text-black text-xs md:text-sm font-bold rounded-lg">SOLD OUT</span>
                               </div>
                             )}
-                            {product.status !== 'sold_out' && (
+                            {product.status === 'reserved' && (
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                <span className="px-4 md:px-6 py-2 md:py-3 bg-white text-gray-700 text-xs md:text-sm font-bold rounded-lg">購入手続き中</span>
+                              </div>
+                            )}
+                            {product.status !== 'sold_out' && product.status !== 'reserved' && (
                               <>
                                 <button className="absolute top-2 md:top-3 right-2 md:right-3 w-7 h-7 md:w-8 md:h-8 flex items-center justify-center bg-white rounded-full shadow-sm hover:bg-gray-100 transition-colors">
                                   <i className="ri-heart-line text-base md:text-lg"></i>

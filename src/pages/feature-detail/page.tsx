@@ -70,9 +70,11 @@ export default function FeatureDetailPage() {
                 return;
             }
             setCollection(colRes.data);
-            const prods = (cpRes.data || []).map((cp: any) => cp.product).filter(Boolean);
+            // draft・hidden の商品は特集内でも公開しない
+            const isPublic = (p: any) => p && ['published', 'reserved', 'sold_out'].includes(p.status);
+            const prods = (cpRes.data || []).map((cp: any) => cp.product).filter(isPublic);
             setProducts(prods);
-            const recProds = (recRes.data || []).map((r: any) => r.product).filter(Boolean);
+            const recProds = (recRes.data || []).map((r: any) => r.product).filter(isPublic);
             setRecommended(recProds);
             setLoading(false);
         };

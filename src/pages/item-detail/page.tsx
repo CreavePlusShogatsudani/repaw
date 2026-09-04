@@ -21,7 +21,6 @@ export default function ProductDetail() {
   const [error, setError] = useState<string | null>(null);
 
   const [selectedImage, setSelectedImage] = useState(0);
-  const [quantity, setQuantity] = useState(1);
   const [showAddedToast, setShowAddedToast] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteId, setFavoriteId] = useState<string | null>(null);
@@ -39,6 +38,7 @@ export default function ProductDetail() {
           .from('products')
           .select('*')
           .eq('id', id)
+          .in('status', ['published', 'reserved', 'sold_out']) // draft・hidden はURL直打ちでも見せない
           .single();
 
         if (productError) throw productError;
@@ -50,6 +50,7 @@ export default function ProductDetail() {
             .from('products')
             .select('*')
             .neq('id', id) // 自分自身は除外
+            .in('status', ['published', 'reserved', 'sold_out'])
             .limit(4);
 
           setRelatedProducts(relatedData || []);
@@ -95,7 +96,7 @@ export default function ProductDetail() {
       price: product.price,
       size: product.size,
       color: product.color,
-      quantity: quantity,
+      quantity: 1,
       image: imageUrl,
       seller: '出品者' // 将来的には実際の出品者名
     });
@@ -341,30 +342,20 @@ export default function ProductDetail() {
                 <p className="text-xs md:text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{product.description}</p>
               </div>
 
-              {/* 数量選択とカート追加 */}
+              {/* カート追加（リユース品はすべて一点物） */}
               <div className="mb-6">
-                <div className="flex items-center gap-3 md:gap-4 mb-4">
-                  <span className="text-sm font-medium whitespace-nowrap">数量：</span>
-                  <div className="flex items-center border rounded-lg">
-                    <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="px-3 md:px-4 py-2 hover:bg-gray-50 cursor-pointer whitespace-nowrap"
-                    >
-                      <i className="ri-subtract-line text-sm md:text-base"></i>
-                    </button>
-                    <span className="px-4 md:px-6 py-2 border-x font-medium whitespace-nowrap text-sm md:text-base">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="px-3 md:px-4 py-2 hover:bg-gray-50 cursor-pointer whitespace-nowrap"
-                    >
-                      <i className="ri-add-line text-sm md:text-base"></i>
-                    </button>
-                  </div>
-                </div>
+                <p className="text-xs md:text-sm text-gray-600 mb-4 flex items-center gap-1.5">
+                  <i className="ri-sparkling-line text-orange-500"></i>
+                  この商品は一点物です。売り切れ後の再入荷はありません
+                </p>
                 <div className="flex gap-3">
                   {product.status === 'sold_out' ? (
                     <div className="flex-1 bg-gray-200 text-gray-500 py-3 md:py-4 rounded-lg text-sm md:text-base font-medium text-center whitespace-nowrap">
                       売り切れ
+                    </div>
+                  ) : product.status === 'reserved' ? (
+                    <div className="flex-1 bg-gray-100 text-gray-500 py-3 md:py-4 rounded-lg text-sm md:text-base font-medium text-center whitespace-nowrap">
+                      他のお客様が購入手続き中です
                     </div>
                   ) : (
                   <button

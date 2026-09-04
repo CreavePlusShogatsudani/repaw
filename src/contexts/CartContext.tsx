@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '../lib/supabase';
 
 export interface CartItem {
     id: number;
@@ -16,8 +17,9 @@ interface CartContextType {
     cartItems: CartItem[];
     addToCart: (item: Omit<CartItem, 'id'>) => void;
     removeFromCart: (id: number) => void;
-    updateQuantity: (id: number, quantity: number) => void;
     clearCart: () => void;
+    /** DBの在庫状態と突き合わせ、買えなくなった商品をカートから外す。外した商品名を返す */
+    syncWithStock: (userId?: string) => Promise<string[]>;
     totalAmount: number;
     itemCount: number;
 }
@@ -28,7 +30,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const [cartItems, setCartItems] = useState<CartItem[]>(() => {
         try {
             const stored = localStorage.getItem('cartItems');
-            return stored ? JSON.parse(stored) : [];
+            const items: CartItem[] = stored ? JSON.parse(stored) : [];
+            return items.map(i => ({ ...i, quantity: 1 }));
         } catch (error) {
             console.error('Failed to load cart from localStorage:', error);
             return [];
@@ -43,21 +46,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
     }, [cartItems]);
 
+    // 一点物なので同じ商品は1つまで、数量は常に1
     const addToCart = (item: Omit<CartItem, 'id'>) => {
         setCartItems(prev => {
-            const existingItemIndex = prev.findIndex(i =>
-                i.productId === item.productId &&
-                i.size === item.size &&
-                i.color === item.color
-            );
-
-            if (existingItemIndex > -1) {
-                const newItems = [...prev];
-                newItems[existingItemIndex].quantity += item.quantity;
-                return newItems;
-            } else {
-                return [...prev, { ...item, id: Date.now() }];
-            }
+            if (prev.some(i => i.productId === item.productId)) return prev;
+            return [...prev, { ...item, quantity: 1, id: Date.now() }];
         });
     };
 
@@ -65,15 +58,34 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setCartItems(prev => prev.filter(item => item.id !== id));
     };
 
-    const updateQuantity = (id: number, quantity: number) => {
-        if (quantity < 1) return;
-        setCartItems(prev => prev.map(item =>
-            item.id === id ? { ...item, quantity } : item
-        ));
-    };
-
     const clearCart = () => {
         setCartItems([]);
+    };
+
+    // published 以外（売り切れ・非公開・他の人が購入手続き中）をカートから外す。
+    // 自分が予約中（reserved_by = 自分）の商品は残す。
+    const syncWithStock = async (userId?: string): Promise<string[]> => {
+        if (cartItems.length === 0) return [];
+        const { data, error } = await supabase
+            .from('products')
+            .select('id, status, reserved_by')
+            .in('id', cartItems.map(i => i.productId));
+        if (error || !data) return [];
+
+        const byId = new Map(data.map(p => [p.id, p]));
+        const isAvailable = (productId: string) => {
+            const p = byId.get(productId);
+            if (!p) return false;
+            if (p.status === 'published') return true;
+            return p.status === 'reserved' && !!userId && p.reserved_by === userId;
+        };
+
+        const removed = cartItems.filter(i => !isAvailable(i.productId));
+        if (removed.length > 0) {
+            const removedIds = new Set(removed.map(i => i.id));
+            setCartItems(prev => prev.filter(i => !removedIds.has(i.id)));
+        }
+        return removed.map(i => i.name);
     };
 
     const totalAmount = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -84,8 +96,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
             cartItems,
             addToCart,
             removeFromCart,
-            updateQuantity,
             clearCart,
+            syncWithStock,
             totalAmount,
             itemCount
         }}>

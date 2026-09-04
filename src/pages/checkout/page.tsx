@@ -5,10 +5,9 @@ import PageMeta from '../../components/PageMeta';
 import { stripePromise } from '../../lib/stripe';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
-import { useCart, CartItem } from '../../contexts/CartContext';
+import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
-import { createOrder } from '../../lib/orders';
 
 // 決済システム（Stripe）接続後に true へ変更する
 const CHECKOUT_ENABLED = false;
@@ -35,10 +34,14 @@ interface FormData {
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { cartItems, totalAmount, clearCart } = useCart();
+  const { cartItems, totalAmount, clearCart, syncWithStock } = useCart();
   const { user, profile, loading: authLoading } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [clientSecret, setClientSecret] = useState<string>("");
+  const [paymentIntentId, setPaymentIntentId] = useState<string>("");
+  // サーバー（begin_checkout）が確定した金額。PaymentIntent 作成後はこちらが正
+  const [serverAmounts, setServerAmounts] = useState<{ subtotal: number; shippingFee: number; total: number } | null>(null);
+  const [checkoutError, setCheckoutError] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
   // 住所選択モード: 'saved' = 登録済み, 'new' = 別の住所
@@ -100,32 +103,87 @@ export default function CheckoutPage() {
     }
   }, [cartItems, navigate]);
 
+  // チェックアウトに入った時点で在庫を再検証（外れた商品があればカートへ戻す）
+  useEffect(() => {
+    if (authLoading || !user) return;
+    syncWithStock(user.id).then(names => { if (names.length > 0) navigate('/cart', { state: { removed: names } }); });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, user?.id]);
+
   const hasSavedAddress = !!(profile?.postal_code || profile?.address);
 
-  const subtotal = totalAmount;
-  const shippingFee = subtotal >= 5000 ? 0 : 500;
-  const total = subtotal + shippingFee;
+  // 金額の正はサーバー（DB の calc_shipping_fee）。ここは PaymentIntent 作成前の見積り表示のみ
+  const subtotal = serverAmounts?.subtotal ?? totalAmount;
+  const shippingFee = serverAmounts?.shippingFee ?? (subtotal >= 5000 ? 0 : 500);
+  const total = serverAmounts?.total ?? subtotal + shippingFee;
+
+  // 配送先（注文に保存される形。order-complete もこの形を読む）
+  const buildShippingAddress = () =>
+    addressMode === 'saved' && profile
+      ? {
+          name: profile.full_name,
+          email: profile.email || user?.email || formData.email,
+          postal_code: profile.postal_code,
+          prefecture: profile.prefecture,
+          city: profile.city,
+          address: profile.address,
+          building: profile.building,
+          phone: profile.phone,
+        }
+      : {
+          name: `${formData.lastName} ${formData.firstName}`,
+          email: formData.email,
+          postal_code: formData.postalCode,
+          prefecture: formData.prefecture,
+          city: formData.city,
+          address: formData.address,
+          building: formData.building,
+          phone: formData.phone,
+        };
+
 
   useEffect(() => {
-    // 支払い方法がクレジットカードの場合、Payment Intentを作成
-    if (currentStep === 2 && formData.paymentMethod === 'credit' && total > 0) {
-      const createPaymentIntent = async () => {
-        try {
-          const { data, error } = await supabase.functions.invoke('create-payment-intent', {
-            body: { amount: total, currency: 'jpy' },
-          });
-
-          if (error) throw error;
-          if (data?.clientSecret) {
-            setClientSecret(data.clientSecret);
-          }
-        } catch (error) {
-          console.error('Error creating payment intent:', error);
-        }
-      };
-      createPaymentIntent();
+    // ステップ2以外に戻ったら PaymentIntent を捨てる（住所変更に追従させる）
+    if (currentStep !== 2) {
+      setClientSecret('');
+      setPaymentIntentId('');
+      setServerAmounts(null);
+      return;
     }
-  }, [currentStep, formData.paymentMethod, total]);
+    if (formData.paymentMethod !== 'credit' || clientSecret || cartItems.length === 0) return;
+
+    // 支払い方法がクレジットカードの場合、Payment Intentを作成
+    // 金額はサーバーが DB から計算し、商品は15分間予約される
+    const createPaymentIntent = async () => {
+      setCheckoutError('');
+      const { data, error } = await supabase.functions.invoke('create-payment-intent', {
+        body: {
+          productIds: cartItems.map((i) => i.productId),
+          shippingAddress: buildShippingAddress(),
+        },
+      });
+
+      if (error) {
+        let code = '';
+        try { code = (await error.context?.json())?.error ?? ''; } catch { /* noop */ }
+        if (code === 'SOLD_OUT') {
+          await syncWithStock(user?.id);
+          setCheckoutError('申し訳ありません。カート内の商品が売り切れ、または他のお客様が購入手続き中のためカートから外しました。内容をご確認ください。');
+        } else {
+          console.error('Error creating payment intent:', error);
+          setCheckoutError('決済の準備に失敗しました。時間をおいて再度お試しください。');
+        }
+        return;
+      }
+      if (data?.clientSecret) {
+        setClientSecret(data.clientSecret);
+        setPaymentIntentId(data.paymentIntentId);
+        setServerAmounts({ subtotal: data.subtotal, shippingFee: data.shippingFee, total: data.total });
+      }
+    };
+    createPaymentIntent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep, formData.paymentMethod, clientSecret]);
 
   // 決済システム接続まではオンライン購入を停止（CHECKOUT_ENABLED を true にすると再開）
   if (!CHECKOUT_ENABLED) {
@@ -446,81 +504,34 @@ export default function CheckoutPage() {
                     <h2 className="text-2xl font-bold mb-6">支払い方法</h2>
 
                     <div className="space-y-6">
-                      <div className="space-y-3">
-                        <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="credit"
-                            checked={formData.paymentMethod === 'credit'}
-                            onChange={handleInputChange}
-                            className="w-5 h-5 cursor-pointer"
-                          />
-                          <div className="ml-4 flex-1">
-                            <div className="flex items-center gap-2">
-                              <i className="ri-bank-card-line text-xl"></i>
-                              <span className="font-medium">クレジットカード</span>
-                            </div>
-                            <p className="text-sm text-gray-600 mt-1">Visa、Mastercard、JCB、AMEX</p>
-                          </div>
-                        </label>
-
-                        <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="convenience"
-                            checked={formData.paymentMethod === 'convenience'}
-                            onChange={handleInputChange}
-                            className="w-5 h-5 cursor-pointer"
-                          />
-                          <div className="ml-4 flex-1">
-                            <div className="flex items-center gap-2">
-                              <i className="ri-store-2-line text-xl"></i>
-                              <span className="font-medium">コンビニ決済</span>
-                            </div>
-                            <p className="text-sm text-gray-600 mt-1">セブンイレブン、ファミリーマート、ローソン</p>
-                          </div>
-                        </label>
-
-                        <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="bank"
-                            checked={formData.paymentMethod === 'bank'}
-                            onChange={handleInputChange}
-                            className="w-5 h-5 cursor-pointer"
-                          />
-                          <div className="ml-4 flex-1">
-                            <div className="flex items-center gap-2">
-                              <i className="ri-bank-line text-xl"></i>
-                              <span className="font-medium">銀行振込</span>
-                            </div>
-                            <p className="text-sm text-gray-600 mt-1">入金確認後に発送</p>
-                          </div>
-                        </label>
+                      {/* 現在はクレジットカードのみ。コンビニ決済・銀行振込は未実装のため選択肢から外している */}
+                      <div className="flex items-center p-4 border-2 border-gray-900 rounded-lg">
+                        <i className="ri-bank-card-line text-xl"></i>
+                        <div className="ml-4 flex-1">
+                          <span className="font-medium">クレジットカード</span>
+                          <p className="text-sm text-gray-600 mt-1">Visa、Mastercard、JCB、AMEX</p>
+                        </div>
                       </div>
 
                       {formData.paymentMethod === 'credit' && (
                         <div className="pt-6 border-t">
+                          {checkoutError && (
+                            <div className="mb-4 p-4 bg-red-50 text-red-700 text-sm rounded-lg">{checkoutError}</div>
+                          )}
                           {clientSecret ? (
                             <Elements stripe={stripePromise} options={{ clientSecret }}>
                               <PaymentForm
                                 setCurrentStep={setCurrentStep}
                                 formData={formData}
                                 clearCart={clearCart}
-                                cartItems={cartItems}
-                                totalAmount={totalAmount}
-                                addressMode={addressMode}
-                                profile={profile}
+                                paymentIntentId={paymentIntentId}
                               />
                             </Elements>
-                          ) : (
+                          ) : !checkoutError ? (
                             <div className="text-center py-4">
                               読み込み中...
                             </div>
-                          )}
+                          ) : null}
                         </div>
                       )}
                     </div>
@@ -684,9 +695,8 @@ export default function CheckoutPage() {
                         <p className="text-xs text-gray-600 mb-1.5 md:mb-2">
                           {item.size} / {item.color}
                         </p>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">数量: {item.quantity}</span>
-                          <span className="font-bold text-xs md:text-sm">¥{(item.price * item.quantity).toLocaleString()}</span>
+                        <div className="flex justify-end items-center">
+                          <span className="font-bold text-xs md:text-sm">¥{item.price.toLocaleString()}</span>
                         </div>
                       </div>
                     </div>
@@ -743,14 +753,11 @@ export default function CheckoutPage() {
   );
 }
 
-function PaymentForm({ setCurrentStep, formData, clearCart, cartItems, totalAmount, addressMode, profile }: {
+function PaymentForm({ setCurrentStep, formData, clearCart, paymentIntentId }: {
   setCurrentStep: (step: number) => void,
   formData: FormData,
   clearCart: () => void,
-  cartItems: CartItem[],
-  totalAmount: number,
-  addressMode: 'saved' | 'new',
-  profile: any,
+  paymentIntentId: string,
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -796,43 +803,15 @@ function PaymentForm({ setCurrentStep, formData, clearCart, cartItems, totalAmou
     }
 
     if (paymentIntent && paymentIntent.status === 'succeeded') {
-      try {
-        // 注文データの作成
-        const shippingAddress = addressMode === 'saved' && profile
-          ? {
-              name: profile.full_name,
-              postal_code: profile.postal_code,
-              prefecture: profile.prefecture,
-              city: profile.city,
-              address: profile.address,
-              building: profile.building,
-              phone: profile.phone,
-            }
-          : {
-              name: `${formData.lastName} ${formData.firstName}`,
-              postal_code: formData.postalCode,
-              prefecture: formData.prefecture,
-              city: formData.city,
-              address: formData.address,
-              building: formData.building,
-              phone: formData.phone,
-            };
-
-        const order = await createOrder({
-          totalAmount: totalAmount + (totalAmount >= 5000 ? 0 : 500),
-          shippingAddress,
-          paymentIntentId: paymentIntent.id,
-          cartItems: cartItems
-        });
-
-        clearCart();
-        navigate('/order-complete', { state: { orderId: order.id } });
-      } catch (err) {
-        console.error('Order creation failed:', err);
-        setError('支払いは完了しましたが、注文処理に失敗しました。サポートにお問い合わせください。');
-        setProcessing(false);
-      }
+      // 注文の作成・在庫の確定は Stripe Webhook（stripe-webhook → finalize_order）が行う。
+      // ここでは完了ページへ遷移し、完了ページ側で注文の反映を待つ。
+      clearCart();
+      navigate('/order-complete', { state: { paymentIntentId: paymentIntent.id || paymentIntentId } });
+      return;
     }
+
+    setError('支払いが完了しませんでした。カード情報をご確認ください。');
+    setProcessing(false);
   };
 
   return (

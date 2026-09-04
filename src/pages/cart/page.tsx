@@ -1,11 +1,24 @@
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
 import PageMeta from '../../components/PageMeta';
 
 export default function CartPage() {
-  const { cartItems, removeFromCart, updateQuantity, totalAmount } = useCart();
+  const { cartItems, removeFromCart, totalAmount, syncWithStock } = useCart();
+  const { user, loading: authLoading } = useAuth();
+  const location = useLocation();
+  // チェックアウト側で外された商品名は state で受け取る
+  const [removedNames, setRemovedNames] = useState<string[]>((location.state?.removed as string[] | undefined) ?? []);
+
+  // カートを開いたとき、売り切れ・購入手続き中になった商品を外す
+  useEffect(() => {
+    if (authLoading) return;
+    syncWithStock(user?.id).then(names => { if (names.length > 0) setRemovedNames(prev => [...prev, ...names]); });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, user?.id]);
 
   const shippingFee = totalAmount >= 5000 ? 0 : 500;
   const total = totalAmount + shippingFee;
@@ -20,6 +33,13 @@ export default function CartPage() {
           <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">
             ショッピングカート
           </h1>
+
+          {removedNames.length > 0 && (
+            <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg text-sm text-orange-800">
+              次の商品は売り切れ、または他のお客様が購入手続き中のためカートから外しました：
+              <span className="font-medium">{removedNames.join('、')}</span>
+            </div>
+          )}
 
           {cartItems.length === 0 ? (
             <div className="text-center py-16 md:py-20">
@@ -114,26 +134,11 @@ export default function CartPage() {
                           </div>
 
                           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                            <div className="flex items-center border rounded-lg">
-                              <button
-                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                className="px-2.5 md:px-3 py-1.5 md:py-2 hover:bg-gray-50 cursor-pointer whitespace-nowrap"
-                              >
-                                <i className="ri-subtract-line text-sm"></i>
-                              </button>
-                              <span className="px-3 md:px-4 py-1.5 md:py-2 border-x font-medium whitespace-nowrap min-w-[50px] md:min-w-[60px] text-center text-sm">
-                                {item.quantity}
-                              </span>
-                              <button
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="px-2.5 md:px-3 py-1.5 md:py-2 hover:bg-gray-50 cursor-pointer whitespace-nowrap"
-                              >
-                                <i className="ri-add-line text-sm"></i>
-                              </button>
-                            </div>
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-orange-50 text-orange-700 text-xs font-medium rounded-full whitespace-nowrap">
+                              <i className="ri-sparkling-line"></i>一点物
+                            </span>
                             <div className="text-right">
-                              <p className="text-lg md:text-xl font-bold">¥{(item.price * item.quantity).toLocaleString()}</p>
-                              <p className="text-xs md:text-sm text-gray-600">¥{item.price.toLocaleString()} × {item.quantity}</p>
+                              <p className="text-lg md:text-xl font-bold">¥{item.price.toLocaleString()}</p>
                             </div>
                           </div>
                         </div>

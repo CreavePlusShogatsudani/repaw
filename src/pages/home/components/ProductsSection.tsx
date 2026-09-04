@@ -13,7 +13,7 @@ export default function ProductsSection() {
     supabase
       .from('products')
       .select('*')
-      .neq('status', 'hidden')
+      .in('status', ['published', 'reserved', 'sold_out'])
       .order('created_at', { ascending: false })
       .limit(8)
       .then(({ data }) => setProducts(data || []));

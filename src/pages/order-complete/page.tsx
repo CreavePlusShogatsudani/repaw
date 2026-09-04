@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { supabase } from '../../lib/supabase';
@@ -22,10 +22,9 @@ interface Order {
   id: string;
   total_amount: number;
   shipping_address: {
+    name?: string;
     email?: string;
-    lastName?: string;
-    firstName?: string;
-    postalCode?: string;
+    postal_code?: string;
     prefecture?: string;
     city?: string;
     address?: string;
@@ -38,52 +37,90 @@ interface Order {
 export default function OrderCompletePage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const orderId = location.state?.orderId as string | undefined;
+  const [searchParams] = useSearchParams();
+  // 通常遷移は state、リダイレクト型決済は Stripe が ?payment_intent= を付けて戻す
+  const paymentIntentId =
+    (location.state?.paymentIntentId as string | undefined) ?? searchParams.get('payment_intent') ?? undefined;
 
   const [order, setOrder] = useState<Order | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pending, setPending] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    if (!orderId) {
+    if (!paymentIntentId) {
       navigate('/');
       return;
     }
 
-    const fetchOrder = async () => {
-      const { data: orderData, error: orderError } = await supabase
+    // 注文は Stripe Webhook が非同期に作るので、反映されるまで数秒ポーリングする
+    let cancelled = false;
+    const MAX_TRIES = 12;
+    const INTERVAL_MS = 1500;
+
+    const fetchOrder = async (attempt: number) => {
+      const { data: orderData } = await supabase
         .from('orders')
         .select('*')
-        .eq('id', orderId)
-        .single();
+        .eq('stripe_payment_intent_id', paymentIntentId)
+        .maybeSingle();
 
-      if (orderError || !orderData) {
-        navigate('/');
+      if (cancelled) return;
+
+      if (!orderData) {
+        if (attempt < MAX_TRIES) {
+          setTimeout(() => fetchOrder(attempt + 1), INTERVAL_MS);
+        } else {
+          setPending(true);
+          setLoading(false);
+        }
         return;
       }
 
       const { data: itemsData } = await supabase
         .from('order_items')
         .select('id, quantity, price_at_purchase, products(id, name, images, size, color)')
-        .eq('order_id', orderId);
+        .eq('order_id', orderData.id);
 
+      if (cancelled) return;
       setOrder(orderData);
       setOrderItems((itemsData as OrderItem[]) || []);
       setLoading(false);
     };
 
-    fetchOrder();
-  }, [orderId, navigate]);
+    fetchOrder(1);
+    return () => { cancelled = true; };
+  }, [paymentIntentId, navigate]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
         <div className="flex justify-center items-center h-[50vh] pt-20">
-          <div className="text-gray-500">読み込み中...</div>
+          <div className="text-gray-500">決済を確認しています...</div>
         </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (pending) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <PageMeta title="ご注文の確認中" noindex />
+        <Navigation />
+        <main className="pt-24 pb-16">
+          <div className="max-w-2xl mx-auto px-6 text-center">
+            <h1 className="text-2xl font-bold mb-4">お支払いを受け付けました</h1>
+            <p className="text-gray-600 mb-8">
+              ご注文の反映に少し時間がかかっています。数分後にマイページの注文履歴でご確認ください。
+              反映されない場合はお問い合わせください。
+            </p>
+            <Link to="/mypage" className="inline-block px-8 py-3 bg-gray-900 text-white rounded-lg font-medium">マイページへ</Link>
+          </div>
+        </main>
         <Footer />
       </div>
     );
@@ -106,7 +143,7 @@ export default function OrderCompletePage() {
   });
   const orderNumber = order.id.split('-')[0].toUpperCase();
   const email = shippingAddress.email || '';
-  const recipientName = `${shippingAddress.lastName || ''} ${shippingAddress.firstName || ''}`.trim();
+  const recipientName = shippingAddress.name || '';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -191,7 +228,7 @@ export default function OrderCompletePage() {
             <h2 className="text-xl font-bold mb-6">配送先</h2>
             <div className="space-y-2 text-sm">
               <p className="font-medium text-base">{recipientName}</p>
-              <p className="text-gray-700">〒{shippingAddress.postalCode}</p>
+              <p className="text-gray-700">〒{shippingAddress.postal_code}</p>
               <p className="text-gray-700">
                 {shippingAddress.prefecture}{shippingAddress.city}{shippingAddress.address}
               </p>
