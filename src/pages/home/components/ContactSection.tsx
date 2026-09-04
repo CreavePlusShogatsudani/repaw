@@ -38,7 +38,7 @@ export default function ContactSection() {
   return (
     <section id="contact" className="py-24 px-6 bg-white">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-16" data-reveal>
           <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Contact</h2>
           <p className="text-gray-600 text-sm tracking-wider">お問い合わせ</p>
         </div>

@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type CSSProperties } from 'react';
 import PageMeta from '../../components/PageMeta';
+import { CONDITION_RANKS, CONDITION_INFO, getConditionInfo } from '../../lib/conditions';
 import { Link } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
@@ -8,7 +9,7 @@ import type { Product } from '../../types';
 
 const CATEGORIES = ['すべて', 'アウター', 'ニット', 'Tシャツ', 'アクセサリー'];
 const SIZES = ['すべて', 'S', 'M', 'L', 'XL', 'フリー'];
-const CONDITIONS = ['すべて', 'A', 'B', 'C'];
+const CONDITIONS = ['すべて', ...CONDITION_RANKS];
 
 const PRICE_RANGES = [
   { label: 'すべて', min: 0, max: Infinity },
@@ -66,16 +67,18 @@ export default function ItemsPage() {
     return true;
   });
 
-  // 並び替え
-  if (sortBy === '価格が安い順') {
-    filteredProducts = [...filteredProducts].sort((a, b) => a.price - b.price);
-  } else if (sortBy === '価格が高い順') {
-    filteredProducts = [...filteredProducts].sort((a, b) => b.price - a.price);
-  } else if (sortBy === '新着順') {
-    filteredProducts = [...filteredProducts].sort((a, b) =>
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
-  }
+  // 並び替え: どのソートでも「販売中 → 購入手続き中 → 売り切れ」の順は固定し、その中で並べる
+  const STATUS_ORDER: Record<string, number> = { published: 0, reserved: 1, sold_out: 2 };
+  const byStatus = (a: Product, b: Product) =>
+    (STATUS_ORDER[a.status] ?? 9) - (STATUS_ORDER[b.status] ?? 9);
+  const byNewest = (a: Product, b: Product) =>
+    new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+
+  let secondary: (a: Product, b: Product) => number = byNewest;
+  if (sortBy === '価格が安い順') secondary = (a, b) => a.price - b.price;
+  else if (sortBy === '価格が高い順') secondary = (a, b) => b.price - a.price;
+
+  filteredProducts = [...filteredProducts].sort((a, b) => byStatus(a, b) || secondary(a, b));
 
   const resetFilters = () => {
     setSelectedCategory('すべて');
@@ -207,8 +210,14 @@ export default function ItemsPage() {
                               onChange={() => setSelectedCondition(condition)}
                               className="w-4 h-4 cursor-pointer"
                             />
-                            <span className="text-sm group-hover:text-orange-600 transition-colors">
+                            <span
+                              className="text-sm group-hover:text-orange-600 transition-colors"
+                              title={condition === 'すべて' ? undefined : `${CONDITION_INFO[condition as keyof typeof CONDITION_INFO].short} — ${CONDITION_INFO[condition as keyof typeof CONDITION_INFO].description}`}
+                            >
                               {condition === 'すべて' ? condition : `${condition}ランク`}
+                              {condition !== 'すべて' && (
+                                <span className="ml-1.5 text-xs text-gray-400">{CONDITION_INFO[condition as keyof typeof CONDITION_INFO].short}</span>
+                              )}
                             </span>
                           </label>
                         ))}
@@ -336,6 +345,7 @@ export default function ItemsPage() {
                             <button
                               key={condition}
                               onClick={() => setSelectedCondition(condition)}
+                              title={condition === 'すべて' ? undefined : CONDITION_INFO[condition as keyof typeof CONDITION_INFO].short}
                               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap cursor-pointer transition-colors ${selectedCondition === condition
                                   ? 'bg-black text-white'
                                   : 'bg-white border border-gray-300 hover:border-black'
@@ -388,24 +398,47 @@ export default function ItemsPage() {
                 ) : (
                   <>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6" data-product-shop>
-                      {filteredProducts.map((product) => (
-                        <Link key={product.id} to={`/product/${product.id}`} className="group cursor-pointer">
+                      {filteredProducts.map((product, index) => (
+                        <Link
+                          key={product.id}
+                          to={`/product/${product.id}`}
+                          className="group cursor-pointer"
+                          data-reveal
+                          style={{ '--reveal-delay': `${(index % 12) * 50}ms` } as CSSProperties}
+                        >
                           <div className="relative mb-3 bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                            <div className="w-full h-64 md:h-80">
+                            <div className="w-full h-64 md:h-80 relative">
                               <img
                                 src={getProductImage(product)}
                                 alt={product.name}
-                                className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                                className={`w-full h-full object-cover object-top transition-transform duration-500 ${product.status === 'sold_out' ? 'grayscale' : 'group-hover:scale-105'}`}
                               />
+                              {/* 2枚目の写真があれば hover でクロスフェード */}
+                              {product.images?.[1] && product.status !== 'sold_out' && (
+                                <img
+                                  src={product.images[1]}
+                                  alt=""
+                                  aria-hidden="true"
+                                  className="absolute inset-0 w-full h-full object-cover object-top opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                                />
+                              )}
+                              {/* hover で状態と実寸をそっと出す（PCのみ） */}
+                              {product.status === 'published' && (
+                                <div className="hidden md:flex absolute inset-x-0 bottom-0 px-3 py-2 bg-gradient-to-t from-black/60 to-transparent text-white text-[11px] gap-3 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 pointer-events-none">
+                                  {getConditionInfo(product.condition) && <span>{product.condition}ランク · {getConditionInfo(product.condition)!.short}</span>}
+                                  {product.back_length_cm && <span>背丈 {product.back_length_cm}cm</span>}
+                                  {product.chest_cm && <span>胴回り {product.chest_cm}cm</span>}
+                                </div>
+                              )}
                             </div>
                             {product.status === 'sold_out' && (
-                              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                                <span className="px-4 md:px-6 py-2 md:py-3 bg-white text-black text-xs md:text-sm font-bold rounded-lg">SOLD OUT</span>
+                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                <span className="px-4 md:px-6 py-2 md:py-3 bg-white text-black text-xs md:text-sm font-bold rounded-lg -rotate-6 shadow">SOLD OUT</span>
                               </div>
                             )}
                             {product.status === 'reserved' && (
                               <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                <span className="px-4 md:px-6 py-2 md:py-3 bg-white text-gray-700 text-xs md:text-sm font-bold rounded-lg">購入手続き中</span>
+                                <span className="px-4 md:px-6 py-2 md:py-3 bg-white text-gray-700 text-xs md:text-sm font-bold rounded-lg pulse-soft">購入手続き中</span>
                               </div>
                             )}
                             {product.status !== 'sold_out' && product.status !== 'reserved' && (
@@ -423,17 +456,19 @@ export default function ItemsPage() {
                           </div>
                           <div>
                             <div className="flex items-center gap-2 mb-1.5 md:mb-2">
-                              {/* 出品者情報は未実装のため一時的にダミー表示 */}
-                              <div className="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center rounded-full overflow-hidden bg-gray-100">
-                                <i className="ri-user-line text-gray-400"></i>
-                              </div>
-                              <span className="text-xs text-gray-500">
-                                出品者
+                              {/* リユース品はすべて一点物。出品者表示は買取オン後に再検討 */}
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-orange-50 text-orange-700 text-[11px] md:text-xs font-medium rounded-full whitespace-nowrap">
+                                <i className="ri-sparkling-line"></i>一点物
                               </span>
                             </div>
                             <div className="flex items-center gap-2 mb-1">
                               <span className="text-xs text-gray-500">サイズ: {product.size}</span>
-                              <span className="text-xs text-gray-500">{product.condition}ランク</span>
+                              <span className="text-xs text-gray-500" title={getConditionInfo(product.condition)?.description}>
+                                {product.condition}ランク
+                                {getConditionInfo(product.condition) && (
+                                  <span className="text-gray-400"> · {getConditionInfo(product.condition)!.short}</span>
+                                )}
+                              </span>
                             </div>
                             <h3 className="text-xs md:text-sm font-medium mb-1.5 md:mb-2 group-hover:underline line-clamp-1">{product.name}</h3>
                             <div className="flex items-center gap-1.5 md:gap-2">

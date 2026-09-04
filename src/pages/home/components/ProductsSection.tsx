@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type CSSProperties } from 'react';
 import { supabase } from '../../../lib/supabase';
 import type { Product } from '../../../types';
 
@@ -31,7 +31,7 @@ export default function ProductsSection() {
   return (
     <section id="items" className="py-24 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-16" data-reveal>
           <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Items</h2>
           <p className="text-gray-600 text-sm tracking-wider">商品一覧</p>
         </div>
@@ -60,11 +60,11 @@ export default function ProductsSection() {
           <div className="text-center py-16 text-gray-400">商品がありません</div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {filtered.map((product) => {
+            {filtered.map((product, index) => {
               const imageUrl = product.images?.[0] || '';
               const discountRate = getDiscountRate(product.price, product.original_price);
               return (
-                <Link key={product.id} to={`/product/${product.id}`} className="group cursor-pointer">
+                <Link key={product.id} to={`/product/${product.id}`} className="group cursor-pointer" data-reveal style={{ '--reveal-delay': `${index * 60}ms` } as CSSProperties}>
                   <div className="relative mb-3 bg-white rounded-lg overflow-hidden">
                     <div className="w-full h-80 bg-gray-50">
                       {imageUrl && (

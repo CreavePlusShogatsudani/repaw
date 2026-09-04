@@ -2,7 +2,7 @@ export default function ImpactSection() {
   return (
     <section id="impact" className="py-24 px-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-16" data-reveal>
           <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Impact</h2>
           <p className="text-gray-600 text-sm tracking-wider">社会的価値・インパクト</p>
         </div>

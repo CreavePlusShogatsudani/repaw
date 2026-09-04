@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
+import { CONDITION_RANKS, CONDITION_INFO } from '../../../lib/conditions';
 
 const BRAND_OPTIONS = [
   { group: 'ノーブランド', brands: ['ノーブランド'] },
@@ -401,10 +402,10 @@ export default function AdminProductFormPage() {
                             className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
                         >
                             <option value="">選択してください</option>
-                            <option value="S">S (新品・未使用)</option>
-                            <option value="A">A (非常に良い)</option>
-                            <option value="B">B (良い)</option>
-                            <option value="C">C (可)</option>
+                            {/* ランク定義は src/lib/conditions.ts が唯一の正（A/B/C）。S は A に含める */}
+                            {CONDITION_RANKS.map((rank) => (
+                                <option key={rank} value={rank}>{rank} ({CONDITION_INFO[rank].short})</option>
+                            ))}
                         </select>
                     </div>
 

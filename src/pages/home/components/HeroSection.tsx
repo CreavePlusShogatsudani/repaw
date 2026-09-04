@@ -60,7 +60,7 @@ export default function HeroSection() {
                         <img
                             src={banner.image_url}
                             alt={banner.title || ''}
-                            className="w-full h-full object-cover"
+                            className={`w-full h-full object-cover ${i === currentIndex ? 'kenburns' : ''}`}
                         />
                         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/40"></div>
                     </div>

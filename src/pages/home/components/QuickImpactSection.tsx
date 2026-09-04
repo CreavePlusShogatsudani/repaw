@@ -1,3 +1,5 @@
+import CountUp from '../../../components/CountUp';
+
 const IMPACT_STATS = [
   {
     icon: 'ri-recycle-line',
@@ -29,7 +31,7 @@ export default function QuickImpactSection() {
   return (
     <section id="impact" className="py-24 px-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-16" data-reveal>
           <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Impact</h2>
           <p className="text-gray-600 text-sm tracking-wider">社会的価値</p>
         </div>
@@ -40,7 +42,7 @@ export default function QuickImpactSection() {
               <div className="w-16 h-16 flex items-center justify-center bg-orange-50 text-orange-600 rounded-full mx-auto mb-4">
                 <i className={`${stat.icon} text-3xl`}></i>
               </div>
-              <div className="text-3xl font-bold mb-1">{stat.value}</div>
+              <div className="text-3xl font-bold mb-1"><CountUp value={stat.value} /></div>
               <div className="text-sm font-medium mb-1">{stat.label}</div>
               <div className="text-xs text-gray-500">{stat.description}</div>
             </div>

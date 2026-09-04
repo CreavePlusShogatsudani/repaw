@@ -29,7 +29,7 @@ export default function ServiceSection() {
   return (
     <section id="service" className="py-24 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-16" data-reveal>
           <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Service</h2>
           <p className="text-gray-600 text-sm tracking-wider">サービス概要</p>
         </div>

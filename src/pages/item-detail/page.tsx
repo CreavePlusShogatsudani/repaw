@@ -7,6 +7,7 @@ import type { Product } from '../../types';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import PageMeta from '../../components/PageMeta';
+import { CONDITION_RANKS, CONDITION_INFO, getConditionInfo } from '../../lib/conditions';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -226,9 +227,10 @@ export default function ProductDetail() {
               <div className="mb-3 md:mb-4 bg-gray-50 rounded-lg overflow-hidden aspect-square">
                 {product.images && product.images.length > 0 ? (
                   <img
+                    key={selectedImage}
                     src={product.images[selectedImage]}
                     alt={product.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover img-fade"
                   />
                 ) : (
                   <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
@@ -279,7 +281,7 @@ export default function ProductDetail() {
                     #{product.category}
                   </span>
                   <span className="px-2.5 md:px-3 py-1 bg-gray-100 text-gray-700 text-xs md:text-sm rounded-full whitespace-nowrap">
-                    #{product.condition}ランク
+                    #{product.condition}ランク{getConditionInfo(product.condition) ? ` · ${getConditionInfo(product.condition)!.short}` : ''}
                   </span>
                 </div>
               </div>
@@ -299,13 +301,39 @@ export default function ProductDetail() {
                   </div>
                   <div>
                     <span className="text-gray-600">状態：</span>
-                    <span className="font-medium">{product.condition}</span>
+                    <span className="font-medium">{product.condition}ランク</span>
+                    {getConditionInfo(product.condition) && (
+                      <span className="text-gray-600">（{getConditionInfo(product.condition)!.short}）</span>
+                    )}
                   </div>
                   <div>
                     <span className="text-gray-600">カラー：</span>
                     <span className="font-medium">{product.color}</span>
                   </div>
                 </div>
+
+                {/* 状態ランクの基準。中古品の購入で一番不安な点なので、その場で確認できるようにする */}
+                <details className="mt-4 group">
+                  <summary className="text-xs md:text-sm text-gray-600 cursor-pointer inline-flex items-center gap-1 hover:text-gray-900 list-none">
+                    <i className="ri-information-line"></i>
+                    状態ランクの基準
+                    <i className="ri-arrow-down-s-line transition-transform group-open:rotate-180"></i>
+                  </summary>
+                  <dl className="mt-3 space-y-2 text-xs md:text-sm">
+                    {CONDITION_RANKS.map((rank) => (
+                      <div
+                        key={rank}
+                        className={`flex gap-3 p-2.5 rounded-lg ${product.condition === rank ? 'bg-orange-50' : 'bg-gray-50'}`}
+                      >
+                        <dt className="font-bold whitespace-nowrap w-16 shrink-0">{CONDITION_INFO[rank].label}</dt>
+                        <dd className="text-gray-700">
+                          <span className="font-medium">{CONDITION_INFO[rank].short}</span>
+                          <span className="text-gray-500"> — {CONDITION_INFO[rank].description}</span>
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </details>
               </div>
 
               {/* 実寸サイズ */}
