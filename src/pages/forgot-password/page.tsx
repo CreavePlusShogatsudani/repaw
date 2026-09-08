@@ -128,7 +128,7 @@ export default function ForgotPasswordPage() {
                   <div>
                     <p className="text-sm text-gray-700 font-light leading-relaxed">
                       メールが届かない場合や、その他お困りのことがございましたら、
-                      <Link to="/" className="text-orange-500 hover:underline cursor-pointer">
+                      <Link to="/contact" className="text-orange-500 hover:underline cursor-pointer">
                         お問い合わせフォーム
                       </Link>
                       からご連絡ください。

@@ -1,5 +1,4 @@
 import PageMeta from '../../components/PageMeta';
-import StitchedImage from '../../components/StitchedImage';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 
@@ -30,15 +29,7 @@ export default function AboutPage() {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="relative h-96 md:h-[28rem] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src="https://readdy.ai/api/search-image?query=Inspiring%20photograph%20of%20diverse%20group%20of%20happy%20dogs%20of%20different%20breeds%20sitting%20together%20in%20a%20bright%20modern%20space%20with%20natural%20lighting%20and%20minimalist%20white%20interior%20design%20symbolizing%20community%20unity%20and%20animal%20welfare%20professional%20photography%20for%20pet%20business%20about%20page&width=1920&height=1080&seq=abouthero2024repow&orientation=landscape"
-            alt="About RePaw"
-            className="w-full h-full object-cover object-top"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-orange-950/50"></div>
-        </div>
+      <section className="relative h-96 md:h-[28rem] flex items-center justify-center overflow-hidden bg-orange-950">
 
         <div className="relative z-10 text-center text-white px-6">
           <h1 className="text-5xl md:text-6xl font-bold mb-4" style={serif}>About Us</h1>
@@ -99,13 +90,7 @@ export default function AboutPage() {
             <h2 className="text-4xl md:text-5xl font-bold">なぜ、犬服のリユースなのか</h2>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center mb-16 md:mb-24">
-            <StitchedImage
-              src="https://readdy.ai/api/search-image?query=Wooden%20drawer%20filled%20with%20neatly%20folded%20colorful%20small%20dog%20sweaters%20and%20knitwear%20warm%20natural%20window%20light%20cozy%20editorial%20lifestyle%20photography%20soft%20warm%20tones&width=800&height=1000&seq=aboutstory1repaw&orientation=portrait"
-              alt="引き出しに眠る犬服"
-              className="aspect-[4/5] max-w-md mx-auto w-full"
-              tilt="left"
-            />
+          <div className="max-w-3xl mx-auto mb-16 md:mb-24">
             <div className="space-y-6">
               <p className="text-base md:text-lg leading-loose text-gray-700">
                 犬を飼っていると、服が余ります。子犬のうちに買ったけどすぐサイズアウトした服、プレゼントでもらったけど好みじゃなかった服、愛犬が旅立ってクローゼットに残ってしまった服。
@@ -116,8 +101,8 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-            <div className="space-y-6 md:order-1 order-2">
+          <div className="max-w-3xl mx-auto">
+            <div className="space-y-6">
               <p className="text-base md:text-lg leading-loose text-gray-700">
                 一方で「保護犬を助けたい」という気持ちはあっても、日常の中で継続的に支援できている人はまだ少ない。特別なアクションを起こさないといけない、という心理的なハードルがあります。
               </p>
@@ -125,12 +110,6 @@ export default function AboutPage() {
                 その2つをつなごうと思いました。<strong className="font-bold text-gray-900">服を手放す人</strong>と<strong className="font-bold text-gray-900">服を必要としている人</strong>をつなぎ、その取引の中に<strong className="font-bold text-gray-900">動物保護への寄付</strong>を組み込む。それが<strong className="font-bold text-gray-900">RePaw</strong>の出発点です。
               </p>
             </div>
-            <StitchedImage
-              src="https://readdy.ai/api/search-image?query=Small%20dog%20wearing%20cozy%20knitted%20sweater%20cuddling%20with%20owner%20in%20warm%20sunlit%20living%20room%20editorial%20lifestyle%20photography%20warm%20tones&width=800&height=1000&seq=aboutstory2repaw&orientation=portrait"
-              alt="セーターを着た犬と飼い主"
-              className="aspect-[4/5] max-w-md mx-auto w-full md:order-2 order-1"
-              tilt="right"
-            />
           </div>
         </div>
       </section>

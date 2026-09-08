@@ -70,6 +70,7 @@ export default function AdminLayout() {
         { path: '/admin/news', label: 'ニュース管理', icon: 'ri-newspaper-line' },
         { path: '/admin/orders', label: '注文管理', icon: 'ri-file-list-3-line' },
         { path: '/admin/buyback', label: '買取申込管理', icon: 'ri-price-tag-3-line', badge: buybackBadge },
+        { path: '/admin/inquiries', label: '問い合わせ管理', icon: 'ri-question-answer-line' },
         { path: '/admin/members', label: 'ユーザー一覧', icon: 'ri-group-line' },
         { path: '/admin/users', label: '管理者アカウント', icon: 'ri-shield-user-line' },
         { path: '/admin/banners', label: 'メインビジュアル', icon: 'ri-image-line' },

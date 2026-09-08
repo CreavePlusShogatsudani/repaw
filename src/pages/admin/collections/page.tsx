@@ -57,10 +57,9 @@ export default function AdminCollectionsPage() {
     const moveOrder = async (index: number, direction: 'up' | 'down') => {
         const swapIndex = direction === 'up' ? index - 1 : index + 1;
         if (swapIndex < 0 || swapIndex >= collections.length) return;
-        const a = collections[index];
-        const b = collections[swapIndex];
-        await supabase.from('collections').update({ sort_order: b.sort_order }).eq('id', a.id);
-        await supabase.from('collections').update({ sort_order: a.sort_order }).eq('id', b.id);
+        const next = [...collections];
+        [next[index], next[swapIndex]] = [next[swapIndex], next[index]];
+        await Promise.all(next.map((c, i) => c.sort_order === i ? null : supabase.from('collections').update({ sort_order: i }).eq('id', c.id)));
         await fetchCollections();
     };
 

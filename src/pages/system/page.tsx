@@ -1,5 +1,4 @@
 import PageMeta from '../../components/PageMeta';
-import StitchedImage from '../../components/StitchedImage';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { useState } from 'react';
@@ -116,15 +115,7 @@ export default function SystemPage() {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="relative h-96 md:h-[28rem] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src="https://readdy.ai/api/search-image?query=Warm%20and%20inviting%20photograph%20of%20a%20cozy%20dog%20clothing%20boutique%20interior%20with%20soft%20natural%20lighting%20streaming%20through%20large%20windows%20featuring%20neatly%20organized%20shelves%20displaying%20colorful%20dog%20sweaters%20coats%20and%20accessories%20in%20earth%20tones%20pastels%20and%20neutral%20colors%20wooden%20display%20fixtures%20potted%20plants%20and%20a%20welcoming%20atmosphere%20that%20emphasizes%20sustainability%20and%20quality%20craftsmanship%20in%20pet%20fashion&width=1920&height=1080&seq=systemhero2024original&orientation=landscape"
-            alt="System Hero"
-            className="w-full h-full object-cover object-top"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-orange-950/50"></div>
-        </div>
+      <section className="relative h-96 md:h-[28rem] flex items-center justify-center overflow-hidden bg-orange-950">
 
         <div className="relative z-10 text-center text-white px-6">
           <h1 className="text-5xl md:text-6xl font-bold mb-4" style={serif}>
@@ -256,13 +247,7 @@ export default function SystemPage() {
           </div>
 
           {/* 寄付先の説明 */}
-          <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-            <StitchedImage
-              src="https://readdy.ai/api/search-image?query=Heartwarming%20photograph%20of%20rescued%20shelter%20dogs%20of%20various%20breeds%20sitting%20together%20in%20a%20bright%20modern%20animal%20shelter%20with%20clean%20white%20walls%20and%20natural%20lighting%20happy%20and%20hopeful%20atmosphere%20professional%20photography%20for%20animal%20welfare%20charity%20program&width=600&height=600&seq=shelterdogs2024&orientation=squarish"
-              alt="動物保護"
-              className="aspect-square max-w-md mx-auto w-full"
-              tilt="left"
-            />
+          <div className="max-w-3xl mx-auto">
 
             <div>
               <h3 className="text-2xl md:text-3xl font-bold mb-6">寄付が支える活動</h3>

@@ -2,6 +2,7 @@ import PageMeta from '../../components/PageMeta';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const FAQ_CATEGORIES = [
   {
@@ -143,15 +144,7 @@ export default function FAQPage() {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="relative h-96 flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <img 
-            src="https://readdy.ai/api/search-image?query=Clean%20minimalist%20photograph%20of%20a%20modern%20customer%20service%20desk%20with%20a%20friendly%20atmosphere%20featuring%20soft%20natural%20lighting%20warm%20wood%20tones%20comfortable%20seating%20area%20potted%20plants%20and%20organized%20help%20center%20materials%20creating%20a%20welcoming%20support%20environment%20for%20customer%20inquiries%20and%20assistance&width=1920&height=1080&seq=faqhero2024original&orientation=landscape"
-            alt="FAQ Hero"
-            className="w-full h-full object-cover object-top"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/40"></div>
-        </div>
+      <section className="relative h-96 flex items-center justify-center overflow-hidden bg-orange-950">
         
         <div className="relative z-10 text-center text-white px-6">
           <h1 className="text-5xl md:text-6xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -251,23 +244,12 @@ export default function FAQPage() {
             お探しの情報が見つからない場合は、お気軽にお問い合わせください。<br />
             サポートチームが丁寧にご対応いたします。
           </p>
-          <button 
-            onClick={() => {
-              const contactSection = document.getElementById('contact');
-              if (contactSection) {
-                contactSection.scrollIntoView({ behavior: 'smooth' });
-              } else {
-                window.REACT_APP_NAVIGATE('/');
-                setTimeout(() => {
-                  const section = document.getElementById('contact');
-                  section?.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
-              }
-            }}
-            className="px-12 py-4 bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors whitespace-nowrap cursor-pointer"
+          <Link
+            to="/contact"
+            className="inline-block px-12 py-4 bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors whitespace-nowrap cursor-pointer"
           >
             お問い合わせ
-          </button>
+          </Link>
         </div>
       </section>
 

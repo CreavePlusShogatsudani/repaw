@@ -39,6 +39,24 @@ interface BuybackRequest {
   created_at: string;
 }
 
+interface Inquiry {
+  id: string;
+  subject: string;
+  body: string;
+  status: 'received' | 'auto_sent' | 'pending_approval' | 'approved_sent';
+  ai_draft: string | null;
+  admin_edited_reply: string | null;
+  created_at: string;
+  replied_at: string | null;
+}
+
+const INQUIRY_STATUS_LABEL: Record<string, { label: string; color: string }> = {
+  received:         { label: '確認中',   color: 'bg-yellow-100 text-yellow-700' },
+  pending_approval: { label: '確認中',   color: 'bg-yellow-100 text-yellow-700' },
+  auto_sent:        { label: '回答済み', color: 'bg-green-100 text-green-700' },
+  approved_sent:    { label: '回答済み', color: 'bg-green-100 text-green-700' },
+};
+
 const ORDER_STATUS_LABEL: Record<string, { label: string; color: string }> = {
   pending:   { label: '支払い待ち', color: 'bg-gray-100 text-gray-700' },
   paid:      { label: '支払い済み', color: 'bg-blue-100 text-blue-700' },
@@ -48,10 +66,10 @@ const ORDER_STATUS_LABEL: Record<string, { label: string; color: string }> = {
 };
 
 export default function MyPage() {
-  const { user, profile, refreshProfile, loading } = useAuth();
+  const { user, profile, refreshProfile, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'favorites' | 'sell'>(
+  const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'favorites' | 'sell' | 'inquiries'>(
     (location.state as any)?.tab || 'profile'
   );
 
@@ -84,6 +102,9 @@ export default function MyPage() {
   const [favoritesLoading, setFavoritesLoading] = useState(false);
   const [buybackRequests, setBuybackRequests] = useState<BuybackRequest[]>([]);
   const [buybackLoading, setBuybackLoading] = useState(false);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [inquiriesLoading, setInquiriesLoading] = useState(false);
+  const [openInquiryId, setOpenInquiryId] = useState<string | null>(null);
 
   // プロフィールデータをステートに反映
   useEffect(() => {
@@ -129,6 +150,21 @@ export default function MyPage() {
       .then(({ data }) => {
         setBuybackRequests((data as BuybackRequest[]) || []);
         setBuybackLoading(false);
+      });
+  }, [activeTab, user]);
+
+  // 問い合わせ履歴取得
+  useEffect(() => {
+    if (activeTab !== 'inquiries' || !user) return;
+    setInquiriesLoading(true);
+    supabase
+      .from('inquiries')
+      .select('id, subject, body, status, ai_draft, admin_edited_reply, created_at, replied_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .then(({ data }) => {
+        setInquiries((data as Inquiry[]) || []);
+        setInquiriesLoading(false);
       });
   }, [activeTab, user]);
 
@@ -188,14 +224,15 @@ export default function MyPage() {
   };
 
   const handleRemoveFavorite = async (favoriteId: string) => {
-    await supabase.from('favorites').delete().eq('id', favoriteId);
+    const { error } = await supabase.from('favorites').delete().eq('id', favoriteId);
+    if (error) { alert('お気に入りの解除に失敗しました。'); return; }
     setFavorites((prev) => prev.filter((f) => f.id !== favoriteId));
   };
 
   const handleAddFavoriteToCart = (fav: FavoriteProduct) => {
     if (!fav.products) return;
     // カートへの追加は CartContext を経由するが、ここでは商品詳細ページへ誘導
-    window.location.href = `/products/${fav.product_id}`;
+    navigate(`/product/${fav.product_id}`);
   };
 
   return (
@@ -205,7 +242,17 @@ export default function MyPage() {
 
       <main className="pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <h1 className="text-3xl font-bold mb-8">マイページ</h1>
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-3xl font-bold">マイページ</h1>
+            <button
+              type="button"
+              onClick={async () => { await signOut(); navigate('/'); }}
+              className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap"
+            >
+              <i className="ri-logout-box-r-line mr-1"></i>
+              ログアウト
+            </button>
+          </div>
 
           {/* タブナビゲーション */}
           <div className="mb-8 overflow-x-auto scrollbar-hide -mx-4 px-4">
@@ -215,6 +262,7 @@ export default function MyPage() {
                 { key: 'orders',    label: '購入履歴',        icon: 'ri-shopping-bag-line' },
                 { key: 'favorites', label: 'お気に入り',      icon: 'ri-heart-line' },
                 { key: 'sell',      label: '買取申込履歴',    icon: 'ri-price-tag-3-line' },
+                { key: 'inquiries', label: '問い合わせ履歴',  icon: 'ri-question-answer-line' },
               ] as const).map(({ key, label, icon }) => (
                 <button
                   key={key}
@@ -673,6 +721,70 @@ export default function MyPage() {
                     className="inline-block px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
                   >
                     買取申込をする
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 問い合わせ履歴タブ */}
+          {activeTab === 'inquiries' && (
+            <div>
+              {inquiriesLoading ? (
+                <div className="text-center py-16 text-gray-500">読み込み中...</div>
+              ) : inquiries.length > 0 ? (
+                <div className="space-y-4">
+                  {inquiries.map((inq) => {
+                    const statusInfo = INQUIRY_STATUS_LABEL[inq.status] || INQUIRY_STATUS_LABEL.received;
+                    const isReplied = inq.status === 'auto_sent' || inq.status === 'approved_sent';
+                    const reply = inq.admin_edited_reply ?? inq.ai_draft;
+                    const isOpen = openInquiryId === inq.id;
+                    return (
+                      <div key={inq.id} className="bg-white border rounded-lg p-6">
+                        <button
+                          type="button"
+                          onClick={() => setOpenInquiryId(isOpen ? null : inq.id)}
+                          className="w-full flex justify-between items-start gap-4 text-left cursor-pointer"
+                        >
+                          <div>
+                            <p className="font-medium mb-1">{inq.subject}</p>
+                            <p className="text-sm text-gray-600">
+                              {new Date(inq.created_at).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
+                            </p>
+                          </div>
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap ${statusInfo.color}`}>
+                            {statusInfo.label}
+                          </span>
+                        </button>
+                        {isOpen && (
+                          <div className="mt-4 pt-4 border-t space-y-4 text-sm">
+                            <div>
+                              <p className="text-gray-500 mb-1">お問い合わせ内容</p>
+                              <p className="whitespace-pre-wrap">{inq.body}</p>
+                            </div>
+                            <div>
+                              <p className="text-gray-500 mb-1">回答</p>
+                              {isReplied && reply ? (
+                                <p className="whitespace-pre-wrap">{reply}</p>
+                              ) : (
+                                <p className="text-gray-600">確認中です。回答までしばらくお待ちください。</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-16">
+                  <i className="ri-question-answer-line text-6xl text-gray-300 mb-4"></i>
+                  <p className="text-gray-600 mb-6">問い合わせ履歴がありません</p>
+                  <Link
+                    to="/contact"
+                    className="inline-block px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
+                  >
+                    お問い合わせをする
                   </Link>
                 </div>
               )}

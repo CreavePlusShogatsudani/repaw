@@ -63,24 +63,18 @@ export default function BuybackResponsePage() {
     }
     setSubmitting(true);
 
-    const updateData: any = {
-      payout_method: payoutMethod,
-      status: 'accepted',
-      user_responded_at: new Date().toISOString(),
-    };
-    if (payoutMethod === 'transfer') {
-      updateData.bank_name = bankName;
-      updateData.bank_branch = bankBranch;
-      updateData.bank_account_type = bankAccountType;
-      updateData.bank_account_number = bankAccountNumber;
-      updateData.bank_account_holder = bankAccountHolder;
-    }
-
-    const { error } = await supabase
-      .from('buyback_requests')
-      .update(updateData)
-      .eq('id', id)
-      .eq('user_id', user!.id);
+    // 一般ユーザーは buyback_requests を直接 UPDATE できないため、回答専用 RPC を使う（007_buyback_response.sql）
+    const { error } = await supabase.rpc('respond_buyback', {
+      p_id: id,
+      p_payout_method: payoutMethod,
+      ...(payoutMethod === 'transfer' ? {
+        p_bank_name: bankName,
+        p_bank_branch: bankBranch,
+        p_bank_account_type: bankAccountType,
+        p_bank_account_number: bankAccountNumber,
+        p_bank_account_holder: bankAccountHolder,
+      } : {}),
+    });
 
     if (error) {
       alert('送信に失敗しました。もう一度お試しください。');

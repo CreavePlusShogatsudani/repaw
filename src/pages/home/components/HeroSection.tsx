@@ -1,151 +1,58 @@
-import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
 
 interface HeroBanner {
-    id: string;
-    title: string | null;
-    subtitle: string | null;
-    image_url: string;
-    link_url: string | null;
-    link_text: string | null;
-    sort_order: number;
-    is_active: boolean;
+  id: string;
+  title: string | null;
+  subtitle: string | null;
+  image_url: string;
+  link_url: string | null;
+  link_text: string | null;
 }
 
+// 管理画面「メインビジュアル」の有効バナーを表示する。未登録時は静的な既定コピーと写真を出す。
+// 複数登録されている場合は5秒ごとに切り替える
 export default function HeroSection() {
-    const navigate = useNavigate();
-    const [banners, setBanners] = useState<HeroBanner[]>([]);
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [loaded, setLoaded] = useState(false);
+  const [banners, setBanners] = useState<HeroBanner[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-    useEffect(() => {
-        supabase
-            .from('hero_banners')
-            .select('*')
-            .eq('is_active', true)
-            .order('sort_order', { ascending: true })
-            .then(({ data }) => {
-                if (data && data.length > 0) setBanners(data);
-                setLoaded(true);
-            });
-    }, []);
+  useEffect(() => {
+    supabase
+      .from('hero_banners')
+      .select('id, title, subtitle, image_url, link_url, link_text')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true })
+      .then(({ data }) => setBanners((data as HeroBanner[]) || []));
+  }, []);
 
-    // 複数バナーの自動スライド
-    useEffect(() => {
-        if (banners.length <= 1) return;
-        const timer = setInterval(() => {
-            setCurrentIndex(i => (i + 1) % banners.length);
-        }, 5000);
-        return () => clearInterval(timer);
-    }, [banners.length]);
+  useEffect(() => {
+    if (banners.length <= 1) return;
+    const timer = setInterval(() => setCurrentIndex((i) => (i + 1) % banners.length), 5000);
+    return () => clearInterval(timer);
+  }, [banners.length]);
 
-    const current = banners[currentIndex];
+  const banner = banners[currentIndex];
 
-    // 読み込み完了前は何も表示しない
-    if (!loaded) {
-        return <section style={{ height: '100dvh' }} className="bg-gray-900" />;
-    }
-
-    // バナーが登録されている場合
-    if (banners.length > 0 && current) {
-        return (
-            <section style={{ height: '100dvh' }} className="relative flex items-center justify-center overflow-hidden">
-                {/* バナー画像 */}
-                {banners.map((banner, i) => (
-                    <div
-                        key={banner.id}
-                        className={`absolute inset-0 transition-opacity duration-1000 ${i === currentIndex ? 'opacity-100' : 'opacity-0'}`}
-                    >
-                        <img
-                            src={banner.image_url}
-                            alt={banner.title || ''}
-                            className={`w-full h-full object-cover ${i === currentIndex ? 'kenburns' : ''}`}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/40"></div>
-                    </div>
-                ))}
-
-                {/* コンテンツ */}
-                <div className="relative z-10 text-center px-6 max-w-4xl mx-auto w-full">
-                    {current.title && (
-                        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-                            {current.title}
-                        </h1>
-                    )}
-                    {current.subtitle && (
-                        <p className="text-lg md:text-xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed">
-                            {current.subtitle}
-                        </p>
-                    )}
-
-                    {current.link_url && current.link_text && (
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                            <button
-                                onClick={() => navigate(current.link_url!)}
-                                className="px-8 py-4 bg-white text-black text-sm font-medium hover:bg-gray-100 transition-colors whitespace-nowrap cursor-pointer"
-                            >
-                                {current.link_text}
-                            </button>
-                        </div>
-                    )}
-                </div>
-
-                {/* ドットインジケーター (複数の場合のみ) */}
-                {banners.length > 1 && (
-                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                        {banners.map((_, i) => (
-                            <button
-                                key={i}
-                                onClick={() => setCurrentIndex(i)}
-                                className={`w-2 h-2 rounded-full transition-all ${i === currentIndex ? 'bg-white w-6' : 'bg-white/50'}`}
-                            />
-                        ))}
-                    </div>
-                )}
-
-                {/* スクロールインジケーター */}
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
-                    <span className="text-xs text-white/70 font-light tracking-widest">SCROLL</span>
-                    <div className="w-px h-8 bg-gradient-to-b from-white/70 to-transparent"></div>
-                </div>
-            </section>
-        );
-    }
-
-    // バナー未登録時はシンプルな静的背景
-    return (
-        <section style={{ height: '100dvh' }} className="relative flex items-center justify-center overflow-hidden bg-gray-900">
-            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/40"></div>
-
-            <div className="relative z-10 text-center px-6 max-w-4xl mx-auto w-full">
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-                    リユースで未来を創る
-                </h1>
-                <p className="text-lg md:text-xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed">
-                    使わなくなった犬服を買い取り、新しい飼い主へ。<br />
-                    あなたの選択が、持続可能な社会を実現します。
-                </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <button
-                        onClick={() => navigate('/products')}
-                        className="px-8 py-4 bg-white text-black text-sm font-medium hover:bg-gray-100 transition-colors whitespace-nowrap cursor-pointer"
-                    >
-                        製品を見る
-                    </button>
-                    <button
-                        onClick={() => navigate('/system')}
-                        className="px-8 py-4 border-2 border-white text-white text-sm font-medium hover:bg-white hover:text-black transition-colors whitespace-nowrap cursor-pointer"
-                    >
-                        買取について
-                    </button>
-                </div>
-            </div>
-
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
-                <span className="text-xs text-white/70 font-light tracking-widest">SCROLL</span>
-                <div className="w-px h-8 bg-gradient-to-b from-white/70 to-transparent"></div>
-            </div>
-        </section>
-    );
+  return (
+    <section className="shop-hero shop-container">
+      <div className="shop-hero-copy">
+        <p className="shop-eyebrow">犬服と、次の暮らし。</p>
+        <h1>{banner?.title || <>お気に入りを、<br />次のうちの子へ。</>}</h1>
+        <p className="shop-hero-description">{banner?.subtitle || <>まだ着られる一着に、新しい出会いを。<br />犬服のリユースショップ、RePawです。</>}</p>
+        <Link to={banner?.link_url || '/products'} className="shop-button">{banner?.link_text || '犬服を探す'} <span aria-hidden="true">→</span></Link>
+        <Link to="/system" className="shop-hero-secondary">着なくなった犬服を譲る</Link>
+      </div>
+      <figure className="shop-hero-photo">
+        {banner ? (
+          <img key={banner.id} src={banner.image_url} alt={banner.title || ''} fetchPriority="high" />
+        ) : (
+          <>
+            <img src="/images/repaw-dog.jpg" alt="ハーネスを着て飼い主の膝に座るトイプードル" fetchPriority="high" />
+            <figcaption>いつものお出かけに、もう一度。</figcaption>
+          </>
+        )}
+      </figure>
+    </section>
+  );
 }

@@ -27,6 +27,7 @@ const MyPage = lazyWithRetry(() => import('../pages/mypage/page'));
 const LoginPage = lazyWithRetry(() => import('../pages/login/page'));
 const SignupPage = lazyWithRetry(() => import('../pages/signup/page'));
 const ForgotPasswordPage = lazyWithRetry(() => import('../pages/forgot-password/page'));
+const ResetPasswordPage = lazyWithRetry(() => import('../pages/reset-password/page'));
 const ImpactPage = lazyWithRetry(() => import('../pages/impact/page'));
 const SystemPage = lazyWithRetry(() => import('../pages/system/page'));
 const BuybackPage = lazyWithRetry(() => import('../pages/buyback/page'));
@@ -37,6 +38,7 @@ const FeaturesPage = lazyWithRetry(() => import('../pages/features/page'));
 const FeatureDetailPage = lazyWithRetry(() => import('../pages/feature-detail/page'));
 const AboutPage = lazyWithRetry(() => import('../pages/about/page'));
 const FAQPage = lazyWithRetry(() => import('../pages/faq/page'));
+const ContactPage = lazyWithRetry(() => import('../pages/contact/page'));
 const NotFound = lazyWithRetry(() => import('../pages/NotFound'));
 
 // Admin Pages
@@ -46,6 +48,7 @@ const AdminProductsPage = lazyWithRetry(() => import('../pages/admin/products/pa
 const AdminProductFormPage = lazyWithRetry(() => import('../pages/admin/products/form'));
 const AdminOrdersPage = lazyWithRetry(() => import('../pages/admin/orders/page'));
 const AdminBuybackPage = lazyWithRetry(() => import('../pages/admin/buyback/page'));
+const AdminInquiriesPage = lazyWithRetry(() => import('../pages/admin/inquiries/page'));
 const AdminUsersPage = lazyWithRetry(() => import('../pages/admin/users/page'));
 const AdminMembersPage = lazyWithRetry(() => import('../pages/admin/members/page'));
 const AdminBannersPage = lazyWithRetry(() => import('../pages/admin/banners/page'));
@@ -98,6 +101,10 @@ const routes: RouteObject[] = [
     element: <ForgotPasswordPage />,
   },
   {
+    path: '/reset-password',
+    element: <ResetPasswordPage />,
+  },
+  {
     path: '/impact',
     element: <ImpactPage />,
   },
@@ -138,6 +145,10 @@ const routes: RouteObject[] = [
     element: <FAQPage />,
   },
   {
+    path: '/contact',
+    element: <ContactPage />,
+  },
+  {
     path: '/admin',
     element: <AdminLayout />,
     children: [
@@ -164,6 +175,10 @@ const routes: RouteObject[] = [
       {
         path: 'buyback',
         element: <AdminBuybackPage />,
+      },
+      {
+        path: 'inquiries',
+        element: <AdminInquiriesPage />,
       },
       {
         path: 'members',

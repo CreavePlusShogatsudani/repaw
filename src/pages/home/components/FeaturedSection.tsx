@@ -28,50 +28,23 @@ export default function FeaturedSection() {
     if (collections.length === 0) return null;
 
     return (
-        <section className="py-24 px-6 bg-gray-50">
-            <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-16" data-reveal>
-                    <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Featured</h2>
-                    <p className="text-gray-600 text-sm tracking-wider">特集</p>
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-8">
-                    {collections.map((c) => (
-                        <Link
-                            key={c.id}
-                            to={`/features/${c.id}`}
-                            className="group cursor-pointer bg-white rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-                        >
-                            <div className="w-full h-96 bg-gray-100 overflow-hidden">
-                                {c.cover_image_url ? (
-                                    <img
-                                        src={c.cover_image_url}
-                                        alt={c.title}
-                                        className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                        <i className="ri-image-line text-5xl"></i>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="p-6">
-                                {c.subtitle && <p className="text-xs text-gray-500 mb-2 tracking-wider">{c.subtitle}</p>}
-                                <h3 className="text-xl font-bold mb-3 group-hover:underline">{c.title}</h3>
-                                {c.description && <p className="text-sm text-gray-600 leading-relaxed">{c.description}</p>}
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-
-                <div className="text-center mt-12">
-                    <Link
-                        to="/features"
-                        className="inline-block px-8 py-3 border-2 border-black text-black text-sm font-medium hover:bg-black hover:text-white transition-colors whitespace-nowrap cursor-pointer"
-                    >
-                        すべての特集を見る
+        <section className="shop-container shop-section shop-featured">
+            <div className="shop-section-heading">
+                <div><p className="shop-eyebrow">JOURNAL</p><h2>犬と暮らす、日々のこと</h2></div>
+                <Link to="/features" className="shop-text-link">特集一覧 <span aria-hidden="true">→</span></Link>
+            </div>
+            <div className={collections.length === 1 ? '' : 'grid md:grid-cols-2 gap-10'}>
+                {collections.map(c => (
+                    <Link key={c.id} to={`/features/${c.id}`} className={`shop-story group ${collections.length === 1 ? 'shop-story-wide' : ''}`}>
+                        {c.cover_image_url && <img src={c.cover_image_url} alt={c.title} loading="lazy" />}
+                        <div className="shop-story-copy">
+                            {c.subtitle && <p className="text-xs text-stone-600 mb-3">{c.subtitle}</p>}
+                            <h3 className="text-xl md:text-2xl font-medium group-hover:underline underline-offset-4">{c.title}</h3>
+                            {c.description && <p className="mt-4 text-sm text-stone-600 leading-7">{c.description}</p>}
+                            <span className="shop-text-link mt-6 inline-flex">続きを読む <span aria-hidden="true">→</span></span>
+                        </div>
                     </Link>
-                </div>
+                ))}
             </div>
         </section>
     );

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
 import { CONDITION_RANKS, CONDITION_INFO } from '../../../lib/conditions';
+import { PRODUCT_CATEGORIES, PRODUCT_SIZES } from '../../../lib/productOptions';
 
 const BRAND_OPTIONS = [
   { group: 'ノーブランド', brands: ['ノーブランド'] },
@@ -67,6 +68,9 @@ export default function AdminProductFormPage() {
     const [uploadingImage, setUploadingImage] = useState(false);
     const [sellerInstagram, setSellerInstagram] = useState(searchParams.get('seller_instagram') || '');
     const [brand, setBrand] = useState('');
+    const [backLengthCm, setBackLengthCm] = useState('');
+    const [chestCm, setChestCm] = useState('');
+    const [neckCm, setNeckCm] = useState('');
     const fromBuyback = searchParams.get('from_buyback');
 
     useEffect(() => {
@@ -100,6 +104,9 @@ export default function AdminProductFormPage() {
             setExistingImages(data.images || []);
             setSellerInstagram(data.seller_instagram || '');
             setBrand(data.brand || '');
+            setBackLengthCm(data.back_length_cm?.toString() || '');
+            setChestCm(data.chest_cm?.toString() || '');
+            setNeckCm(data.neck_cm?.toString() || '');
         }
         setLoading(false);
     };
@@ -237,6 +244,9 @@ export default function AdminProductFormPage() {
             images: finalImages,
             seller_instagram: sellerInstagram.replace('@', '') || null,
             brand: brand || null,
+            back_length_cm: backLengthCm ? parseFloat(backLengthCm) : null,
+            chest_cm: chestCm ? parseFloat(chestCm) : null,
+            neck_cm: neckCm ? parseFloat(neckCm) : null,
         };
 
         if (isEdit) {
@@ -343,11 +353,9 @@ export default function AdminProductFormPage() {
                             className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
                         >
                             <option value="">選択してください</option>
-                            <option value="アウター">アウター</option>
-                            <option value="トップス">トップス</option>
-                            <option value="ボトムス">ボトムス</option>
-                            <option value="アクセサリー">アクセサリー</option>
-                            <option value="その他">その他</option>
+                            {PRODUCT_CATEGORIES.map(c => (
+                                <option key={c} value={c}>{c}</option>
+                            ))}
                         </select>
                     </div>
 
@@ -359,7 +367,7 @@ export default function AdminProductFormPage() {
                             className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
                         >
                             <option value="">選択してください</option>
-                            {['XS', 'SS', 'S', 'SM', 'M', 'ML', 'L', 'XL', 'XXL', 'フリーサイズ'].map(s => (
+                            {PRODUCT_SIZES.map(s => (
                                 <option key={s} value={s}>{s}</option>
                             ))}
                         </select>
@@ -421,6 +429,26 @@ export default function AdminProductFormPage() {
                         />
                     </div>
 
+                    {/* 実寸（商品カード・詳細ページに表示される） */}
+                    {([
+                        ['背丈 (cm)', backLengthCm, setBackLengthCm],
+                        ['胴回り (cm)', chestCm, setChestCm],
+                        ['首回り (cm)', neckCm, setNeckCm],
+                    ] as const).map(([label, value, setter]) => (
+                        <div key={label} className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700">{label}</label>
+                            <input
+                                type="number"
+                                min="0"
+                                step="0.5"
+                                value={value}
+                                onChange={(e) => setter(e.target.value)}
+                                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                placeholder="例: 30"
+                            />
+                        </div>
+                    ))}
+
                     <div className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">ステータス *</label>
                         <select
@@ -431,6 +459,8 @@ export default function AdminProductFormPage() {
                         >
                             <option value="published">公開</option>
                             <option value="draft">非公開 (下書き)</option>
+                            <option value="sold_out">売り切れ</option>
+                            {status === 'reserved' && <option value="reserved">購入手続き中</option>}
                         </select>
                     </div>
 

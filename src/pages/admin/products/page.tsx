@@ -106,9 +106,11 @@ export default function AdminProductsPage() {
                                         <td className="p-4 text-sm">
                                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${product.status === 'published'
                                                     ? 'bg-green-100 text-green-700'
+                                                    : product.status === 'reserved' ? 'bg-yellow-100 text-yellow-700'
+                                                    : product.status === 'sold_out' ? 'bg-red-100 text-red-700'
                                                     : 'bg-gray-100 text-gray-700'
                                                 }`}>
-                                                {product.status === 'published' ? '公開中' : '非公開'}
+                                                {product.status === 'published' ? '公開中' : product.status === 'reserved' ? '購入手続き中' : product.status === 'sold_out' ? '売り切れ' : '非公開'}
                                             </span>
                                         </td>
                                         <td className="p-4 text-sm text-gray-500">

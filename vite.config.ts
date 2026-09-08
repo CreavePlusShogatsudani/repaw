@@ -11,9 +11,6 @@ export default defineConfig({
   define: {
     __BASE_PATH__: JSON.stringify(base),
     __IS_PREVIEW__: JSON.stringify(isPreview),
-    __READDY_PROJECT_ID__: JSON.stringify(process.env.PROJECT_ID || ""),
-    __READDY_VERSION_ID__: JSON.stringify(process.env.VERSION_ID || ""),
-    __READDY_AI_DOMAIN__: JSON.stringify(process.env.READDY_AI_DOMAIN || ""),
   },
   plugins: [
     react(),

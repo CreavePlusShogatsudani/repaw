@@ -54,21 +54,12 @@ export default function SignupPage() {
       if (authError) throw authError;
 
       if (authData.user) {
-        // 2. profilesテーブルにレコード作成（トリガーがない場合のバックアップ）
-        // profileテーブルはschema.sqlで定義済み、idはauth.usersのidを参照
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            email: formData.email,
-            full_name: formData.petName ? `${formData.petName}の飼い主` : '名無しさん',
-          });
-
-        if (profileError) {
-          console.error('Profile creation error:', profileError);
-          // プロフィール作成失敗しても、ユーザー登録は成功しているので続行（または後でリトライ）
+        // profiles 行は DB トリガー handle_new_user が作成する（pet_name / pet_breed は metadata から反映）
+        if (authData.session) {
+          // メール確認が不要な設定ではこの時点でログイン済み
+          navigate('/mypage');
+          return;
         }
-
         alert('登録確認メールを送信しました。メール内のリンクをクリックして登録を完了してください。');
         navigate('/login');
       }

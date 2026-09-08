@@ -1,182 +1,57 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useCart } from '../../../contexts/CartContext';
 import { supabase } from '../../../lib/supabase';
 
+const links = [
+  { to: '/products', label: '犬服を探す' },
+  { to: '/features', label: '特集・読みもの' },
+  { to: '/system', label: '買取・寄付' },
+  { to: '/about', label: 'RePawについて' },
+];
+
 export default function Navigation() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user } = useAuth();
   const { itemCount } = useCart();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const menuButton = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { setIsMenuOpen(false); menuButton.current?.focus(); }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isMenuOpen]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate('/');
     setIsMenuOpen(false);
+    navigate('/');
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // メニュー展開中は背景スクロールを無効化
-  useEffect(() => {
-    document.body.style.overflow = isMenuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [isMenuOpen]);
-
   return (
-    <>
-      {/* デスクトップナビゲーション */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white ${
-        isScrolled ? 'shadow-md py-3' : 'py-4 md:py-6'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
-          <div className="flex items-center justify-between">
-            {/* ロゴ */}
-            <Link to="/" className="text-xl md:text-2xl font-bold cursor-pointer transition-colors text-black" style={{ fontFamily: "'Playfair Display', serif" }}>
-              RePaw
-            </Link>
-
-            {/* デスクトップメニュー */}
-            <div className="hidden md:flex items-center gap-2">
-              <Link to="/products" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
-                アイテム一覧
-              </Link>
-              <Link to="/features" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
-                特集
-              </Link>
-              <Link to="/news" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
-                ニュース
-              </Link>
-              <Link to="/system" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
-                買取・寄付
-              </Link>
-              <Link to="/impact" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
-                社会貢献
-              </Link>
-              <Link to="/about" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
-                About
-              </Link>
-              <Link to="/faq" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
-                FAQ
-              </Link>
-              <Link to="/cart" className="relative px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
-                <i className="ri-shopping-cart-line text-lg"></i>
-                {itemCount > 0 && (
-                  <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-orange-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-0.5 leading-none">
-                    {itemCount > 99 ? '99+' : itemCount}
-                  </span>
-                )}
-              </Link>
-              {user ? (
-                <div className="flex items-center gap-1">
-                  <Link to="/mypage" className="px-4 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
-                    <i className="ri-user-fill text-lg"></i>
-                  </Link>
-                  <button onClick={handleLogout} className="px-3 py-2 text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-all cursor-pointer whitespace-nowrap">
-                    <i className="ri-logout-box-line text-lg"></i>
-                  </button>
-                </div>
-              ) : (
-                <Link to="/login" className={`px-4 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer whitespace-nowrap border ${'text-gray-900 border-gray-900 hover:bg-gray-900 hover:text-white'
-                }`}>
-                  ログイン
-                </Link>
-              )}
-            </div>
-
-            {/* モバイルメニューボタン */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden w-10 h-10 flex items-center justify-center cursor-pointer rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-all duration-200 text-black"
-            >
-              <i className={`${isMenuOpen ? 'ri-close-line' : 'ri-menu-line'} text-2xl`}></i>
-            </button>
-          </div>
+    <header className="shop-header">
+      <nav className="shop-container shop-nav" aria-label="メインメニュー">
+        <Link to="/" className="shop-logo" onClick={() => setIsMenuOpen(false)}>RePaw<span>犬服のリユースショップ</span></Link>
+        <div className="shop-desktop-links">
+          {links.map(link => <Link key={link.to} to={link.to} aria-current={pathname === link.to ? 'page' : undefined}>{link.label}</Link>)}
         </div>
-
-        {/* モバイルメニュー */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
-            <div className="px-4 py-4">
-              {/* ナビリンク */}
-              <div className="space-y-1 mb-4">
-                {[
-                  { to: '/products', label: 'アイテム一覧' },
-                  { to: '/features', label: '特集' },
-                  { to: '/news', label: 'ニュース' },
-                  { to: '/buyback', label: '買取申し込み' },
-                  { to: '/system', label: '仕組みについて' },
-                  { to: '/impact', label: '社会貢献' },
-                  { to: '/about', label: 'About' },
-                  { to: '/faq', label: 'FAQ' },
-                ].map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    className="block text-sm font-medium text-black hover:text-orange-600 hover:bg-orange-50 transition-all px-4 py-3 rounded-lg"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-
-              {/* アカウント・カートボタン */}
-              <div className="border-t border-gray-100 pt-4 space-y-2">
-                <Link
-                  to="/cart"
-                  className="flex items-center gap-3 w-full text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 transition-all px-4 py-3 rounded-lg"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <i className="ri-shopping-cart-line text-lg"></i>
-                  カートを見る
-                  {itemCount > 0 && (
-                    <span className="ml-auto min-w-[20px] h-5 bg-orange-500 text-white text-xs font-bold rounded-full flex items-center justify-center px-1">
-                      {itemCount > 99 ? '99+' : itemCount}
-                    </span>
-                  )}
-                </Link>
-                {user ? (
-                  <>
-                    <Link
-                      to="/mypage"
-                      className="flex items-center gap-3 w-full text-sm font-medium text-gray-900 bg-gray-100 hover:bg-gray-200 transition-all px-4 py-3 rounded-lg"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <i className="ri-user-line text-lg"></i>
-                      マイページ
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center gap-3 w-full text-sm font-medium text-red-600 hover:bg-red-50 transition-all px-4 py-3 rounded-lg"
-                    >
-                      <i className="ri-logout-box-line text-lg"></i>
-                      ログアウト
-                    </button>
-                  </>
-                ) : (
-                  <Link
-                    to="/login"
-                    className="flex items-center gap-3 w-full text-sm font-medium text-gray-900 bg-gray-100 hover:bg-gray-200 transition-all px-4 py-3 rounded-lg"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <i className="ri-user-line text-lg"></i>
-                    ログイン / 新規登録
-                  </Link>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+        <div className="shop-nav-actions">
+          <Link to={user ? '/mypage' : '/login'} className="shop-account" aria-label={user ? 'マイページ' : 'ログイン'}><i className="ri-user-line" aria-hidden="true" /><span>{user ? 'マイページ' : 'ログイン'}</span></Link>
+          <Link to="/cart" className="shop-cart" aria-label={`カート${itemCount > 0 ? `、${itemCount}点` : ''}`} onClick={() => setIsMenuOpen(false)}><i className="ri-shopping-bag-line" aria-hidden="true" />{itemCount > 0 && <span>{itemCount > 99 ? '99+' : itemCount}</span>}</Link>
+          <button ref={menuButton} type="button" className="shop-menu-button" aria-label={isMenuOpen ? 'メニューを閉じる' : 'メニューを開く'} aria-expanded={isMenuOpen} aria-controls="shop-mobile-menu" onClick={() => setIsMenuOpen(!isMenuOpen)}><i className={isMenuOpen ? 'ri-close-line' : 'ri-menu-line'} aria-hidden="true" /></button>
+        </div>
       </nav>
-    </>
+      {isMenuOpen && <nav id="shop-mobile-menu" className="shop-mobile-menu" aria-label="追加メニュー">
+        {[...links, { to: '/buyback', label: '買取を申し込む' }, { to: '/impact', label: '動物たちへの支援' }, { to: '/news', label: 'お知らせ' }, { to: '/faq', label: 'よくある質問' }].map(link => <Link key={link.to} to={link.to} onClick={() => setIsMenuOpen(false)}>{link.label}<span aria-hidden="true">→</span></Link>)}
+        <Link to={user ? '/mypage' : '/login'} onClick={() => setIsMenuOpen(false)}>{user ? 'マイページ' : 'ログイン / 新規登録'}</Link>
+        {user && <button type="button" onClick={handleLogout}>ログアウト</button>}
+      </nav>}
+    </header>
   );
 }

@@ -291,10 +291,10 @@ export default function OrderCompletePage() {
                 <i className="ri-question-line text-lg"></i>
                 <span>よくある質問</span>
               </a>
-              <a href="#" className="flex items-center gap-2 text-gray-700 hover:text-orange-600 transition-colors cursor-pointer whitespace-nowrap">
+              <Link to="/contact" className="flex items-center gap-2 text-gray-700 hover:text-orange-600 transition-colors cursor-pointer whitespace-nowrap">
                 <i className="ri-mail-line text-lg"></i>
                 <span>お問い合わせ</span>
-              </a>
+              </Link>
               <a href="#" className="flex items-center gap-2 text-gray-700 hover:text-orange-600 transition-colors cursor-pointer whitespace-nowrap">
                 <i className="ri-phone-line text-lg"></i>
                 <span>電話サポート</span>

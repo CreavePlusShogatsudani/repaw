@@ -1,9 +1,40 @@
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { supabase } from '../../../lib/supabase';
+import { useAuth } from '../../../contexts/AuthContext';
 
-export default function ContactSection() {
+interface OrderOption {
+  id: string;
+  created_at: string;
+  order_items: { products: { name: string } | null }[];
+}
+
+// standalone: /contact ページ用。折りたたみ（details）なしでフォームを直接表示する
+export default function ContactSection({ standalone = false }: { standalone?: boolean }) {
+  const { hash } = useLocation();
+  const { user, loading } = useAuth();
+  const details = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    if (hash !== '#contact' || !details.current) return;
+    details.current.open = true;
+    const frame = requestAnimationFrame(() => document.getElementById('contact')?.scrollIntoView());
+    return () => cancelAnimationFrame(frame);
+  }, [hash]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [orders, setOrders] = useState<OrderOption[]>([]);
+
+  // 注文選択用に自分の注文を取得
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('orders')
+      .select('id, created_at, order_items(products(name))')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .then(({ data }) => setOrders((data as unknown as OrderOption[]) || []));
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -14,92 +45,79 @@ export default function ContactSection() {
     const formData = new FormData(form);
 
     try {
-      const response = await fetch('https://readdy.ai/api/form/d58knm93kamldd1561qg', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+      const { data, error } = await supabase.functions.invoke('handle-inquiry', {
+        body: {
+          subject: formData.get('subject'),
+          body: formData.get('message'),
+          order_id: formData.get('order_id') || null,
         },
-        body: new URLSearchParams(formData as any).toString(),
       });
 
-      if (response.ok) {
+      if (!error && data?.id) {
         setSubmitStatus('success');
         form.reset();
       } else {
         setSubmitStatus('error');
       }
-    } catch (error) {
+    } catch {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  return (
-    <section id="contact" className="py-24 px-6 bg-white">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-16" data-reveal>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Contact</h2>
-          <p className="text-gray-600 text-sm tracking-wider">お問い合わせ</p>
-        </div>
-
-        <form 
+  const content = loading ? null : !user ? (
+    <div className="py-8 text-center">
+      <p className="text-sm text-gray-700 mb-4">お問い合わせにはログインが必要です</p>
+      <Link
+        to="/login"
+        state={{ from: '/contact' }}
+        className="inline-block px-8 py-3 bg-black text-white text-sm rounded-sm hover:bg-gray-800 transition-colors whitespace-nowrap cursor-pointer"
+      >
+        ログインする
+      </Link>
+    </div>
+  ) : (
+        <form
           id="contact-form"
-          data-readdy-form
           onSubmit={handleSubmit}
-          className="space-y-6"
+          className="space-y-6 pt-8 pb-4"
         >
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium mb-2">お名前 *</label>
-              <input 
-                type="text"
-                id="name"
-                name="name"
-                required
-                disabled={isSubmitting}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-100"
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-2">メールアドレス *</label>
-              <input 
-                type="email"
-                id="email"
-                name="email"
-                required
-                disabled={isSubmitting}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-100"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium mb-2">電話番号</label>
-            <input 
-              type="tel"
-              id="phone"
-              name="phone"
-              disabled={isSubmitting}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-100"
-            />
-          </div>
-
           <div>
             <label htmlFor="subject" className="block text-sm font-medium mb-2">件名 *</label>
-            <input 
+            <input
               type="text"
               id="subject"
               name="subject"
               required
+              maxLength={100}
               disabled={isSubmitting}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-100"
             />
           </div>
 
+          {orders.length > 0 && (
+            <div>
+              <label htmlFor="order_id" className="block text-sm font-medium mb-2">関連する注文（任意）</label>
+              <select
+                id="order_id"
+                name="order_id"
+                disabled={isSubmitting}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-100 bg-white"
+              >
+                <option value="">選択しない</option>
+                {orders.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {new Date(o.created_at).toLocaleDateString('ja-JP')} / {o.id.split('-')[0].toUpperCase()} / {o.order_items.map((i) => i.products?.name || '商品').join('、')}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div>
             <label htmlFor="message" className="block text-sm font-medium mb-2">お問い合わせ内容 *</label>
-            <textarea 
+            <textarea
               id="message"
               name="message"
               rows={6}
@@ -113,7 +131,7 @@ export default function ContactSection() {
 
           {submitStatus === 'success' && (
             <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm">
-              お問い合わせを受け付けました。ご連絡ありがとうございます。
+              お問い合わせを受け付けました。回答はマイページの「問い合わせ履歴」からご確認いただけます。
             </div>
           )}
 
@@ -124,15 +142,28 @@ export default function ContactSection() {
           )}
 
           <div className="text-center">
-            <button 
+            <button
               type="submit"
               disabled={isSubmitting}
-              className="px-12 py-4 bg-black text-white rounded-full hover:bg-gray-800 transition-colors whitespace-nowrap cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="px-12 py-4 bg-black text-white rounded-sm hover:bg-gray-800 transition-colors whitespace-nowrap cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {isSubmitting ? '送信中...' : '送信する'}
             </button>
           </div>
         </form>
+  );
+
+  if (standalone) {
+    return <div className="max-w-4xl mx-auto">{content}</div>;
+  }
+
+  return (
+    <section id="contact" className="shop-container shop-contact">
+      <div className="max-w-4xl mx-auto">
+        <details ref={details}>
+        <summary className="shop-contact-toggle"><span>お困りのことはありますか？<small>商品についてのご質問・お問い合わせ</small></span><span className="shop-contact-label">フォームを開く ＋</span></summary>
+        {content}
+        </details>
       </div>
     </section>
   );

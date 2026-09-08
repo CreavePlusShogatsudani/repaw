@@ -1,13 +1,11 @@
 import PageMeta from '../../components/PageMeta';
 import Navigation from './components/Navigation';
 import HeroSection from './components/HeroSection';
-import ServiceSection from './components/ServiceSection';
 import NewArrivalsSection from './components/NewArrivalsSection';
-import ProductsSection from './components/ProductsSection';
+import SizeSection from './components/SizeSection';
 import FeaturedSection from './components/FeaturedSection';
 import NewsSection from './components/NewsSection';
 import QuickSystemSection from './components/QuickSystemSection';
-import QuickImpactSection from './components/QuickImpactSection';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
 
@@ -16,15 +14,15 @@ export default function HomePage() {
     <div className="min-h-screen bg-white">
       <PageMeta path="/" />
       <Navigation />
+      <main className="shop-home">
       <HeroSection />
-      <ServiceSection />
       <NewArrivalsSection />
-      <ProductsSection />
+      <SizeSection />
       <FeaturedSection />
-      <NewsSection />
       <QuickSystemSection />
-      <QuickImpactSection />
+      <NewsSection />
       <ContactSection />
+      </main>
       <Footer />
     </div>
   );

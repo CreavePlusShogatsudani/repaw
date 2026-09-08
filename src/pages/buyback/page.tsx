@@ -1,8 +1,10 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function BuybackPage() {
   const [formData, setFormData] = useState({
@@ -19,6 +21,20 @@ export default function BuybackPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const { user, profile, loading: authLoading } = useAuth();
+
+  // プロフィール登録済みの項目をプリフィル（未入力の欄だけ）
+  useEffect(() => {
+    if (!user) return;
+    setFormData(prev => ({
+      ...prev,
+      name: prev.name || profile?.full_name || '',
+      email: prev.email || user.email || '',
+      phone: prev.phone || profile?.phone || '',
+      address: prev.address || [profile?.postal_code, profile?.prefecture, profile?.city, profile?.address, profile?.building].filter(Boolean).join(' '),
+      instagram: prev.instagram || profile?.instagram_account || '',
+    }));
+  }, [user, profile]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -31,10 +47,10 @@ export default function BuybackPage() {
     setSubmitStatus('idle');
 
     try {
-      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) throw new Error('UNAUTHORIZED');
 
       const { error } = await supabase.from('buyback_requests').insert({
-        user_id: user?.id ?? null,
+        user_id: user.id,
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
@@ -83,7 +99,20 @@ export default function BuybackPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-8" data-readdy-form id="buyback-form">
+          {/* 買取申込は会員限定（FAQ の案内どおり）。未ログインの申込は査定回答フローに乗れないため */}
+          {authLoading ? null : !user ? (
+            <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+              <p className="text-sm text-gray-700 mb-4">買取のお申し込みには会員登録・ログインが必要です</p>
+              <Link
+                to="/login"
+                state={{ from: '/buyback' }}
+                className="inline-block px-8 py-3 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 transition-colors whitespace-nowrap cursor-pointer"
+              >
+                ログイン / 新規登録
+              </Link>
+            </div>
+          ) : (
+          <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-8" id="buyback-form">
             <div className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -285,6 +314,7 @@ export default function BuybackPage() {
               {isSubmitting ? '送信中...' : '申し込む'}
             </button>
           </form>
+          )}
         </div>
       </div>
 

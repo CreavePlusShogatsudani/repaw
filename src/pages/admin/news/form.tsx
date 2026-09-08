@@ -4,7 +4,9 @@ import { supabase } from '../../../lib/supabase';
 
 const CATEGORIES = ['お知らせ', '寄付報告', '新商品', 'イベント'];
 
-const today = () => new Date().toISOString().slice(0, 16);
+// datetime-local 用にローカル時刻で 'YYYY-MM-DDTHH:mm' を作る（toISOString は UTC になり9時間ずれる）
+const toLocalInput = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+const today = () => toLocalInput(new Date());
 
 export default function AdminNewsFormPage() {
     const { id } = useParams<{ id: string }>();
@@ -46,7 +48,7 @@ export default function AdminNewsFormPage() {
         setExcerpt(data.excerpt || '');
         setContent(data.content || '');
         setThumbnailUrl(data.thumbnail_url || '');
-        setPublishedAt(data.published_at ? data.published_at.slice(0, 16) : today());
+        setPublishedAt(data.published_at ? toLocalInput(new Date(data.published_at)) : today());
         setIsPublished(data.is_published || false);
         setLoading(false);
     };

@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import PageMeta from '../../components/PageMeta';
-import StitchedImage from '../../components/StitchedImage';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 
@@ -10,24 +9,18 @@ const IMPACTS = [
     icon: 'ri-leaf-line',
     title: '環境への配慮',
     description: 'まだ使える犬服が毎年大量に捨てられています。リユースすることで、新品をつくるために必要な水・エネルギー・素材の消費を減らすことができます。捨てる前に、次の誰かへ。その積み重ねが環境への負荷を減らしていきます。',
-    image: 'https://readdy.ai/api/search-image?query=Sunlight%20filtering%20through%20green%20forest%20leaves%20environmental%20conservation%20fresh%20natural%20light%20editorial%20nature%20photography&width=900&height=700&seq=impactenv2026&orientation=landscape',
-    imageAlt: '木漏れ日の差す森',
   },
   {
     eyebrow: 'For Animals',
     icon: 'ri-heart-line',
     title: '動物保護への支援',
     description: 'RePawでの売上の一部は、保護犬・保護猫の支援活動を行う団体への寄付にあてています。服を買う・売るという日常の行動が、保護施設で暮らす動物たちの医療費や生活環境の改善につながっています。',
-    image: 'https://readdy.ai/api/search-image?query=Volunteer%20gently%20holding%20small%20rescued%20dog%20in%20bright%20animal%20shelter%20warm%20hopeful%20atmosphere%20editorial%20photography&width=900&height=700&seq=impactanimal2026&orientation=landscape',
-    imageAlt: '保護犬を抱くボランティア',
   },
   {
     eyebrow: 'Culture',
     icon: 'ri-refresh-line',
     title: 'ものを大切にする文化',
     description: '「気に入って買ったけど、うちの子には合わなかった」という経験、ありませんか。良いものを長く、次の子へつなぐ。そういう選択肢がもっと当たり前になってほしいと思っています。',
-    image: 'https://readdy.ai/api/search-image?query=Hands%20folding%20small%20second%20hand%20dog%20clothes%20with%20care%20on%20wooden%20table%20warm%20light%20editorial%20photography&width=900&height=700&seq=impactculture2026&orientation=landscape',
-    imageAlt: '犬服を丁寧にたたむ手元',
   },
 ];
 
@@ -58,15 +51,7 @@ export default function ImpactPage() {
       <Navigation />
 
       {/* Hero */}
-      <section className="relative h-96 md:h-[28rem] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src="https://readdy.ai/api/search-image?query=Inspiring%20photograph%20of%20a%20lush%20green%20forest%20with%20sunlight%20filtering%20through%20trees%20symbolizing%20environmental%20conservation%20and%20sustainability%20clean%20natural%20beauty%20with%20soft%20lighting%20professional%20nature%20photography%20for%20eco-friendly%20brand%20message&width=1920&height=600&seq=impacthero2024&orientation=landscape"
-            alt="社会への取り組み"
-            className="w-full h-full object-cover object-top"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-orange-950/50"></div>
-        </div>
+      <section className="relative h-96 md:h-[28rem] flex items-center justify-center overflow-hidden bg-orange-950">
         <div className="relative z-10 text-center text-white px-6">
           <h1 className="text-5xl md:text-6xl font-bold mb-4" style={serif}>Our Impact</h1>
           <p className="text-lg md:text-xl">RePawの社会への取り組み</p>
@@ -88,18 +73,12 @@ export default function ImpactPage() {
         </div>
       </section>
 
-      {/* 3 Impact Areas — マガジン風交互レイアウト */}
+      {/* 3 Impact Areas */}
       <section className="py-20 md:py-28 px-6 bg-orange-50">
         <div className="max-w-6xl mx-auto space-y-16 md:space-y-24">
           {IMPACTS.map((item, index) => (
-            <div key={index} className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-              <StitchedImage
-                src={item.image}
-                alt={item.imageAlt}
-                className={`aspect-[9/7] w-full ${index % 2 === 1 ? 'md:order-2' : ''}`}
-                tilt={index % 2 === 1 ? 'right' : 'left'}
-              />
-              <div className={index % 2 === 1 ? 'md:order-1' : ''}>
+            <div key={index} className="max-w-3xl mx-auto">
+              <div>
                 <p className="text-orange-600 italic text-lg md:text-xl mb-3" style={serif}>{item.eyebrow}</p>
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-12 h-12 flex items-center justify-center bg-orange-100 text-orange-600 rounded-full flex-shrink-0">
