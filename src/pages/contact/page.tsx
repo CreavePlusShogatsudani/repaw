@@ -1,4 +1,5 @@
 import PageMeta from '../../components/PageMeta';
+import PageHeader from '../../components/PageHeader';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import ContactSection from '../home/components/ContactSection';
@@ -9,13 +10,12 @@ export default function ContactPage() {
       <PageMeta title="お問い合わせ" description="RePawへのお問い合わせフォーム。商品・配送・買取についてのご質問を受け付けています。" path="/contact" />
       <Navigation />
 
-      <main className="pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-6xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Contact</h1>
-            <p className="text-gray-600 text-sm tracking-wider">お問い合わせ</p>
+      <main className="page">
+        <div className="shop-container pb-24">
+          <PageHeader eyebrow="Contact" title="お問い合わせ" lead="商品・配送・買取について、ログイン後にフォームからご質問いただけます。回答はマイページの「問い合わせ履歴」でご確認ください。" />
+          <div className="max-w-[44em]">
+            <ContactSection standalone />
           </div>
-          <ContactSection standalone />
         </div>
       </main>
 

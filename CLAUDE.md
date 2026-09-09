@@ -189,7 +189,9 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 - 商品カード: 写真（`--rp-photo-bg` 地に multiply）、ブランド小文字、品名、サイズ・ランク、価格、最終行に「○○ちゃんのおさがり」
 - 商品詳細は価格の下に「このお買い物から ¥○ を寄付」。寄付率は `src/lib/donation.ts`
 - 商品写真が最大のボトルネック。一眼レフでの統一撮影（背景・照明・構図を固定）が前提
-- About / Impact / System / FAQ などの下層ページは旧デザインのまま（未適用）
+- 下層ページも同じ文法。共通部品 `src/components/PageHeader.tsx`（英字の小見出し + h1 + 一文）と `src/index.css` の「下層ページ共通」クラス（page / page-section / rp-prose / rp-rows / rp-steps / rp-tabs / rp-faq / rp-band / rp-input / rp-article）を使う
+- 記事本文（特集・ニュース）の `#` `##` は半角スペース無しでも見出しとして描画する
+- ログインの「ログイン状態を保持」と Google / Apple ログインは未実装のため UI から削除済み
 
 ## 主要フロー
 
@@ -313,10 +315,9 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 - 通知メール（問い合わせ回答時・買取査定時）: 基盤未選定。`// TODO(#21)` が handle-inquiry と admin/inquiries にある
 - 利用規約 `/terms`・プライバシーポリシー `/privacy`: リンクはあるがページが無い（文面待ち）
 - プロフィールの Instagram（instagram_account / show_instagram）は公開サイトに反映されない。products.seller_id も未設定
-- カートの「購入手続きへ進む」が `CHECKOUT_ENABLED` と連動していない。クーポン入力欄・ソーシャルログインボタンは飾り
+- カートの「購入手続きへ進む」が `CHECKOUT_ENABLED` と連動していない。クーポン入力欄は飾り
 - pending_approval の ai_draft は RLS が行単位のため本人が API から読める（UI では非表示）
 - トップのヒーロー画像 `repaw-dog.jpg` が 2.7MB
-- 未使用コンポーネント: home/components の ProductsSection / ImpactSection / ServiceSection / SystemSection / QuickImpactSection
 - sitemap.xml に /contact 未記載
 
 ## 今後の検討事項

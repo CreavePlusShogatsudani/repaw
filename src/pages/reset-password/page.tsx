@@ -59,11 +59,11 @@ export default function ResetPasswordPage() {
               <div className="w-20 h-20 flex items-center justify-center bg-green-100 rounded-full mx-auto mb-6">
                 <i className="ri-checkbox-circle-line text-4xl text-green-600"></i>
               </div>
-              <h1 className="text-3xl font-bold mb-4">パスワードを更新しました</h1>
-              <p className="text-gray-600 text-sm mb-8 font-light">新しいパスワードでログインされています。</p>
+              <h1 className="text-[26px] font-medium tracking-[.08em] mb-4">パスワードを更新しました</h1>
+              <p className="text-sm text-[#6f6f6a] leading-relaxed mb-8">新しいパスワードでログインされています。</p>
               <button
                 onClick={() => navigate('/mypage')}
-                className="block w-full py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors cursor-pointer font-medium whitespace-nowrap"
+                className="block w-full py-3 bg-[#161616] text-white rounded-sm hover:bg-[#333] transition-colors cursor-pointer font-medium whitespace-nowrap"
               >
                 マイページへ
               </button>
@@ -73,14 +73,14 @@ export default function ResetPasswordPage() {
               <div className="w-16 h-16 flex items-center justify-center bg-red-100 rounded-full mx-auto mb-4">
                 <i className="ri-error-warning-line text-3xl text-red-600"></i>
               </div>
-              <h1 className="text-3xl font-bold mb-2">リンクが無効です</h1>
-              <p className="text-gray-600 text-sm font-light mb-8">
+              <h1 className="text-[26px] font-medium tracking-[.08em] mb-2">リンクが無効です</h1>
+              <p className="text-sm text-[#6f6f6a] leading-relaxed mb-8">
                 パスワード再設定リンクが無効か、有効期限が切れています。<br />
                 もう一度リセットメールを送信してください。
               </p>
               <Link
                 to="/forgot-password"
-                className="block w-full py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors cursor-pointer font-medium whitespace-nowrap"
+                className="block w-full py-3 bg-[#161616] text-white rounded-sm hover:bg-[#333] transition-colors cursor-pointer font-medium whitespace-nowrap"
               >
                 リセットメールを再送信
               </Link>
@@ -88,11 +88,11 @@ export default function ResetPasswordPage() {
           ) : (
             <>
               <div className="text-center mb-8">
-                <div className="w-16 h-16 flex items-center justify-center bg-orange-100 rounded-full mx-auto mb-4">
-                  <i className="ri-lock-password-line text-3xl text-orange-600"></i>
+                <div className="w-16 h-16 flex items-center justify-center bg-[#f3f2ee] rounded-full mx-auto mb-4">
+                  <i className="ri-lock-password-line text-3xl text-[#6f6f6a]"></i>
                 </div>
-                <h1 className="text-3xl font-bold mb-2">新しいパスワード</h1>
-                <p className="text-gray-600 text-sm font-light">新しいパスワードを入力してください。</p>
+                <h1 className="text-[26px] font-medium tracking-[.08em] mb-2">新しいパスワード</h1>
+                <p className="text-sm text-[#6f6f6a] leading-relaxed">新しいパスワードを入力してください。</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -107,7 +107,7 @@ export default function ResetPasswordPage() {
                     minLength={8}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                    className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-[#161616] text-sm"
                     placeholder="8文字以上"
                     disabled={loading}
                   />
@@ -120,14 +120,14 @@ export default function ResetPasswordPage() {
                     minLength={8}
                     value={confirm}
                     onChange={(e) => setConfirm(e.target.value)}
-                    className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                    className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-[#161616] text-sm"
                     disabled={loading}
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors cursor-pointer font-medium whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full py-3 bg-[#161616] text-white rounded-sm hover:bg-[#333] transition-colors cursor-pointer font-medium whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {loading ? '更新中...' : 'パスワードを更新'}
                 </button>

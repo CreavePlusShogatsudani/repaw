@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import PageMeta from '../../components/PageMeta';
+import PageHeader from '../../components/PageHeader';
 import { Link } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
@@ -40,60 +41,39 @@ export default function FeaturesPage() {
             <PageMeta title="特集" description="RePawの犬服リユース特集一覧。季節・ブランド・テーマ別におすすめ商品をまとめてご紹介します。" path="/features" />
             <Navigation />
 
-            <div className="pt-32 pb-24 px-6">
-                <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h1 className="text-5xl md:text-6xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Features</h1>
-                        <p className="text-gray-600 text-lg">特集一覧</p>
-                    </div>
+            <main className="page">
+                <div className="shop-container pb-24">
+                    <PageHeader eyebrow="Journal" title="特集・読みもの" lead="犬と暮らす日々のことと、テーマごとにまとめた犬服をご紹介します。" />
 
                     {loading ? (
-                        <div className="flex justify-center py-24">
-                            <div className="w-8 h-8 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12" role="status" aria-label="読み込んでいます">
+                            {Array.from({ length: 3 }).map((_, i) => <div key={i} className="product-skeleton !aspect-[4/3]" />)}
                         </div>
                     ) : collections.length === 0 ? (
-                        <div className="text-center py-24 text-gray-400">
-                            <i className="ri-folder-line text-5xl mb-4 block"></i>
-                            現在公開中の特集はありません
-                        </div>
+                        <p className="py-24 text-center text-sm text-[color:var(--rp-muted)]">現在公開中の特集はありません。</p>
                     ) : (
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-14">
                             {collections.map((c) => (
-                                <Link
-                                    key={c.id}
-                                    to={`/features/${c.id}`}
-                                    className="group cursor-pointer"
-                                >
-                                    <div className="relative w-full h-80 bg-gray-100 rounded-lg overflow-hidden mb-4">
+                                <Link key={c.id} to={`/features/${c.id}`} className="group block">
+                                    <div className="aspect-[4/3] overflow-hidden bg-[color:var(--rp-photo-bg)]">
                                         {c.cover_image_url ? (
-                                            <img
-                                                src={c.cover_image_url}
-                                                alt={c.title}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                            />
+                                            <img src={c.cover_image_url} alt={c.title} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                                <i className="ri-image-line text-5xl"></i>
-                                            </div>
-                                        )}
-                                        {c.tag && (
-                                            <div className="absolute top-4 left-4">
-                                                <span className="px-3 py-1 bg-white text-black text-xs font-bold rounded-full">
-                                                    {c.tag}
-                                                </span>
-                                            </div>
+                                            <div className="w-full h-full flex items-center justify-center text-[color:var(--rp-muted)]"><i className="ri-image-line text-3xl"></i></div>
                                         )}
                                     </div>
-                                    {c.subtitle && <p className="text-sm text-gray-500 mb-1">{c.subtitle}</p>}
-                                    <h3 className="text-xl font-bold mb-2 group-hover:underline">{c.title}</h3>
-                                    {c.description && <p className="text-sm text-gray-600 mb-3">{c.description}</p>}
-                                    <p className="text-sm text-orange-600 font-medium">{c.product_count}点の商品</p>
+                                    <div className="pt-5">
+                                        {(c.tag || c.subtitle) && <p className="text-xs tracking-[.06em] text-[color:var(--rp-muted)]">{c.tag || c.subtitle}</p>}
+                                        <h2 className="mt-2 text-xl font-medium tracking-[.04em] leading-relaxed group-hover:underline underline-offset-4">{c.title}</h2>
+                                        {c.description && <p className="mt-3 text-sm leading-7 text-[color:var(--rp-text)] line-clamp-2">{c.description}</p>}
+                                        <p className="mt-4 text-xs tracking-[.06em] text-[color:var(--rp-muted)]">{c.product_count}点の犬服</p>
+                                    </div>
                                 </Link>
                             ))}
                         </div>
                     )}
                 </div>
-            </div>
+            </main>
 
             <Footer />
         </div>

@@ -116,7 +116,7 @@ export default function ItemsPage() {
       <div className="shop-catalog pb-16 md:pb-24 px-5 md:px-10">
         <div className="max-w-7xl mx-auto">
           <div className="shop-catalog-heading">
-            <div><p className="shop-eyebrow">OUR WARDROBE</p><h1>犬服を探す</h1></div>
+            <div><p className="shop-eyebrow">Shop</p><h1>犬服を探す</h1></div>
             {!loading && !error && <p className="text-stone-600 text-xs md:text-sm" role="status">{filteredProducts.length}点</p>}
           </div>
           {selectedSize !== 'すべて' && <div className="mb-6 flex items-center gap-4 text-sm"><span>サイズ：{selectedSize}</span><button type="button" onClick={() => setSelectedSize('すべて')} className="min-h-11 underline underline-offset-4 text-stone-600">解除</button></div>}

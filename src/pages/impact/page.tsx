@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import PageMeta from '../../components/PageMeta';
+import PageHeader from '../../components/PageHeader';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 
@@ -42,99 +43,72 @@ const DONATION_STEPS = [
   },
 ];
 
-const serif = { fontFamily: "'Playfair Display', serif" };
-
 export default function ImpactPage() {
   return (
     <div className="min-h-screen bg-white">
       <PageMeta title="社会への取り組み" description="RePawの環境保護・動物保護支援への取り組みをご紹介します。犬服のリユースが社会貢献につながる仕組みです。" path="/impact" />
       <Navigation />
 
-      {/* Hero */}
-      <section className="relative h-96 md:h-[28rem] flex items-center justify-center overflow-hidden bg-orange-950">
-        <div className="relative z-10 text-center text-white px-6">
-          <h1 className="text-5xl md:text-6xl font-bold mb-4" style={serif}>Our Impact</h1>
-          <p className="text-lg md:text-xl">RePawの社会への取り組み</p>
-        </div>
-      </section>
+      <main className="page">
+        <div className="shop-container">
+          <PageHeader eyebrow="Impact" title="社会への取り組み" lead="犬服のリユースを通じて「環境」と「動物保護」という2つの課題に取り組んでいます。" />
 
-      {/* Intro */}
-      <section className="py-20 md:py-28 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-orange-600 italic text-lg md:text-xl mb-3" style={serif}>Why RePaw</p>
-          <h2 className="text-3xl md:text-4xl font-bold leading-snug mb-8">
-            服を売り買いすることが、
-            <br className="hidden md:block" />
-            社会への貢献になる
-          </h2>
-          <p className="text-base md:text-lg leading-loose text-gray-700 text-left md:text-center">
-            RePawは、犬服のリユースを通じて「環境」と「動物保護」という2つの課題に取り組んでいます。特別なことをしなくても、日常の買い物のなかで社会に貢献できる仕組みをつくりたい。それがRePawを始めた理由のひとつです。
-          </p>
-        </div>
-      </section>
-
-      {/* 3 Impact Areas */}
-      <section className="py-20 md:py-28 px-6 bg-orange-50">
-        <div className="max-w-6xl mx-auto space-y-16 md:space-y-24">
-          {IMPACTS.map((item, index) => (
-            <div key={index} className="max-w-3xl mx-auto">
-              <div>
-                <p className="text-orange-600 italic text-lg md:text-xl mb-3" style={serif}>{item.eyebrow}</p>
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 flex items-center justify-center bg-orange-100 text-orange-600 rounded-full flex-shrink-0">
-                    <i className={`${item.icon} text-xl`}></i>
-                  </div>
-                  <h3 className="text-2xl md:text-3xl font-bold">{item.title}</h3>
-                </div>
-                <p className="text-base md:text-lg leading-loose text-gray-700">{item.description}</p>
-              </div>
+          {/* Intro */}
+          <section className="page-section">
+            <p className="shop-eyebrow">Why RePaw</p>
+            <h2>服を売り買いすることが、社会への貢献になる</h2>
+            <div className="rp-prose mt-8">
+              <p>
+                RePawは、犬服のリユースを通じて「環境」と「動物保護」という2つの課題に取り組んでいます。特別なことをしなくても、日常の買い物のなかで社会に貢献できる仕組みをつくりたい。それがRePawを始めた理由のひとつです。
+              </p>
             </div>
-          ))}
-        </div>
-      </section>
+          </section>
 
-      {/* 寄付の仕組み */}
-      <section className="py-20 md:py-28 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14 md:mb-20">
-            <p className="text-orange-600 italic text-lg md:text-xl mb-3" style={serif}>How It Works</p>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">寄付の仕組み</h2>
-            <p className="text-base md:text-lg text-gray-600">RePawでのお買い物が、そのまま支援につながります</p>
-          </div>
-
-          <div className="relative grid md:grid-cols-3 gap-10 md:gap-8">
-            {/* 縫い目のつなぎ線（PC） */}
-            <div className="hidden md:block absolute top-7 left-[16.67%] right-[16.67%] border-t-2 border-dashed border-orange-300" aria-hidden="true"></div>
-            {DONATION_STEPS.map((step, index) => (
-              <div key={index} className="relative text-center">
-                <div className="w-14 h-14 flex items-center justify-center bg-orange-600 text-white rounded-full mx-auto mb-5 text-xl font-bold relative z-10">
-                  {step.number}
+          {/* 3 Impact Areas */}
+          <section className="page-section">
+            <p className="shop-eyebrow">Our Focus</p>
+            <h2>3つの取り組み</h2>
+            <div className="rp-rows mt-10">
+              {IMPACTS.map((item) => (
+                <div key={item.title}>
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
                 </div>
-                <h3 className="text-lg md:text-xl font-bold mb-3">{step.title}</h3>
-                <p className="text-base leading-relaxed text-gray-700">{step.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+              ))}
+            </div>
+          </section>
 
-      {/* CTA */}
-      <section className="py-20 md:py-28 px-6 bg-orange-600">
-        <div className="max-w-4xl mx-auto text-center text-white">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">あなたの選択が、誰かの力になる</h2>
-          <p className="text-base md:text-lg leading-relaxed text-orange-50 mb-10">
-            使わなくなった犬服を手放すだけで、環境にも動物にも優しい選択になります。
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/products" className="px-8 py-4 bg-white text-orange-600 rounded-full text-sm md:text-base font-bold hover:bg-orange-50 transition-colors whitespace-nowrap">
-              商品を見る
-            </Link>
-            <Link to="/buyback" className="px-8 py-4 border-2 border-white text-white rounded-full text-sm md:text-base font-bold hover:bg-white hover:text-orange-600 transition-colors whitespace-nowrap">
-              買取を申し込む
-            </Link>
-          </div>
+          {/* 寄付の仕組み */}
+          <section className="page-section">
+            <p className="shop-eyebrow">How It Works</p>
+            <h2>寄付の仕組み</h2>
+            <p className="mt-3 text-sm text-[color:var(--rp-muted)]">RePawでのお買い物が、そのまま支援につながります</p>
+            <div className="rp-steps mt-10">
+              {DONATION_STEPS.map((step, index) => (
+                <div key={step.title}>
+                  <span className="rp-num">0{index + 1}</span>
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
-      </section>
+
+        {/* CTA */}
+        <section className="rp-band page-section">
+          <div className="shop-container">
+            <h2>あなたの選択が、誰かの力になる</h2>
+            <div className="rp-prose mt-6">
+              <p>使わなくなった犬服を手放すだけで、環境にも動物にも優しい選択になります。</p>
+            </div>
+            <div className="flex flex-wrap gap-3 mt-8">
+              <Link to="/products" className="rp-btn rp-btn-black">犬服を探す</Link>
+              <Link to="/buyback" className="rp-btn rp-btn-outline">買取を申し込む</Link>
+            </div>
+          </div>
+        </section>
+      </main>
 
       <Footer />
     </div>

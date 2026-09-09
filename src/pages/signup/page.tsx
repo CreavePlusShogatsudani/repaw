@@ -80,8 +80,8 @@ export default function SignupPage() {
       <main className="pt-24 pb-16">
         <div className="max-w-md mx-auto px-6">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">新規登録</h1>
-            <p className="text-gray-600">RePawへようこそ</p>
+            <h1 className="text-[26px] font-medium tracking-[.08em] mb-2">新規登録</h1>
+            <p className="text-sm text-[#6f6f6a] leading-relaxed">RePawへようこそ</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -101,7 +101,7 @@ export default function SignupPage() {
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-600"
+                className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-[#161616]"
                 placeholder="example@email.com"
                 disabled={loading}
               />
@@ -118,7 +118,7 @@ export default function SignupPage() {
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-600 pr-12"
+                  className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-[#161616] pr-12"
                   placeholder="8文字以上"
                   minLength={8}
                   disabled={loading}
@@ -145,7 +145,7 @@ export default function SignupPage() {
                   required
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-600 pr-12"
+                  className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-[#161616] pr-12"
                   placeholder="パスワードを再入力"
                   minLength={8}
                   disabled={loading}
@@ -171,7 +171,7 @@ export default function SignupPage() {
                     type="text"
                     value={formData.petName}
                     onChange={(e) => setFormData({ ...formData, petName: e.target.value })}
-                    className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-600"
+                    className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-[#161616]"
                     placeholder="例：もも"
                     disabled={loading}
                   />
@@ -183,7 +183,7 @@ export default function SignupPage() {
                     type="text"
                     value={formData.petBreed}
                     onChange={(e) => setFormData({ ...formData, petBreed: e.target.value })}
-                    className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-600"
+                    className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-[#161616]"
                     placeholder="例：柴犬"
                     disabled={loading}
                   />
@@ -203,9 +203,9 @@ export default function SignupPage() {
                 disabled={loading}
               />
               <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer">
-                <Link to="/terms" className="text-orange-600 hover:underline">利用規約</Link>
+                <Link to="/terms" className="text-[#161616] underline underline-offset-4 hover:text-[#6f6f6a]">利用規約</Link>
                 および
-                <Link to="/privacy" className="text-orange-600 hover:underline">プライバシーポリシー</Link>
+                <Link to="/privacy" className="text-[#161616] underline underline-offset-4 hover:text-[#6f6f6a]">プライバシーポリシー</Link>
                 に同意します
               </label>
             </div>
@@ -214,7 +214,7 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3 bg-orange-600 text-white rounded-lg transition-colors font-medium whitespace-nowrap ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-orange-700 cursor-pointer'
+              className={`w-full py-3 bg-[#161616] text-white rounded-sm transition-colors font-medium whitespace-nowrap ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-[#333] cursor-pointer'
                 }`}
             >
               {loading ? (
@@ -232,40 +232,12 @@ export default function SignupPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               すでにアカウントをお持ちの方は
-              <Link to="/login" className="text-orange-600 hover:underline ml-1 cursor-pointer">
+              <Link to="/login" className="text-[#161616] underline underline-offset-4 hover:text-[#6f6f6a] ml-1 cursor-pointer">
                 ログイン
               </Link>
             </p>
           </div>
 
-          {/* ソーシャルログイン */}
-          <div className="mt-8">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500">または</span>
-              </div>
-            </div>
-
-            <div className="mt-6 space-y-3">
-              <button
-                type="button"
-                className="w-full py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap"
-              >
-                <i className="ri-google-fill text-xl text-red-500"></i>
-                Googleで登録
-              </button>
-              <button
-                type="button"
-                className="w-full py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap"
-              >
-                <i className="ri-apple-fill text-xl"></i>
-                Appleで登録
-              </button>
-            </div>
-          </div>
         </div>
       </main>
 

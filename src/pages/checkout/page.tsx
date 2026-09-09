@@ -193,13 +193,13 @@ export default function CheckoutPage() {
         <Navigation />
         <main className="pt-32 pb-24 px-4 text-center">
           <i className="ri-tools-line text-5xl text-gray-400"></i>
-          <h1 className="mt-4 text-2xl md:text-3xl font-bold">オンライン決済は準備中です</h1>
-          <p className="mt-3 text-sm md:text-base text-gray-600">
+          <h1 className="mt-4 text-[26px] md:text-[34px] font-medium tracking-[.08em]">オンライン決済は準備中です</h1>
+          <p className="mt-3 text-sm text-[#6f6f6a] leading-relaxed">
             決済システムの準備が整い次第、ご購入いただけるようになります。
           </p>
           <Link
             to="/products"
-            className="inline-block mt-8 px-8 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
+            className="inline-block mt-8 px-8 py-3 bg-[#161616] text-white rounded-sm font-medium hover:bg-[#333] transition-colors cursor-pointer whitespace-nowrap"
           >
             商品一覧へ戻る
           </Link>
@@ -247,7 +247,7 @@ export default function CheckoutPage() {
               {[1, 2, 3].map((step) => (
                 <div key={step} className="flex items-center">
                   <div className={`flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full text-sm md:text-base font-bold transition-all ${currentStep >= step
-                    ? 'bg-gray-900 text-white'
+                    ? 'bg-[#161616] text-white'
                     : 'bg-gray-200 text-gray-400'
                     }`}>
                     {step}
@@ -278,14 +278,14 @@ export default function CheckoutPage() {
               <form onSubmit={handleSubmit}>
                 {/* ステップ1: 配送情報 */}
                 {currentStep === 1 && (
-                  <div className="bg-white rounded-lg p-6 md:p-8 shadow-sm">
+                  <div className="bg-white border border-[#e6e6e1] rounded-sm p-6 md:p-8">
                     <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">配送先</h2>
 
                     {/* 住所切り替え */}
                     {hasSavedAddress && (
                       <div className="mb-6 space-y-3">
                         <label
-                          className={`flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${addressMode === 'saved' ? 'border-gray-900 bg-gray-50' : 'border-gray-200'}`}
+                          className={`flex items-start gap-3 p-4 border-2 rounded-sm cursor-pointer transition-colors ${addressMode === 'saved' ? 'border-gray-900 bg-gray-50' : 'border-gray-200'}`}
                           onClick={() => setAddressMode('saved')}
                         >
                           <input type="radio" checked={addressMode === 'saved'} readOnly className="mt-1 w-4 h-4" />
@@ -299,7 +299,7 @@ export default function CheckoutPage() {
                           </div>
                         </label>
                         <label
-                          className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors ${addressMode === 'new' ? 'border-gray-900 bg-gray-50' : 'border-gray-200'}`}
+                          className={`flex items-center gap-3 p-4 border-2 rounded-sm cursor-pointer transition-colors ${addressMode === 'new' ? 'border-gray-900 bg-gray-50' : 'border-gray-200'}`}
                           onClick={() => setAddressMode('new')}
                         >
                           <input type="radio" checked={addressMode === 'new'} readOnly className="w-4 h-4" />
@@ -319,7 +319,7 @@ export default function CheckoutPage() {
                           value={formData.email}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-3 md:px-4 py-2.5 md:py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm md:text-base"
+                          className="w-full px-3 md:px-4 py-2.5 md:py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm md:text-base"
                           placeholder="example@email.com"
                         />
                       </div>
@@ -335,7 +335,7 @@ export default function CheckoutPage() {
                             value={formData.lastName}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-3 md:px-4 py-2.5 md:py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm md:text-base"
+                            className="w-full px-3 md:px-4 py-2.5 md:py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm md:text-base"
                             placeholder="山田"
                           />
                         </div>
@@ -349,7 +349,7 @@ export default function CheckoutPage() {
                             value={formData.firstName}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-3 md:px-4 py-2.5 md:py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm md:text-base"
+                            className="w-full px-3 md:px-4 py-2.5 md:py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm md:text-base"
                             placeholder="太郎"
                           />
                         </div>
@@ -366,7 +366,7 @@ export default function CheckoutPage() {
                             value={formData.lastNameKana}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
+                            className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
                             placeholder="ヤマダ"
                           />
                         </div>
@@ -380,7 +380,7 @@ export default function CheckoutPage() {
                             value={formData.firstNameKana}
                             onChange={handleInputChange}
                             required
-                            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
+                            className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
                             placeholder="タロウ"
                           />
                         </div>
@@ -396,7 +396,7 @@ export default function CheckoutPage() {
                           value={formData.postalCode}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
+                          className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
                           placeholder="123-4567"
                           maxLength={8}
                         />
@@ -411,7 +411,7 @@ export default function CheckoutPage() {
                           value={formData.prefecture}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm cursor-pointer"
+                          className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm cursor-pointer"
                         >
                           <option value="">選択してください</option>
                           {prefectures.map((pref) => (
@@ -430,7 +430,7 @@ export default function CheckoutPage() {
                           value={formData.city}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
+                          className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
                           placeholder="渋谷区"
                         />
                       </div>
@@ -445,7 +445,7 @@ export default function CheckoutPage() {
                           value={formData.address}
                           onChange={handleInputChange}
                           required
-                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
+                          className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
                           placeholder="道玄坂1-2-3"
                         />
                       </div>
@@ -459,7 +459,7 @@ export default function CheckoutPage() {
                           name="building"
                           value={formData.building}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
+                          className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
                           placeholder="〇〇マンション101号室"
                         />
                       </div>
@@ -474,7 +474,7 @@ export default function CheckoutPage() {
                           value={formData.phone}
                           onChange={handleInputChange}
                           required={addressMode === 'new' || !hasSavedAddress}
-                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
+                          className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
                           placeholder="090-1234-5678"
                         />
                       </div>
@@ -490,7 +490,7 @@ export default function CheckoutPage() {
                       </Link>
                       <button
                         type="submit"
-                        className="px-6 md:px-8 py-2.5 md:py-3 bg-gray-900 text-white rounded-lg text-sm md:text-base font-medium hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
+                        className="px-6 md:px-8 py-2.5 md:py-3 bg-[#161616] text-white rounded-sm text-sm md:text-base font-medium hover:bg-[#333] transition-colors cursor-pointer whitespace-nowrap"
                       >
                         支払い方法へ進む
                       </button>
@@ -500,12 +500,12 @@ export default function CheckoutPage() {
 
                 {/* ステップ2: 支払い方法 */}
                 {currentStep === 2 && (
-                  <div className="bg-white rounded-lg p-8 shadow-sm">
+                  <div className="bg-white border border-[#e6e6e1] rounded-sm p-8">
                     <h2 className="text-2xl font-bold mb-6">支払い方法</h2>
 
                     <div className="space-y-6">
                       {/* 現在はクレジットカードのみ。コンビニ決済・銀行振込は未実装のため選択肢から外している */}
-                      <div className="flex items-center p-4 border-2 border-gray-900 rounded-lg">
+                      <div className="flex items-center p-4 border-2 border-gray-900 rounded-sm">
                         <i className="ri-bank-card-line text-xl"></i>
                         <div className="ml-4 flex-1">
                           <span className="font-medium">クレジットカード</span>
@@ -547,7 +547,7 @@ export default function CheckoutPage() {
                       </button>
                       <button
                         type="submit"
-                        className="px-8 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
+                        className="px-8 py-3 bg-[#161616] text-white rounded-sm font-medium hover:bg-[#333] transition-colors cursor-pointer whitespace-nowrap"
                       >
                         確認画面へ進む
                       </button>
@@ -558,7 +558,7 @@ export default function CheckoutPage() {
                 {/* ステップ3: 確認 */}
                 {currentStep === 3 && (
                   <div className="space-y-6">
-                    <div className="bg-white rounded-lg p-8 shadow-sm">
+                    <div className="bg-white border border-[#e6e6e1] rounded-sm p-8">
                       <h2 className="text-2xl font-bold mb-6">配送先情報</h2>
                       {addressMode === 'saved' && hasSavedAddress ? (
                         <div className="text-sm text-gray-700 space-y-1">
@@ -594,13 +594,13 @@ export default function CheckoutPage() {
                       <button
                         type="button"
                         onClick={() => setCurrentStep(1)}
-                        className="mt-4 text-sm text-orange-600 hover:text-orange-700 cursor-pointer whitespace-nowrap"
+                        className="mt-4 text-sm text-[#161616] underline underline-offset-4 hover:text-[#6f6f6a] cursor-pointer whitespace-nowrap"
                       >
                         変更する
                       </button>
                     </div>
 
-                    <div className="bg-white rounded-lg p-8 shadow-sm">
+                    <div className="bg-white border border-[#e6e6e1] rounded-sm p-8">
                       <h2 className="text-2xl font-bold mb-6">支払い方法</h2>
                       <div className="flex items-center gap-3 text-sm">
                         <i className={`text-xl ${formData.paymentMethod === 'credit' ? 'ri-bank-card-line' :
@@ -621,15 +621,15 @@ export default function CheckoutPage() {
                       <button
                         type="button"
                         onClick={() => setCurrentStep(2)}
-                        className="mt-4 text-sm text-orange-600 hover:text-orange-700 cursor-pointer whitespace-nowrap"
+                        className="mt-4 text-sm text-[#161616] underline underline-offset-4 hover:text-[#6f6f6a] cursor-pointer whitespace-nowrap"
                       >
                         編集する
                       </button>
                     </div>
 
-                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
+                    <div className="bg-[#f3f2ee] border border-[#e6e6e1] rounded-sm p-6">
                       <div className="flex items-start gap-3">
-                        <i className="ri-information-line text-xl text-orange-600 flex-shrink-0 mt-0.5"></i>
+                        <i className="ri-information-line text-xl text-[#6f6f6a] flex-shrink-0 mt-0.5"></i>
                         <div className="text-sm text-gray-700">
                           <p className="font-medium mb-2">ご注文前にご確認ください</p>
                           <ul className="space-y-1 text-xs">
@@ -641,7 +641,7 @@ export default function CheckoutPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3 bg-white rounded-lg p-6 shadow-sm">
+                    <div className="flex items-start gap-3 bg-white border border-[#e6e6e1] rounded-sm p-6">
                       <input
                         type="checkbox"
                         id="terms"
@@ -649,8 +649,8 @@ export default function CheckoutPage() {
                         className="w-5 h-5 mt-0.5 cursor-pointer"
                       />
                       <label htmlFor="terms" className="text-sm text-gray-700 cursor-pointer">
-                        <a href="#" className="text-orange-600 hover:underline">利用規約</a>と
-                        <a href="#" className="text-orange-600 hover:underline">プライバシーポリシー</a>に同意します
+                        <a href="#" className="text-[#161616] underline underline-offset-4 hover:text-[#6f6f6a]">利用規約</a>と
+                        <a href="#" className="text-[#161616] underline underline-offset-4 hover:text-[#6f6f6a]">プライバシーポリシー</a>に同意します
                       </label>
                     </div>
 
@@ -665,7 +665,7 @@ export default function CheckoutPage() {
                       </button>
                       <button
                         type="submit"
-                        className="px-8 py-4 bg-orange-600 text-white rounded-lg font-bold hover:bg-orange-700 transition-colors cursor-pointer whitespace-nowrap text-lg"
+                        className="px-8 py-4 bg-[#161616] text-white rounded-sm font-bold hover:bg-[#333] transition-colors cursor-pointer whitespace-nowrap text-lg"
                       >
                         注文を確定する
                       </button>
@@ -677,7 +677,7 @@ export default function CheckoutPage() {
 
             {/* 注文サマリー */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg p-4 md:p-6 shadow-sm sticky top-20 md:top-24">
+              <div className="bg-white border border-[#e6e6e1] rounded-sm p-4 md:p-6 sticky top-20 md:top-24">
                 <h2 className="text-base md:text-lg font-bold mb-4 md:mb-6">注文内容</h2>
 
                 <div className="space-y-3 md:space-y-4 mb-4 md:mb-6 pb-4 md:pb-6 border-b">
@@ -830,7 +830,7 @@ function PaymentForm({ setCurrentStep, formData, clearCart, paymentIntentId }: {
         <button
           onClick={handleSubmit}
           disabled={!stripe || processing}
-          className="px-8 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap disabled:opacity-50"
+          className="px-8 py-3 bg-[#161616] text-white rounded-sm font-medium hover:bg-[#333] transition-colors cursor-pointer whitespace-nowrap disabled:opacity-50"
         >
           {processing ? '処理中...' : '注文を確定する'}
         </button>

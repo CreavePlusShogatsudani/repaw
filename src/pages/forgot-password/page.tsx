@@ -36,11 +36,11 @@ export default function ForgotPasswordPage() {
           {!isSubmitted ? (
             <>
               <div className="text-center mb-8">
-                <div className="w-16 h-16 flex items-center justify-center bg-orange-100 rounded-full mx-auto mb-4">
-                  <i className="ri-lock-password-line text-3xl text-orange-600"></i>
+                <div className="w-16 h-16 flex items-center justify-center bg-[#f3f2ee] rounded-full mx-auto mb-4">
+                  <i className="ri-lock-password-line text-3xl text-[#6f6f6a]"></i>
                 </div>
-                <h1 className="text-3xl font-bold mb-2">パスワードを忘れた</h1>
-                <p className="text-gray-600 text-sm font-light">
+                <h1 className="text-[26px] font-medium tracking-[.08em] mb-2">パスワードを忘れた</h1>
+                <p className="text-sm text-[#6f6f6a] leading-relaxed">
                   登録されているメールアドレスを入力してください。<br />
                   パスワードリセット用のリンクをお送りします。
                 </p>
@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                    className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-[#161616] text-sm"
                     placeholder="example@email.com"
                     disabled={loading}
                   />
@@ -70,7 +70,7 @@ export default function ForgotPasswordPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors cursor-pointer font-medium whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full py-3 bg-[#161616] text-white rounded-sm hover:bg-[#333] transition-colors cursor-pointer font-medium whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {loading ? '送信中...' : 'リセットリンクを送信'}
                 </button>
@@ -80,7 +80,7 @@ export default function ForgotPasswordPage() {
               <div className="mt-6 text-center">
                 <Link 
                   to="/login" 
-                  className="text-sm text-orange-500 hover:underline cursor-pointer inline-flex items-center gap-1"
+                  className="text-sm text-[#161616] underline underline-offset-4 hover:text-[#6f6f6a] cursor-pointer inline-flex items-center gap-1"
                 >
                   <i className="ri-arrow-left-line"></i>
                   ログインに戻る
@@ -93,12 +93,12 @@ export default function ForgotPasswordPage() {
                 <div className="w-20 h-20 flex items-center justify-center bg-green-100 rounded-full mx-auto mb-6">
                   <i className="ri-mail-check-line text-4xl text-green-600"></i>
                 </div>
-                <h1 className="text-3xl font-bold mb-4">メールを送信しました</h1>
-                <p className="text-gray-600 mb-2 font-light leading-relaxed">
+                <h1 className="text-[26px] font-medium tracking-[.08em] mb-4">メールを送信しました</h1>
+                <p className="text-sm text-[#6f6f6a] leading-relaxed mb-2">
                   <strong className="text-gray-900">{email}</strong> 宛に<br />
                   パスワードリセット用のリンクを送信しました。
                 </p>
-                <p className="text-gray-600 text-sm mb-8 font-light">
+                <p className="text-sm text-[#6f6f6a] leading-relaxed mb-8">
                   メールが届かない場合は、迷惑メールフォルダもご確認ください。
                 </p>
 
@@ -106,13 +106,13 @@ export default function ForgotPasswordPage() {
                 <div className="space-y-3">
                   <Link
                     to="/login"
-                    className="block w-full py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors cursor-pointer font-medium whitespace-nowrap text-center"
+                    className="block w-full py-3 bg-[#161616] text-white rounded-sm hover:bg-[#333] transition-colors cursor-pointer font-medium whitespace-nowrap text-center"
                   >
                     ログインページへ
                   </Link>
                   <button
                     onClick={() => setIsSubmitted(false)}
-                    className="w-full py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer font-medium whitespace-nowrap"
+                    className="w-full py-3 border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors cursor-pointer font-medium whitespace-nowrap"
                   >
                     別のメールアドレスで再送信
                   </button>
@@ -128,7 +128,7 @@ export default function ForgotPasswordPage() {
                   <div>
                     <p className="text-sm text-gray-700 font-light leading-relaxed">
                       メールが届かない場合や、その他お困りのことがございましたら、
-                      <Link to="/contact" className="text-orange-500 hover:underline cursor-pointer">
+                      <Link to="/contact" className="text-[#161616] underline underline-offset-4 hover:text-[#6f6f6a] cursor-pointer">
                         お問い合わせフォーム
                       </Link>
                       からご連絡ください。

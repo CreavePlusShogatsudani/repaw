@@ -51,18 +51,18 @@ interface Inquiry {
 }
 
 const INQUIRY_STATUS_LABEL: Record<string, { label: string; color: string }> = {
-  received:         { label: '確認中',   color: 'bg-yellow-100 text-yellow-700' },
-  pending_approval: { label: '確認中',   color: 'bg-yellow-100 text-yellow-700' },
-  auto_sent:        { label: '回答済み', color: 'bg-green-100 text-green-700' },
-  approved_sent:    { label: '回答済み', color: 'bg-green-100 text-green-700' },
+  received:         { label: '確認中',   color: 'bg-[#f3f2ee] text-[#6f6f6a]' },
+  pending_approval: { label: '確認中',   color: 'bg-[#f3f2ee] text-[#6f6f6a]' },
+  auto_sent:        { label: '回答済み', color: 'bg-[#161616] text-white' },
+  approved_sent:    { label: '回答済み', color: 'bg-[#161616] text-white' },
 };
 
 const ORDER_STATUS_LABEL: Record<string, { label: string; color: string }> = {
-  pending:   { label: '支払い待ち', color: 'bg-gray-100 text-gray-700' },
-  paid:      { label: '支払い済み', color: 'bg-blue-100 text-blue-700' },
-  shipped:   { label: '発送済み',   color: 'bg-orange-100 text-orange-700' },
-  completed: { label: '配送完了',   color: 'bg-green-100 text-green-700' },
-  cancelled: { label: 'キャンセル', color: 'bg-red-100 text-red-700' },
+  pending:   { label: '支払い待ち', color: 'bg-[#f3f2ee] text-[#6f6f6a]' },
+  paid:      { label: '支払い済み', color: 'bg-[#e6e6e1] text-[#2a2a28]' },
+  shipped:   { label: '発送済み',   color: 'bg-[#e6e6e1] text-[#2a2a28]' },
+  completed: { label: '配送完了',   color: 'bg-[#161616] text-white' },
+  cancelled: { label: 'キャンセル', color: 'bg-[#f3f2ee] text-[#6f6f6a] line-through' },
 };
 
 export default function MyPage() {
@@ -243,11 +243,11 @@ export default function MyPage() {
       <main className="pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold">マイページ</h1>
+            <h1 className="text-[26px] md:text-[34px] font-medium tracking-[.08em]">マイページ</h1>
             <button
               type="button"
               onClick={async () => { await signOut(); navigate('/'); }}
-              className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap"
+              className="px-4 py-2 text-sm border rounded-sm hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap"
             >
               <i className="ri-logout-box-r-line mr-1"></i>
               ログアウト
@@ -256,7 +256,7 @@ export default function MyPage() {
 
           {/* タブナビゲーション */}
           <div className="mb-8 overflow-x-auto scrollbar-hide -mx-4 px-4">
-            <div className="inline-flex bg-white rounded-full p-1 shadow-sm min-w-max">
+            <div className="rp-tabs min-w-max" role="tablist">
               {([
                 { key: 'profile',   label: 'プロフィール',    icon: 'ri-user-line' },
                 { key: 'orders',    label: '購入履歴',        icon: 'ri-shopping-bag-line' },
@@ -266,10 +266,10 @@ export default function MyPage() {
               ] as const).map(({ key, label, icon }) => (
                 <button
                   key={key}
+                  role="tab"
+                  aria-selected={activeTab === key}
                   onClick={() => setActiveTab(key)}
-                  className={`px-4 md:px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap cursor-pointer transition-colors ${
-                    activeTab === key ? 'bg-black text-white' : 'hover:bg-gray-100'
-                  }`}
+                  className="whitespace-nowrap cursor-pointer"
                 >
                   <i className={`${icon} mr-2`}></i>
                   {label}
@@ -281,13 +281,13 @@ export default function MyPage() {
           {/* プロフィールタブ */}
           {activeTab === 'profile' && (
             <div className="max-w-3xl">
-              <div className="bg-white border rounded-lg p-8">
+              <div className="bg-white border border-[#e6e6e1] rounded-sm p-8">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold">プロフィール設定</h2>
                   {!isEditing ? (
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap"
+                      className="px-4 py-2 text-sm border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap"
                     >
                       <i className="ri-edit-line mr-2"></i>編集
                     </button>
@@ -295,14 +295,14 @@ export default function MyPage() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => { setIsEditing(false); setSaveError(null); }}
-                        className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap"
+                        className="px-4 py-2 text-sm border border-gray-300 rounded-sm hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap"
                       >
                         キャンセル
                       </button>
                       <button
                         onClick={handleSaveProfile}
                         disabled={saving}
-                        className="px-4 py-2 text-sm bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap disabled:opacity-50"
+                        className="px-4 py-2 text-sm bg-[#161616] text-white rounded-sm hover:bg-[#333] transition-colors cursor-pointer whitespace-nowrap disabled:opacity-50"
                       >
                         {saving ? '保存中...' : '保存'}
                       </button>
@@ -325,7 +325,7 @@ export default function MyPage() {
                         value={petName}
                         onChange={(e) => setPetName(e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                        className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
                       />
                     </div>
                     <div>
@@ -335,7 +335,7 @@ export default function MyPage() {
                         value={petBreed}
                         onChange={(e) => setPetBreed(e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                        className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
                       />
                     </div>
                   </div>
@@ -354,7 +354,7 @@ export default function MyPage() {
                           value={instagramAccount}
                           onChange={(e) => setInstagramAccount(e.target.value)}
                           disabled={!isEditing}
-                          className="flex-1 min-w-0 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                          className="flex-1 min-w-0 px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
                           placeholder="instagram_username"
                         />
                       </div>
@@ -363,7 +363,7 @@ export default function MyPage() {
                       <div className="flex flex-col gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-2">
-                            <i className="ri-instagram-line text-pink-600 flex-shrink-0"></i>
+                            <i className="ri-instagram-line text-[#6f6f6a] flex-shrink-0"></i>
                             <span className="font-medium text-sm">商品ページでの表示</span>
                           </div>
                           <p className="text-xs text-gray-600 leading-relaxed">
@@ -402,7 +402,7 @@ export default function MyPage() {
                         value={recipientName}
                         onChange={(e) => setRecipientName(e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                        className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
                         placeholder="山田 太郎"
                       />
                     </div>
@@ -413,7 +413,7 @@ export default function MyPage() {
                         value={postalCode}
                         onChange={(e) => setPostalCode(e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                        className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
                         placeholder="123-4567"
                       />
                     </div>
@@ -424,7 +424,7 @@ export default function MyPage() {
                         value={prefecture}
                         onChange={(e) => setPrefecture(e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                        className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
                         placeholder="東京都"
                       />
                     </div>
@@ -435,7 +435,7 @@ export default function MyPage() {
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                        className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
                         placeholder="渋谷区"
                       />
                     </div>
@@ -446,7 +446,7 @@ export default function MyPage() {
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                        className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
                         placeholder="神宮前1-2-3"
                       />
                     </div>
@@ -457,7 +457,7 @@ export default function MyPage() {
                         value={building}
                         onChange={(e) => setBuilding(e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                        className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
                         placeholder="〇〇マンション101号室"
                       />
                     </div>
@@ -474,7 +474,7 @@ export default function MyPage() {
                         type="email"
                         value={profile?.email || ''}
                         disabled
-                        className="w-full px-4 py-3 border rounded-lg bg-gray-50 text-gray-600"
+                        className="w-full px-4 py-3 border rounded-sm bg-gray-50 text-gray-600"
                       />
                     </div>
                     <div>
@@ -484,7 +484,7 @@ export default function MyPage() {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         disabled={!isEditing}
-                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                        className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
                         placeholder="090-1234-5678"
                       />
                     </div>
@@ -507,7 +507,7 @@ export default function MyPage() {
                       year: 'numeric', month: 'long', day: 'numeric',
                     });
                     return (
-                      <div key={order.id} className="bg-white border rounded-lg p-6">
+                      <div key={order.id} className="bg-white border border-[#e6e6e1] rounded-sm p-6">
                         <div className="flex justify-between items-start mb-4">
                           <div>
                             <p className="text-sm text-gray-600 mb-1">
@@ -553,7 +553,7 @@ export default function MyPage() {
                   <p className="text-gray-600 mb-6">まだ購入履歴がありません</p>
                   <Link
                     to="/products"
-                    className="inline-block px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
+                    className="inline-block px-6 py-3 bg-[#161616] text-white rounded-sm hover:bg-[#333] transition-colors cursor-pointer whitespace-nowrap"
                   >
                     商品を見る
                   </Link>
@@ -601,7 +601,7 @@ export default function MyPage() {
                         </div>
                         <button
                           onClick={() => handleAddFavoriteToCart(fav)}
-                          className="w-full py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
+                          className="w-full py-2 bg-[#161616] text-white rounded-sm hover:bg-[#333] transition-colors cursor-pointer whitespace-nowrap"
                         >
                           商品ページへ
                         </button>
@@ -615,7 +615,7 @@ export default function MyPage() {
                   <p className="text-gray-600 mb-6">お気に入りの商品がありません</p>
                   <Link
                     to="/products"
-                    className="inline-block px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
+                    className="inline-block px-6 py-3 bg-[#161616] text-white rounded-sm hover:bg-[#333] transition-colors cursor-pointer whitespace-nowrap"
                   >
                     商品を見る
                   </Link>
@@ -629,13 +629,13 @@ export default function MyPage() {
             <div>
               {/* 寄付合計 */}
               {!buybackLoading && donationTotal > 0 && (
-                <div className="mb-6 p-5 bg-orange-50 border border-orange-200 rounded-xl flex items-center gap-4">
-                  <div className="w-12 h-12 flex items-center justify-center bg-orange-500 text-white rounded-full flex-shrink-0">
+                <div className="mb-6 p-5 bg-[#f3f2ee] border border-[#e6e6e1] rounded-sm flex items-center gap-4">
+                  <div className="w-12 h-12 flex items-center justify-center bg-[#161616] text-white rounded-sm flex-shrink-0">
                     <i className="ri-heart-line text-xl"></i>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600 mb-0.5">あなたの寄付合計</p>
-                    <p className="text-2xl font-bold text-orange-600">¥{donationTotal.toLocaleString()}</p>
+                    <p className="text-2xl font-bold text-[#161616]">¥{donationTotal.toLocaleString()}</p>
                     <div className="flex gap-3 mt-1">
                       {donateTotal > 0 && (
                         <p className="text-xs text-gray-400">全額寄付 ¥{donateTotal.toLocaleString()}</p>
@@ -655,19 +655,19 @@ export default function MyPage() {
                 <div className="space-y-4">
                   {buybackRequests.map((req) => {
                     const statusMap: Record<string, { label: string; color: string }> = {
-                      pending:   { label: '受付済み',         color: 'bg-gray-100 text-gray-700' },
-                      reviewing: { label: '査定中',           color: 'bg-yellow-100 text-yellow-700' },
-                      quoted:    { label: '査定額が届いています', color: 'bg-orange-100 text-orange-700' },
-                      accepted:  { label: '回答済み',         color: 'bg-blue-100 text-blue-700' },
-                      completed: { label: '完了',             color: 'bg-green-100 text-green-700' },
-                      rejected:  { label: '対応不可',         color: 'bg-red-100 text-red-700' },
+                      pending:   { label: '受付済み',         color: 'bg-[#f3f2ee] text-[#6f6f6a]' },
+                      reviewing: { label: '査定中',           color: 'bg-[#e6e6e1] text-[#2a2a28]' },
+                      quoted:    { label: '査定額が届いています', color: 'bg-[#e6e6e1] text-[#2a2a28]' },
+                      accepted:  { label: '回答済み',         color: 'bg-[#e6e6e1] text-[#2a2a28]' },
+                      completed: { label: '完了',             color: 'bg-[#161616] text-white' },
+                      rejected:  { label: '対応不可',         color: 'bg-[#f3f2ee] text-[#6f6f6a] line-through' },
                     };
                     const statusInfo = statusMap[req.status] || statusMap.pending;
                     const date = new Date(req.created_at).toLocaleDateString('ja-JP', {
                       year: 'numeric', month: 'long', day: 'numeric',
                     });
                     return (
-                      <div key={req.id} className="bg-white border rounded-lg p-6">
+                      <div key={req.id} className="bg-white border border-[#e6e6e1] rounded-sm p-6">
                         <div className="flex justify-between items-start mb-4">
                           <div>
                             <p className="text-sm text-gray-600 mb-1">
@@ -698,11 +698,11 @@ export default function MyPage() {
                           </div>
                         </div>
                         {req.status === 'quoted' && (
-                          <div className="mt-4 pt-4 border-t border-orange-200">
-                            <p className="text-sm text-orange-700 mb-3">査定額が確定しました。受け取り方法をお選びください。</p>
+                          <div className="mt-4 pt-4 border-t border-[#e6e6e1]">
+                            <p className="text-sm text-[#2a2a28] mb-3">査定額が確定しました。受け取り方法をお選びください。</p>
                             <Link
                               to={`/buyback/response/${req.id}`}
-                              className="inline-block px-6 py-3 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 transition-colors"
+                              className="inline-block px-6 py-3 bg-[#161616] text-white text-sm font-medium rounded-sm hover:bg-[#333] transition-colors"
                             >
                               査定結果を確認して回答する →
                             </Link>
@@ -718,7 +718,7 @@ export default function MyPage() {
                   <p className="text-gray-600 mb-6">買取申込履歴がありません</p>
                   <Link
                     to="/buyback"
-                    className="inline-block px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
+                    className="inline-block px-6 py-3 bg-[#161616] text-white rounded-sm hover:bg-[#333] transition-colors cursor-pointer whitespace-nowrap"
                   >
                     買取申込をする
                   </Link>
@@ -740,7 +740,7 @@ export default function MyPage() {
                     const reply = inq.admin_edited_reply ?? inq.ai_draft;
                     const isOpen = openInquiryId === inq.id;
                     return (
-                      <div key={inq.id} className="bg-white border rounded-lg p-6">
+                      <div key={inq.id} className="bg-white border border-[#e6e6e1] rounded-sm p-6">
                         <button
                           type="button"
                           onClick={() => setOpenInquiryId(isOpen ? null : inq.id)}
@@ -782,7 +782,7 @@ export default function MyPage() {
                   <p className="text-gray-600 mb-6">問い合わせ履歴がありません</p>
                   <Link
                     to="/contact"
-                    className="inline-block px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
+                    className="inline-block px-6 py-3 bg-[#161616] text-white rounded-sm hover:bg-[#333] transition-colors cursor-pointer whitespace-nowrap"
                   >
                     お問い合わせをする
                   </Link>

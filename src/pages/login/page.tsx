@@ -11,8 +11,7 @@ export default function LoginPage() {
   const from = (location.state as { from?: string })?.from || '/';
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    rememberMe: false
+    password: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,8 +51,8 @@ export default function LoginPage() {
       <main className="pt-24 pb-16">
         <div className="max-w-md mx-auto px-6">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">ログイン</h1>
-            <p className="text-gray-600">RePawへようこそ</p>
+            <h1 className="text-[26px] font-medium tracking-[.08em] mb-2">ログイン</h1>
+            <p className="text-sm text-[#6f6f6a] leading-relaxed">RePawへようこそ</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -73,7 +72,7 @@ export default function LoginPage() {
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-600"
+                className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-[#161616]"
                 placeholder="example@email.com"
                 disabled={loading}
               />
@@ -90,7 +89,7 @@ export default function LoginPage() {
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-600 pr-12"
+                  className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-[#161616] pr-12"
                   placeholder="パスワードを入力"
                   disabled={loading}
                 />
@@ -104,22 +103,8 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* ログイン状態を保持 & パスワードを忘れた */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="remember"
-                  checked={formData.rememberMe}
-                  onChange={(e) => setFormData({ ...formData, rememberMe: e.target.checked })}
-                  className="w-4 h-4 cursor-pointer"
-                  disabled={loading}
-                />
-                <label htmlFor="remember" className="text-sm text-gray-600 cursor-pointer">
-                  ログイン状態を保持
-                </label>
-              </div>
-              <Link to="/forgot-password" className="text-sm text-orange-600 hover:underline cursor-pointer">
+            <div className="flex justify-end">
+              <Link to="/forgot-password" className="text-sm text-[#161616] underline underline-offset-4 hover:text-[#6f6f6a] cursor-pointer">
                 パスワードを忘れた
               </Link>
             </div>
@@ -128,7 +113,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3 bg-orange-600 text-white rounded-lg transition-colors font-medium whitespace-nowrap ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-orange-700 cursor-pointer'
+              className={`w-full py-3 bg-[#161616] text-white rounded-sm transition-colors font-medium whitespace-nowrap ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-[#333] cursor-pointer'
                 }`}
             >
               {loading ? (
@@ -146,40 +131,12 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               アカウントをお持ちでない方は
-              <Link to="/signup" className="text-orange-600 hover:underline ml-1 cursor-pointer">
+              <Link to="/signup" className="text-[#161616] underline underline-offset-4 hover:text-[#6f6f6a] ml-1 cursor-pointer">
                 新規登録
               </Link>
             </p>
           </div>
 
-          {/* ソーシャルログイン */}
-          <div className="mt-8">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500">または</span>
-              </div>
-            </div>
-
-            <div className="mt-6 space-y-3">
-              <button
-                type="button"
-                className="w-full py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap"
-              >
-                <i className="ri-google-fill text-xl text-red-500"></i>
-                Googleでログイン
-              </button>
-              <button
-                type="button"
-                className="w-full py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap"
-              >
-                <i className="ri-apple-fill text-xl"></i>
-                Appleでログイン
-              </button>
-            </div>
-          </div>
         </div>
       </main>
 

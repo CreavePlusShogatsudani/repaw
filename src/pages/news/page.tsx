@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import PageMeta from '../../components/PageMeta';
+import PageHeader from '../../components/PageHeader';
 import { useState, useEffect } from 'react';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
@@ -43,68 +44,43 @@ export default function NewsPage() {
     return (
         <div className="min-h-screen bg-white">
             <PageMeta title="ニュース・お知らせ" description="RePawからの最新情報・お知らせ・イベント情報をお届けします。" path="/news" />
-      <Navigation />
+            <Navigation />
 
-            <div className="pt-32 pb-24 px-6">
-                <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h1 className="text-5xl md:text-6xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>News</h1>
-                        <p className="text-gray-600 text-lg">お知らせ一覧</p>
-                    </div>
+            <main className="page">
+                <div className="shop-container pb-24">
+                    <PageHeader eyebrow="News" title="お店からのお知らせ" lead="入荷や寄付の報告、イベントのご案内をお届けします。" />
 
-                    <div className="flex flex-wrap gap-3 justify-center mb-12">
+                    <div className="rp-tabs mb-2" role="tablist">
                         {CATEGORIES.map(cat => (
-                            <button
-                                key={cat}
-                                onClick={() => setSelectedCategory(cat)}
-                                className={`px-6 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap cursor-pointer ${
-                                    selectedCategory === cat
-                                        ? 'bg-black text-white'
-                                        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                                }`}
-                            >
-                                {cat}
-                            </button>
+                            <button key={cat} role="tab" aria-selected={selectedCategory === cat} onClick={() => setSelectedCategory(cat)}>{cat}</button>
                         ))}
                     </div>
 
                     {loading ? (
-                        <div className="flex justify-center py-16">
-                            <div className="w-8 h-8 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
-                        </div>
+                        <div className="py-16 text-sm text-[color:var(--rp-muted)]" role="status">読み込んでいます</div>
                     ) : filtered.length === 0 ? (
-                        <div className="text-center py-16 text-gray-400">記事がありません</div>
+                        <p className="py-16 text-sm text-[color:var(--rp-muted)]">記事がありません。</p>
                     ) : (
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div>
                             {filtered.map(news => (
-                                <Link key={news.id} to={`/news/${news.id}`} className="group cursor-pointer">
-                                    <div className="w-full h-64 bg-gray-100 rounded-lg overflow-hidden mb-4">
-                                        {news.thumbnail_url ? (
-                                            <img
-                                                src={news.thumbnail_url}
-                                                alt={news.title}
-                                                className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                                <i className="ri-newspaper-line text-4xl"></i>
-                                            </div>
-                                        )}
+                                <Link key={news.id} to={`/news/${news.id}`} className="group grid grid-cols-[110px_1fr] md:grid-cols-[140px_110px_1fr_200px] items-center gap-x-6 gap-y-2 py-6 border-b border-[color:var(--rp-line)]">
+                                    <time dateTime={news.published_at} className="text-xs tracking-[.04em] text-[color:var(--rp-muted)]">{formatDate(news.published_at)}</time>
+                                    <span className="rp-badge justify-self-start">{news.category}</span>
+                                    <div className="col-span-2 md:col-span-1">
+                                        <h2 className="text-base font-medium leading-relaxed group-hover:underline underline-offset-4">{news.title}</h2>
+                                        {news.excerpt && <p className="mt-1 text-sm text-[color:var(--rp-muted)] line-clamp-1">{news.excerpt}</p>}
                                     </div>
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <span className="text-sm text-gray-500">{formatDate(news.published_at)}</span>
-                                        <span className="px-3 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full whitespace-nowrap">
-                                            {news.category}
-                                        </span>
-                                    </div>
-                                    <h3 className="text-lg font-bold mb-2 group-hover:underline">{news.title}</h3>
-                                    {news.excerpt && <p className="text-sm text-gray-600 line-clamp-2">{news.excerpt}</p>}
+                                    {news.thumbnail_url && (
+                                        <div className="hidden md:block aspect-[16/9] overflow-hidden bg-[color:var(--rp-photo-bg)]">
+                                            <img src={news.thumbnail_url} alt="" loading="lazy" className="w-full h-full object-cover" />
+                                        </div>
+                                    )}
                                 </Link>
                             ))}
                         </div>
                     )}
                 </div>
-            </div>
+            </main>
 
             <Footer />
         </div>

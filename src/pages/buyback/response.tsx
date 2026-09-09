@@ -102,9 +102,9 @@ export default function BuybackResponsePage() {
         <Navigation />
         <main className="max-w-2xl mx-auto px-6 py-24 text-center">
           <i className="ri-checkbox-circle-line text-5xl text-green-500 mb-4 block"></i>
-          <h1 className="text-2xl font-bold mb-4">回答済みです</h1>
-          <p className="text-gray-600 mb-8">この申込への回答は完了しています。</p>
-          <button onClick={() => navigate('/mypage')} className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800">
+          <h1 className="text-[26px] md:text-[34px] font-medium tracking-[.08em] mb-4">回答済みです</h1>
+          <p className="text-sm text-[#6f6f6a] leading-relaxed mb-8">この申込への回答は完了しています。</p>
+          <button onClick={() => navigate('/mypage')} className="px-6 py-3 bg-[#161616] text-white rounded-sm hover:bg-[#333]">
             マイページへ戻る
           </button>
         </main>
@@ -117,16 +117,16 @@ export default function BuybackResponsePage() {
     <div className="min-h-screen bg-white">
       <Navigation />
       <main className="max-w-2xl mx-auto px-6 py-16">
-        <h1 className="text-2xl font-bold mb-2">査定結果のご確認</h1>
-        <p className="text-gray-500 text-sm mb-10">査定結果をご確認いただき、受け取り方法をお選びください。</p>
+        <h1 className="text-[26px] md:text-[34px] font-medium tracking-[.08em] mb-2">査定結果のご確認</h1>
+        <p className="text-sm text-[#6f6f6a] leading-relaxed mb-10">査定結果をご確認いただき、受け取り方法をお選びください。</p>
 
         {/* 査定結果 */}
-        <div className="bg-orange-50 border border-orange-200 rounded-xl p-6 mb-10">
+        <div className="bg-[#f3f2ee] border border-[#e6e6e1] rounded-sm p-6 mb-10">
           <p className="text-sm text-gray-600 mb-1">{request.item_type || '商品'}</p>
           <p className="text-xs text-gray-400 mb-4">{request.item_description}</p>
           <div className="flex items-baseline gap-2">
             <span className="text-gray-600 text-sm">査定額</span>
-            <span className="text-3xl font-bold text-orange-600">
+            <span className="text-3xl font-bold text-[#161616]">
               ¥{(request.estimated_price ?? 0).toLocaleString()}
             </span>
           </div>
@@ -137,14 +137,14 @@ export default function BuybackResponsePage() {
           <div>
             <p className="font-bold mb-4">受け取り方法を選んでください</p>
             <div className="space-y-3">
-              <label className={`flex items-start gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all ${payoutMethod === 'donate' ? 'border-orange-500 bg-orange-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                <input type="radio" name="payout" value="donate" checked={payoutMethod === 'donate'} onChange={() => setPayoutMethod('donate')} className="mt-0.5 accent-orange-500" />
+              <label className={`flex items-start gap-4 p-5 rounded-sm border-2 cursor-pointer transition-all ${payoutMethod === 'donate' ? 'border-[#161616] bg-[#f3f2ee]' : 'border-gray-200 hover:border-gray-300'}`}>
+                <input type="radio" name="payout" value="donate" checked={payoutMethod === 'donate'} onChange={() => setPayoutMethod('donate')} className="mt-0.5 accent-[#161616]" />
                 <div>
                   <p className="font-bold">全額を動物保護団体に寄付する</p>
                   <p className="text-sm text-gray-500 mt-1">査定額の全額が保護犬・保護猫の支援に使われます。</p>
                 </div>
               </label>
-              <label className={`flex items-start gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all ${payoutMethod === 'transfer' ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}>
+              <label className={`flex items-start gap-4 p-5 rounded-sm border-2 cursor-pointer transition-all ${payoutMethod === 'transfer' ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}>
                 <input type="radio" name="payout" value="transfer" checked={payoutMethod === 'transfer'} onChange={() => setPayoutMethod('transfer')} className="mt-0.5" />
                 <div>
                   <p className="font-bold">口座振込で受け取る</p>
@@ -156,34 +156,34 @@ export default function BuybackResponsePage() {
 
           {/* 口座情報入力 */}
           {payoutMethod === 'transfer' && (
-            <div className="space-y-4 p-6 bg-gray-50 rounded-xl border border-gray-200">
+            <div className="space-y-4 p-6 bg-gray-50 rounded-sm border border-gray-200">
               <p className="font-bold text-sm">振込先口座情報</p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-xs text-gray-600">銀行名 *</label>
-                  <input type="text" value={bankName} onChange={e => setBankName(e.target.value)} placeholder="例: ○○銀行" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+                  <input type="text" value={bankName} onChange={e => setBankName(e.target.value)} placeholder="例: ○○銀行" className="w-full px-3 py-2 border border-gray-200 rounded-sm text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs text-gray-600">支店名 *</label>
-                  <input type="text" value={bankBranch} onChange={e => setBankBranch(e.target.value)} placeholder="例: △△支店" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+                  <input type="text" value={bankBranch} onChange={e => setBankBranch(e.target.value)} placeholder="例: △△支店" className="w-full px-3 py-2 border border-gray-200 rounded-sm text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-xs text-gray-600">口座種別 *</label>
-                  <select value={bankAccountType} onChange={e => setBankAccountType(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white">
+                  <select value={bankAccountType} onChange={e => setBankAccountType(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-sm text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white">
                     <option value="普通">普通</option>
                     <option value="当座">当座</option>
                   </select>
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs text-gray-600">口座番号 *</label>
-                  <input type="text" value={bankAccountNumber} onChange={e => setBankAccountNumber(e.target.value)} placeholder="例: 1234567" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+                  <input type="text" value={bankAccountNumber} onChange={e => setBankAccountNumber(e.target.value)} placeholder="例: 1234567" className="w-full px-3 py-2 border border-gray-200 rounded-sm text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
                 </div>
               </div>
               <div className="space-y-1">
                 <label className="text-xs text-gray-600">口座名義（カタカナ） *</label>
-                <input type="text" value={bankAccountHolder} onChange={e => setBankAccountHolder(e.target.value)} placeholder="例: ヤマダ タロウ" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+                <input type="text" value={bankAccountHolder} onChange={e => setBankAccountHolder(e.target.value)} placeholder="例: ヤマダ タロウ" className="w-full px-3 py-2 border border-gray-200 rounded-sm text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
               </div>
             </div>
           )}
@@ -191,7 +191,7 @@ export default function BuybackResponsePage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-4 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-50"
+            className="w-full py-4 bg-[#161616] text-white font-medium rounded-sm hover:bg-[#333] transition-colors disabled:opacity-50"
           >
             {submitting ? '送信中...' : '回答を送信する'}
           </button>

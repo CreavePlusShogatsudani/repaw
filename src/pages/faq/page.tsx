@@ -1,4 +1,5 @@
 import PageMeta from '../../components/PageMeta';
+import PageHeader from '../../components/PageHeader';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { useState } from 'react';
@@ -117,12 +118,6 @@ const FAQ_CATEGORIES = [
 
 export default function FAQPage() {
   const [activeCategory, setActiveCategory] = useState('purchase');
-  const [openQuestion, setOpenQuestion] = useState<string | null>(null);
-
-  const toggleQuestion = (categoryId: string, questionIndex: number) => {
-    const key = `${categoryId}-${questionIndex}`;
-    setOpenQuestion(openQuestion === key ? null : key);
-  };
 
   const currentCategory = FAQ_CATEGORIES.find(cat => cat.id === activeCategory);
 
@@ -143,115 +138,55 @@ export default function FAQPage() {
       <PageMeta title="よくある質問" description="RePawの購入・買取・寄付についてよくある質問をまとめました。" path="/faq" jsonLd={faqJsonLd} />
       <Navigation />
 
-      {/* Hero Section */}
-      <section className="relative h-96 flex items-center justify-center overflow-hidden bg-orange-950">
-        
-        <div className="relative z-10 text-center text-white px-6">
-          <h1 className="text-5xl md:text-6xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
-            よくある質問
-          </h1>
-          <p className="text-lg font-light">Frequently Asked Questions</p>
-        </div>
-      </section>
+      <main className="page">
+        <div className="shop-container">
+          <PageHeader eyebrow="FAQ" title="よくある質問" lead="RePawの購入・買取・寄付についてよくある質問をまとめました。" />
 
-      {/* FAQ Content */}
-      <section className="py-24 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">お困りのことはありませんか？</h2>
-            <p className="text-gray-600 text-sm font-light">カテゴリーから質問を選んでください</p>
-          </div>
+          <section className="page-section">
+            <h2>お困りのことはありませんか？</h2>
+            <p className="mt-3 text-sm text-[color:var(--rp-muted)]">カテゴリーから質問を選んでください</p>
 
-          {/* Category Tabs */}
-          <div className="flex flex-wrap justify-center gap-4 mb-16">
-            {FAQ_CATEGORIES.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => {
-                  setActiveCategory(category.id);
-                  setOpenQuestion(null);
-                }}
-                className={`px-6 py-3 rounded-full font-medium text-sm transition-all whitespace-nowrap cursor-pointer flex items-center gap-2 ${
-                  activeCategory === category.id
-                    ? 'bg-orange-500 text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                <i className={`${category.icon} text-lg`}></i>
-                {category.title}
-              </button>
-            ))}
-          </div>
+            {/* Category Tabs */}
+            <div className="rp-tabs mt-10" role="tablist">
+              {FAQ_CATEGORIES.map((category) => (
+                <button
+                  key={category.id}
+                  role="tab"
+                  aria-selected={activeCategory === category.id}
+                  onClick={() => setActiveCategory(category.id)}
+                >
+                  {category.title}
+                </button>
+              ))}
+            </div>
 
-          {/* Questions */}
-          <div className="max-w-4xl mx-auto">
+            {/* Questions */}
             {currentCategory && (
-              <div className="space-y-4">
-                {currentCategory.questions.map((item, index) => {
-                  const key = `${activeCategory}-${index}`;
-                  const isOpen = openQuestion === key;
-
-                  return (
-                    <div
-                      key={index}
-                      className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
-                    >
-                      <button
-                        onClick={() => toggleQuestion(activeCategory, index)}
-                        className="w-full px-6 py-5 flex items-start justify-between text-left hover:bg-orange-50 transition-colors cursor-pointer"
-                      >
-                        <div className="flex items-start gap-4 flex-1 pr-4">
-                          <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 bg-orange-500 text-white rounded-full font-bold text-sm">
-                            Q
-                          </div>
-                          <span className="font-bold text-gray-900 pt-1">{item.question}</span>
-                        </div>
-                        <div className={`w-8 h-8 flex items-center justify-center rounded-full bg-orange-500 text-white flex-shrink-0 transition-transform ${
-                          isOpen ? 'rotate-180' : ''
-                        }`}>
-                          <i className="ri-arrow-down-s-line text-xl"></i>
-                        </div>
-                      </button>
-                      {isOpen && (
-                        <div className="px-6 py-5 bg-orange-50/50 border-t border-gray-100">
-                          <div className="flex items-start gap-4">
-                            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 bg-gray-700 text-white rounded-full font-bold text-sm">
-                              A
-                            </div>
-                            <p className="text-gray-700 leading-relaxed pt-1 font-light">{item.answer}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+              <div className="rp-faq" key={currentCategory.id}>
+                {currentCategory.questions.map((item) => (
+                  <details key={item.question}>
+                    <summary>{item.question}<i className="ri-arrow-down-s-line" aria-hidden="true"></i></summary>
+                    <div className="rp-faq-answer">{item.answer}</div>
+                  </details>
+                ))}
               </div>
             )}
-          </div>
+          </section>
         </div>
-      </section>
 
-      {/* Contact CTA */}
-      <section className="py-24 px-6 bg-gray-50">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="w-20 h-20 flex items-center justify-center bg-orange-500 text-white rounded-full mx-auto mb-6">
-            <i className="ri-customer-service-2-line text-4xl"></i>
+        {/* Contact CTA */}
+        <section className="rp-band page-section">
+          <div className="shop-container">
+            <h2>解決しない場合は</h2>
+            <div className="rp-prose mt-6">
+              <p>お探しの情報が見つからない場合は、お気軽にお問い合わせください。サポートチームが丁寧にご対応いたします。</p>
+            </div>
+            <div className="mt-8">
+              <Link to="/contact" className="rp-btn rp-btn-black">お問い合わせ</Link>
+            </div>
           </div>
-          <h2 className="text-2xl md:text-3xl font-bold mb-6">
-            解決しない場合は
-          </h2>
-          <p className="text-gray-600 mb-8 font-light leading-relaxed">
-            お探しの情報が見つからない場合は、お気軽にお問い合わせください。<br />
-            サポートチームが丁寧にご対応いたします。
-          </p>
-          <Link
-            to="/contact"
-            className="inline-block px-12 py-4 bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors whitespace-nowrap cursor-pointer"
-          >
-            お問い合わせ
-          </Link>
-        </div>
-      </section>
+        </section>
+      </main>
 
       <Footer />
     </div>

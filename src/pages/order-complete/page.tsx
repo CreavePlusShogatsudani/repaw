@@ -113,12 +113,12 @@ export default function OrderCompletePage() {
         <Navigation />
         <main className="pt-24 pb-16">
           <div className="max-w-2xl mx-auto px-6 text-center">
-            <h1 className="text-2xl font-bold mb-4">お支払いを受け付けました</h1>
-            <p className="text-gray-600 mb-8">
+            <h1 className="text-[26px] md:text-[34px] font-medium tracking-[.08em] mb-4">お支払いを受け付けました</h1>
+            <p className="text-sm text-[#6f6f6a] leading-relaxed mb-8">
               ご注文の反映に少し時間がかかっています。数分後にマイページの注文履歴でご確認ください。
               反映されない場合はお問い合わせください。
             </p>
-            <Link to="/mypage" className="inline-block px-8 py-3 bg-gray-900 text-white rounded-lg font-medium">マイページへ</Link>
+            <Link to="/mypage" className="inline-block px-8 py-3 bg-[#161616] text-white rounded-sm font-medium">マイページへ</Link>
           </div>
         </main>
         <Footer />
@@ -157,15 +157,15 @@ export default function OrderCompletePage() {
             <div className="w-20 h-20 flex items-center justify-center bg-green-100 rounded-full mx-auto mb-6">
               <i className="ri-check-line text-5xl text-green-600"></i>
             </div>
-            <h1 className="text-3xl font-bold mb-4">ご注文ありがとうございます！</h1>
-            <p className="text-gray-600 text-lg">
+            <h1 className="text-[26px] md:text-[34px] font-medium tracking-[.08em] mb-4">ご注文ありがとうございます！</h1>
+            <p className="text-sm text-[#6f6f6a] leading-relaxed">
               ご注文が正常に完了しました。確認メールを
               <span className="font-medium">{email}</span>に送信しました。
             </p>
           </div>
 
           {/* 注文番号と日付 */}
-          <div className="bg-white rounded-lg p-8 shadow-sm mb-6">
+          <div className="bg-white border border-[#e6e6e1] rounded-sm p-8 mb-6">
             <div className="grid md:grid-cols-3 gap-6 text-center">
               <div>
                 <p className="text-sm text-gray-600 mb-2">注文番号</p>
@@ -177,13 +177,13 @@ export default function OrderCompletePage() {
               </div>
               <div>
                 <p className="text-sm text-gray-600 mb-2">お届け予定日</p>
-                <p className="font-medium text-orange-600">{estimatedDelivery}</p>
+                <p className="font-medium text-[#161616]">{estimatedDelivery}</p>
               </div>
             </div>
           </div>
 
           {/* 注文内容 */}
-          <div className="bg-white rounded-lg p-8 shadow-sm mb-6">
+          <div className="bg-white border border-[#e6e6e1] rounded-sm p-8 mb-6">
             <h2 className="text-xl font-bold mb-6">注文内容</h2>
             <div className="space-y-4 mb-6 pb-6 border-b">
               {orderItems.map((item) => {
@@ -224,7 +224,7 @@ export default function OrderCompletePage() {
           </div>
 
           {/* 配送先情報 */}
-          <div className="bg-white rounded-lg p-8 shadow-sm mb-6">
+          <div className="bg-white border border-[#e6e6e1] rounded-sm p-8 mb-6">
             <h2 className="text-xl font-bold mb-6">配送先</h2>
             <div className="space-y-2 text-sm">
               <p className="font-medium text-base">{recipientName}</p>
@@ -240,26 +240,26 @@ export default function OrderCompletePage() {
           </div>
 
           {/* 次のステップ */}
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-6 mb-8">
+          <div className="bg-[#f3f2ee] border border-[#e6e6e1] rounded-sm p-6 mb-8">
             <h3 className="font-bold mb-4 flex items-center gap-2">
-              <i className="ri-information-line text-xl text-orange-600"></i>
+              <i className="ri-information-line text-xl text-[#6f6f6a]"></i>
               <span>次のステップ</span>
             </h3>
             <ul className="space-y-3 text-sm text-gray-700">
               <li className="flex items-start gap-3">
-                <i className="ri-mail-line text-lg text-orange-600 flex-shrink-0 mt-0.5"></i>
+                <i className="ri-mail-line text-lg text-[#6f6f6a] flex-shrink-0 mt-0.5"></i>
                 <span>注文確認メールをご確認ください（迷惑メールフォルダもご確認ください）</span>
               </li>
               <li className="flex items-start gap-3">
-                <i className="ri-box-3-line text-lg text-orange-600 flex-shrink-0 mt-0.5"></i>
+                <i className="ri-box-3-line text-lg text-[#6f6f6a] flex-shrink-0 mt-0.5"></i>
                 <span>商品の準備が整い次第、発送完了メールをお送りします</span>
               </li>
               <li className="flex items-start gap-3">
-                <i className="ri-truck-line text-lg text-orange-600 flex-shrink-0 mt-0.5"></i>
+                <i className="ri-truck-line text-lg text-[#6f6f6a] flex-shrink-0 mt-0.5"></i>
                 <span>配送状況はマイページの注文履歴から確認できます</span>
               </li>
               <li className="flex items-start gap-3">
-                <i className="ri-customer-service-2-line text-lg text-orange-600 flex-shrink-0 mt-0.5"></i>
+                <i className="ri-customer-service-2-line text-lg text-[#6f6f6a] flex-shrink-0 mt-0.5"></i>
                 <span>ご不明な点がございましたら、お気軽にお問い合わせください</span>
               </li>
             </ul>
@@ -269,14 +269,14 @@ export default function OrderCompletePage() {
           <div className="grid md:grid-cols-2 gap-4">
             <Link
               to="/mypage"
-              className="flex items-center justify-center gap-2 px-6 py-4 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
+              className="flex items-center justify-center gap-2 px-6 py-4 bg-[#161616] text-white rounded-sm font-medium hover:bg-[#333] transition-colors cursor-pointer whitespace-nowrap"
             >
               <i className="ri-user-line text-xl"></i>
               <span>マイページで確認</span>
             </Link>
             <Link
               to="/products"
-              className="flex items-center justify-center gap-2 px-6 py-4 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap"
+              className="flex items-center justify-center gap-2 px-6 py-4 border-2 border-gray-900 text-gray-900 rounded-sm font-medium hover:bg-gray-50 transition-colors cursor-pointer whitespace-nowrap"
             >
               <i className="ri-shopping-bag-line text-xl"></i>
               <span>買い物を続ける</span>
@@ -287,15 +287,15 @@ export default function OrderCompletePage() {
           <div className="mt-12 text-center">
             <p className="text-sm text-gray-600 mb-4">お困りのことがございましたら</p>
             <div className="flex flex-wrap justify-center gap-6 text-sm">
-              <a href="#" className="flex items-center gap-2 text-gray-700 hover:text-orange-600 transition-colors cursor-pointer whitespace-nowrap">
+              <a href="#" className="flex items-center gap-2 text-gray-700 hover:text-[#6f6f6a] transition-colors cursor-pointer whitespace-nowrap">
                 <i className="ri-question-line text-lg"></i>
                 <span>よくある質問</span>
               </a>
-              <Link to="/contact" className="flex items-center gap-2 text-gray-700 hover:text-orange-600 transition-colors cursor-pointer whitespace-nowrap">
+              <Link to="/contact" className="flex items-center gap-2 text-gray-700 hover:text-[#6f6f6a] transition-colors cursor-pointer whitespace-nowrap">
                 <i className="ri-mail-line text-lg"></i>
                 <span>お問い合わせ</span>
               </Link>
-              <a href="#" className="flex items-center gap-2 text-gray-700 hover:text-orange-600 transition-colors cursor-pointer whitespace-nowrap">
+              <a href="#" className="flex items-center gap-2 text-gray-700 hover:text-[#6f6f6a] transition-colors cursor-pointer whitespace-nowrap">
                 <i className="ri-phone-line text-lg"></i>
                 <span>電話サポート</span>
               </a>

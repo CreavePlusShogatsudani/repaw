@@ -30,12 +30,12 @@ export default function CartPage() {
 
       <main className="shop-catalog pb-12 md:pb-16">
         <div className="shop-container">
-          <h1 className="text-2xl md:text-3xl font-medium mb-6 md:mb-8">
+          <h1 className="text-[26px] md:text-[34px] font-medium tracking-[.08em] mb-6 md:mb-8">
             ショッピングカート
           </h1>
 
           {removedNames.length > 0 && (
-            <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-sm text-sm text-orange-800">
+            <div className="mb-6 p-4 bg-[#f3f2ee] border border-[#e6e6e1] rounded-sm text-sm text-[#2a2a28]">
               次の商品は売り切れ、または他のお客様が購入手続き中のためカートから外しました：
               <span className="font-medium">{removedNames.join('、')}</span>
             </div>
@@ -47,7 +47,7 @@ export default function CartPage() {
               <p className="text-sm md:text-base text-gray-600 mb-6 md:mb-8">お気に入りの商品を見つけて、カートに追加しましょう</p>
               <Link
                 to="/products"
-                className="inline-block px-6 md:px-8 py-2.5 md:py-3 bg-gray-900 text-white rounded-sm text-sm md:text-base font-medium hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
+                className="inline-block px-6 md:px-8 py-2.5 md:py-3 bg-[#161616] text-white rounded-sm text-sm md:text-base font-medium hover:bg-[#333] transition-colors cursor-pointer whitespace-nowrap"
               >
                 商品一覧を見る
               </Link>

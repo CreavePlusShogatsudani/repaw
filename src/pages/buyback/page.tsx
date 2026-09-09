@@ -92,8 +92,8 @@ export default function BuybackPage() {
       <div className="pt-32 pb-20 px-6">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">買取申し込み</h1>
-            <p className="text-lg text-gray-600">
+            <h1 className="text-[26px] md:text-[34px] font-medium tracking-[.08em] mb-4">買取申し込み</h1>
+            <p className="text-sm text-[#6f6f6a] leading-relaxed">
               不要になったアイテムを買い取らせていただきます。<br />
               以下のフォームに必要事項をご記入ください。
             </p>
@@ -101,18 +101,18 @@ export default function BuybackPage() {
 
           {/* 買取申込は会員限定（FAQ の案内どおり）。未ログインの申込は査定回答フローに乗れないため */}
           {authLoading ? null : !user ? (
-            <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <div className="bg-white border border-[#e6e6e1] rounded-sm p-8 text-center">
               <p className="text-sm text-gray-700 mb-4">買取のお申し込みには会員登録・ログインが必要です</p>
               <Link
                 to="/login"
                 state={{ from: '/buyback' }}
-                className="inline-block px-8 py-3 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 transition-colors whitespace-nowrap cursor-pointer"
+                className="inline-block px-8 py-3 bg-[#161616] text-white text-sm rounded-sm hover:bg-[#333] transition-colors whitespace-nowrap cursor-pointer"
               >
                 ログイン / 新規登録
               </Link>
             </div>
           ) : (
-          <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-8" id="buyback-form">
+          <form onSubmit={handleSubmit} className="bg-white border border-[#e6e6e1] rounded-sm p-8" id="buyback-form">
             <div className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -125,7 +125,7 @@ export default function BuybackPage() {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#161616] focus:border-transparent text-sm"
                   placeholder="山田 太郎"
                 />
               </div>
@@ -141,7 +141,7 @@ export default function BuybackPage() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#161616] focus:border-transparent text-sm"
                   placeholder="example@email.com"
                 />
               </div>
@@ -157,7 +157,7 @@ export default function BuybackPage() {
                   value={formData.phone}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#161616] focus:border-transparent text-sm"
                   placeholder="090-1234-5678"
                 />
               </div>
@@ -173,7 +173,7 @@ export default function BuybackPage() {
                   value={formData.address}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#161616] focus:border-transparent text-sm"
                   placeholder="東京都渋谷区..."
                 />
               </div>
@@ -188,7 +188,7 @@ export default function BuybackPage() {
                   value={formData.itemType}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#161616] focus:border-transparent text-sm"
                 >
                   <option value="">選択してください</option>
                   <option value="衣類">衣類</option>
@@ -211,7 +211,7 @@ export default function BuybackPage() {
                   required
                   maxLength={500}
                   rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#161616] focus:border-transparent text-sm resize-none"
                   placeholder="ブランド名、商品名、色、サイズなど"
                 />
                 <p className="text-xs text-gray-500 mt-1">{formData.itemDescription.length}/500文字</p>
@@ -227,7 +227,7 @@ export default function BuybackPage() {
                   value={formData.condition}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#161616] focus:border-transparent text-sm"
                 >
                   <option value="">選択してください</option>
                   <option value="新品・未使用">新品・未使用</option>
@@ -248,7 +248,7 @@ export default function BuybackPage() {
                   name="purchaseDate"
                   value={formData.purchaseDate}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#161616] focus:border-transparent text-sm"
                   placeholder="2023年春頃"
                 />
               </div>
@@ -265,7 +265,7 @@ export default function BuybackPage() {
                     name="instagram"
                     value={formData.instagram}
                     onChange={handleChange}
-                    className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+                    className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#161616] focus:border-transparent text-sm"
                     placeholder="your_instagram_id"
                   />
                 </div>
@@ -283,7 +283,7 @@ export default function BuybackPage() {
                   onChange={handleChange}
                   maxLength={500}
                   rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#161616] focus:border-transparent text-sm resize-none"
                   placeholder="ご質問やご要望がございましたらご記入ください"
                 />
                 <p className="text-xs text-gray-500 mt-1">{formData.message.length}/500文字</p>
@@ -291,8 +291,8 @@ export default function BuybackPage() {
             </div>
 
             {submitStatus === 'success' && (
-              <div className="mt-6 p-4 bg-teal-50 border border-teal-200 rounded-lg">
-                <p className="text-teal-800 text-sm">
+              <div className="mt-6 p-4 bg-[#f3f2ee] border border-[#e6e6e1] rounded-sm">
+                <p className="text-[#2a2a28] text-sm">
                   お申し込みありがとうございます。担当者より3営業日以内にご連絡いたします。
                 </p>
               </div>
@@ -309,7 +309,7 @@ export default function BuybackPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="mt-8 w-full bg-gray-900 text-white py-4 rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
+              className="mt-8 w-full bg-[#161616] text-white py-4 rounded-sm font-medium hover:bg-[#333] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap"
             >
               {isSubmitting ? '送信中...' : '申し込む'}
             </button>

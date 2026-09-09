@@ -301,3 +301,75 @@ html { scroll-padding-top: 96px; }
   .product-skeleton { animation: none; }
   .product-card:hover .product-card-image img, .explore-categories a:hover .tile img { transform: none; }
 }
+
+/* ==========================================================
+   下層ページ共通（トップと同じ文法）
+   ========================================================== */
+.page { padding-top: 72px; }
+.page-header { padding: 56px 0 40px; border-bottom: 1px solid var(--rp-line); margin-bottom: 56px; }
+.page-header h1 { font-size: 34px; font-weight: 500; letter-spacing: .08em; line-height: 1.4; }
+.page-header-lead { margin-top: 14px; font-size: 14px; line-height: 1.9; color: var(--rp-muted); max-width: 40em; }
+.page-header-center { text-align: center; }
+.page-header-center .page-header-lead { margin-inline: auto; }
+.page-section { padding-block: 72px; border-top: 1px solid var(--rp-line); }
+.page-section:first-of-type { border-top: 0; }
+.page-section h2 { font-size: 26px; font-weight: 500; letter-spacing: .08em; line-height: 1.5; }
+.page-section h3 { font-size: 16px; font-weight: 500; letter-spacing: .04em; }
+.rp-prose { font-size: 15px; line-height: 2.1; color: var(--rp-text); max-width: 40em; }
+.rp-prose p + p { margin-top: 1.4em; }
+.rp-prose strong { font-weight: 500; }
+.rp-band { background: var(--rp-sand); padding-block: 72px; }
+/* 定義リスト（見出し + 説明を罫線で区切る） */
+.rp-rows { border-top: 1px solid var(--rp-line); }
+.rp-rows > div { display: grid; grid-template-columns: 220px 1fr; gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--rp-line); }
+.rp-rows h3 { font-size: 16px; font-weight: 500; letter-spacing: .04em; }
+.rp-rows p { font-size: 14px; line-height: 1.9; color: var(--rp-text); }
+.rp-rows .rp-num { font-family: 'Playfair Display', serif; font-style: italic; font-size: 15px; color: var(--rp-muted); margin-right: 12px; }
+/* テキストのタブ（カテゴリ切り替え） */
+.rp-tabs { display: flex; flex-wrap: wrap; gap: 0 28px; border-bottom: 1px solid var(--rp-line); }
+.rp-tabs button { padding: 12px 0; font-size: 14px; letter-spacing: .04em; color: var(--rp-muted); border-bottom: 1px solid transparent; margin-bottom: -1px; }
+.rp-tabs button[aria-selected="true"] { color: var(--rp-ink); border-bottom-color: var(--rp-ink); }
+/* よくある質問（details） */
+.rp-faq details { border-bottom: 1px solid var(--rp-line); }
+.rp-faq summary { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px 0; font-size: 15px; letter-spacing: .02em; cursor: pointer; list-style: none; }
+.rp-faq summary::-webkit-details-marker { display: none; }
+.rp-faq summary i { color: var(--rp-muted); transition: transform .2s; }
+.rp-faq details[open] summary i { transform: rotate(180deg); }
+.rp-faq .rp-faq-answer { padding: 0 0 24px; font-size: 14px; line-height: 2; color: var(--rp-text); max-width: 44em; }
+/* 数字の並び（3〜4ステップ） */
+.rp-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+.rp-steps > div { border-top: 1px solid var(--rp-ink); padding-top: 16px; }
+.rp-steps .rp-num { font-family: 'Playfair Display', serif; font-style: italic; font-size: 20px; color: var(--rp-muted); }
+.rp-steps h3 { margin-top: 10px; font-size: 15px; font-weight: 500; }
+.rp-steps p { margin-top: 8px; font-size: 13px; line-height: 1.9; color: var(--rp-muted); }
+/* フォーム */
+.rp-field { display: block; margin-bottom: 22px; }
+.rp-field > span { display: block; font-size: 12px; letter-spacing: .06em; color: var(--rp-muted); margin-bottom: 8px; }
+.rp-input { width: 100%; padding: 13px 14px; border: 1px solid var(--rp-line); border-radius: var(--rp-radius); font-size: 14px; background: #fff; }
+.rp-input:focus { outline: 2px solid var(--rp-ink); outline-offset: 1px; border-color: var(--rp-ink); }
+/* 記事本文 */
+.rp-article { font-size: 15px; line-height: 2.1; }
+.rp-article h2 { font-size: 24px; font-weight: 500; letter-spacing: .06em; margin: 48px 0 16px; padding-top: 24px; border-top: 1px solid var(--rp-line); }
+.rp-article h3 { font-size: 18px; font-weight: 500; letter-spacing: .04em; margin: 36px 0 12px; }
+.rp-article p { margin: 0 0 1.4em; }
+.rp-article img { width: 100%; margin: 32px 0; }
+.rp-badge { display: inline-block; padding: 4px 10px; border: 1px solid var(--rp-line); font-size: 11px; letter-spacing: .06em; color: var(--rp-muted); }
+@media (max-width: 1023px) {
+  .rp-steps { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 767px) {
+  .page { padding-top: 64px; }
+  .page-header { padding: 32px 0 24px; margin-bottom: 36px; }
+  .page-header h1 { font-size: 26px; }
+  .page-section { padding-block: 48px; }
+  .page-section h2 { font-size: 22px; }
+  .rp-band { padding-block: 48px; }
+  .rp-rows > div { grid-template-columns: 1fr; gap: 8px; padding: 18px 0; }
+  .rp-tabs { gap: 0 18px; }
+  .rp-steps { grid-template-columns: 1fr; gap: 24px; }
+  .rp-article h2 { font-size: 20px; margin-top: 36px; }
+}
+.rp-band h2 { font-size: 26px; font-weight: 500; letter-spacing: .08em; line-height: 1.5; }
+@media (max-width: 767px) { .rp-band h2 { font-size: 22px; } }
+.page-header + .page-section { padding-top: 0; border-top: 0; }
+.rp-rows p, .rp-faq .rp-faq-answer { max-width: 44em; }

@@ -67,12 +67,12 @@ export default function ContactSection({ standalone = false }: { standalone?: bo
   };
 
   const content = loading ? null : !user ? (
-    <div className="py-8 text-center">
-      <p className="text-sm text-gray-700 mb-4">お問い合わせにはログインが必要です</p>
+    <div className="py-8">
+      <p className="text-sm text-[color:var(--rp-text)] mb-5">お問い合わせにはログインが必要です</p>
       <Link
         to="/login"
         state={{ from: '/contact' }}
-        className="inline-block px-8 py-3 bg-black text-white text-sm rounded-sm hover:bg-gray-800 transition-colors whitespace-nowrap cursor-pointer"
+        className="rp-btn rp-btn-black"
       >
         ログインする
       </Link>
@@ -84,7 +84,7 @@ export default function ContactSection({ standalone = false }: { standalone?: bo
           className="space-y-6 pt-8 pb-4"
         >
           <div>
-            <label htmlFor="subject" className="block text-sm font-medium mb-2">件名 *</label>
+            <label htmlFor="subject" className="block text-xs tracking-[.06em] text-[color:var(--rp-muted)] mb-2">件名 *</label>
             <input
               type="text"
               id="subject"
@@ -92,18 +92,18 @@ export default function ContactSection({ standalone = false }: { standalone?: bo
               required
               maxLength={100}
               disabled={isSubmitting}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-100"
+              className="rp-input disabled:bg-gray-100"
             />
           </div>
 
           {orders.length > 0 && (
             <div>
-              <label htmlFor="order_id" className="block text-sm font-medium mb-2">関連する注文（任意）</label>
+              <label htmlFor="order_id" className="block text-xs tracking-[.06em] text-[color:var(--rp-muted)] mb-2">関連する注文（任意）</label>
               <select
                 id="order_id"
                 name="order_id"
                 disabled={isSubmitting}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black disabled:bg-gray-100 bg-white"
+                className="rp-input disabled:bg-gray-100"
               >
                 <option value="">選択しない</option>
                 {orders.map((o) => (
@@ -116,7 +116,7 @@ export default function ContactSection({ standalone = false }: { standalone?: bo
           )}
 
           <div>
-            <label htmlFor="message" className="block text-sm font-medium mb-2">お問い合わせ内容 *</label>
+            <label htmlFor="message" className="block text-xs tracking-[.06em] text-[color:var(--rp-muted)] mb-2">お問い合わせ内容 *</label>
             <textarea
               id="message"
               name="message"
@@ -124,28 +124,28 @@ export default function ContactSection({ standalone = false }: { standalone?: bo
               required
               maxLength={500}
               disabled={isSubmitting}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black resize-none disabled:bg-gray-100"
+              className="rp-input resize-none disabled:bg-gray-100"
               placeholder="500文字以内でご入力ください"
             />
           </div>
 
           {submitStatus === 'success' && (
-            <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm">
+            <div className="p-4 bg-green-50 border border-green-200 rounded-sm text-green-800 text-sm">
               お問い合わせを受け付けました。回答はマイページの「問い合わせ履歴」からご確認いただけます。
             </div>
           )}
 
           {submitStatus === 'error' && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+            <div className="p-4 bg-red-50 border border-red-200 rounded-sm text-red-800 text-sm">
               送信に失敗しました。もう一度お試しください。
             </div>
           )}
 
-          <div className="text-center">
+          <div>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-12 py-4 bg-black text-white rounded-sm hover:bg-gray-800 transition-colors whitespace-nowrap cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="rp-btn rp-btn-black min-w-[240px] disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {isSubmitting ? '送信中...' : '送信する'}
             </button>

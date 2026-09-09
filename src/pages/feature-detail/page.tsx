@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
+import ProductCard from '../../components/ProductCard';
 import { supabase } from '../../lib/supabase';
+import { PRODUCT_SELECT } from '../../lib/products';
 import type { Product } from '../../types';
 import PageMeta from '../../components/PageMeta';
 
@@ -17,21 +19,18 @@ interface Collection {
     is_active: boolean;
 }
 
+// 本文の記法: `# 大見出し` / `## 見出し` / `![alt](url)`。
+// 管理画面で「##見出し」のようにスペース無しで書かれても見出しとして扱う
 function renderContent(text: string) {
     return text.split('\n').map((line, i) => {
-        if (line.startsWith('## ')) return <h2 key={i} className="text-2xl font-bold mt-8 mb-4">{line.slice(3)}</h2>;
-        if (line.startsWith('# ')) return <h1 key={i} className="text-3xl font-bold mt-10 mb-4">{line.slice(2)}</h1>;
-        if (line === '') return <div key={i} className="h-4" />;
-        // 画像 ![alt](url)
+        const h2 = line.match(/^##\s*(.+)$/);
+        if (h2) return <h2 key={i}>{h2[1].trim()}</h2>;
+        const h1 = line.match(/^#\s*(.+)$/);
+        if (h1) return <h2 key={i}>{h1[1].trim()}</h2>;
+        if (line.trim() === '') return null;
         const imgMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
-        if (imgMatch) {
-            return (
-                <div key={i} className="my-6">
-                    <img src={imgMatch[2]} alt={imgMatch[1]} className="w-full rounded-lg object-cover" />
-                </div>
-            );
-        }
-        return <p key={i} className="leading-relaxed text-gray-700">{line}</p>;
+        if (imgMatch) return <img key={i} src={imgMatch[2]} alt={imgMatch[1]} loading="lazy" />;
+        return <p key={i}>{line}</p>;
     });
 }
 
@@ -55,12 +54,12 @@ export default function FeatureDetailPage() {
                     .single(),
                 supabase
                     .from('collection_products')
-                    .select('sort_order, product:products(*)')
+                    .select(`sort_order, product:products(${PRODUCT_SELECT})`)
                     .eq('collection_id', id)
                     .order('sort_order', { ascending: true }),
                 supabase
                     .from('recommended_products')
-                    .select('sort_order, product:products(*)')
+                    .select(`sort_order, product:products(${PRODUCT_SELECT})`)
                     .eq('collection_id', id)
                     .order('sort_order', { ascending: true }),
             ]);
@@ -72,10 +71,8 @@ export default function FeatureDetailPage() {
             setCollection(colRes.data);
             // draft・hidden の商品は特集内でも公開しない
             const isPublic = (p: any) => p && ['published', 'reserved', 'sold_out'].includes(p.status);
-            const prods = (cpRes.data || []).map((cp: any) => cp.product).filter(isPublic);
-            setProducts(prods);
-            const recProds = (recRes.data || []).map((r: any) => r.product).filter(isPublic);
-            setRecommended(recProds);
+            setProducts((cpRes.data || []).map((cp: any) => cp.product).filter(isPublic));
+            setRecommended((recRes.data || []).map((r: any) => r.product).filter(isPublic));
             setLoading(false);
         };
         fetchData();
@@ -101,174 +98,59 @@ export default function FeatureDetailPage() {
             />
             <Navigation />
 
-            {/* Hero */}
-            <div className="relative h-96 bg-gray-200 overflow-hidden">
-                {collection.cover_image_url ? (
-                    <img
-                        src={collection.cover_image_url}
-                        alt={collection.title}
-                        className="w-full h-full object-cover"
-                    />
-                ) : (
-                    <div className="w-full h-full bg-gray-200" />
-                )}
-                <div className="absolute inset-0 bg-black/40 flex items-end pb-12 px-6">
-                    <div className="max-w-7xl mx-auto w-full">
-                        {collection.tag && (
-                            <span className="inline-block px-3 py-1 bg-white text-black text-xs font-bold rounded-full mb-3">
-                                {collection.tag}
-                            </span>
-                        )}
-                        {collection.subtitle && (
-                            <p className="text-white/70 text-sm tracking-wider mb-2">{collection.subtitle}</p>
-                        )}
-                        <h1 className="text-4xl md:text-5xl font-bold text-white">{collection.title}</h1>
-                    </div>
-                </div>
-            </div>
-
-            <div className="max-w-7xl mx-auto px-6 py-16">
-                {/* Description / Content */}
-                {(collection.content || collection.description) && (
-                    <div className="max-w-2xl mb-12">
-                        {collection.content ? (
-                            <div className="text-base space-y-2">{renderContent(collection.content)}</div>
-                        ) : (
-                            <p className="text-gray-700 leading-relaxed text-lg">{collection.description}</p>
-                        )}
-                    </div>
-                )}
-
-                {/* Products */}
-                <div className="mb-8 flex items-center justify-between">
-                    <h2 className="text-2xl font-bold">
-                        このグループの商品
-                        <span className="ml-3 text-lg font-normal text-gray-500">{products.length}点</span>
-                    </h2>
-                    <Link to="/features" className="text-sm text-gray-500 hover:text-gray-700">
-                        ← 特集一覧に戻る
-                    </Link>
-                </div>
-
-                {products.length === 0 ? (
-                    <div className="text-center py-24 text-gray-400">
-                        <i className="ri-shopping-bag-line text-5xl mb-4 block"></i>
-                        現在商品が登録されていません
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {products.map((product) => {
-                            const thumb = product.images?.[0];
-                            const discount = product.original_price
-                                ? Math.round((1 - product.price / product.original_price) * 100)
-                                : null;
-                            return (
-                                <Link
-                                    key={product.id}
-                                    to={`/product/${product.id}`}
-                                    className="group"
-                                >
-                                    <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden mb-3">
-                                        {thumb ? (
-                                            <img
-                                                src={thumb}
-                                                alt={product.name}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                                <i className="ri-image-line text-4xl"></i>
-                                            </div>
-                                        )}
-                                        {discount && discount > 0 && (
-                                            <div className="absolute top-3 left-3">
-                                                <span className="px-2 py-0.5 bg-orange-500 text-white text-xs font-bold">
-                                                    -{discount}%
-                                                </span>
-                                            </div>
-                                        )}
-                                        {product.stock === 0 && (
-                                            <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
-                                                <span className="text-sm font-medium text-gray-600">SOLD OUT</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <p className="text-xs text-gray-500 mb-1">{product.category}</p>
-                                    <h3 className="text-sm font-medium text-gray-900 mb-2 group-hover:underline line-clamp-2">
-                                        {product.name}
-                                    </h3>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-base font-bold">¥{(product.price ?? 0).toLocaleString()}</span>
-                                        {product.original_price && (
-                                            <span className="text-xs text-gray-400 line-through">
-                                                ¥{(product.original_price ?? 0).toLocaleString()}
-                                            </span>
-                                        )}
-                                    </div>
-                                </Link>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
-
-            {/* おすすめ商品 */}
-            {recommended.length > 0 && (
-                <div className="bg-gray-50 py-16 mt-8">
-                    <div className="max-w-7xl mx-auto px-6">
-                        <h2 className="text-2xl font-bold mb-8">おすすめ商品</h2>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {recommended.map((product) => {
-                                const thumb = product.images?.[0];
-                                const discount = product.original_price
-                                    ? Math.round((1 - product.price / product.original_price) * 100)
-                                    : null;
-                                return (
-                                    <Link key={product.id} to={`/product/${product.id}`} className="group">
-                                        <div className="relative aspect-[3/4] bg-gray-100 rounded overflow-hidden mb-3">
-                                            {thumb ? (
-                                                <img
-                                                    src={thumb}
-                                                    alt={product.name}
-                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                                    <i className="ri-image-line text-4xl"></i>
-                                                </div>
-                                            )}
-                                            {discount && discount > 0 && (
-                                                <div className="absolute top-3 left-3">
-                                                    <span className="px-2 py-0.5 bg-orange-500 text-white text-xs font-bold">
-                                                        -{discount}%
-                                                    </span>
-                                                </div>
-                                            )}
-                                            {product.stock === 0 && (
-                                                <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
-                                                    <span className="text-sm font-medium text-gray-600">SOLD OUT</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <p className="text-xs text-gray-500 mb-1">{product.category}</p>
-                                        <h3 className="text-sm font-medium text-gray-900 mb-2 group-hover:underline line-clamp-2">
-                                            {product.name}
-                                        </h3>
-                                        <div className="flex items-baseline gap-2">
-                                            <span className="text-base font-bold">¥{(product.price ?? 0).toLocaleString()}</span>
-                                            {product.original_price && (
-                                                <span className="text-xs text-gray-400 line-through">
-                                                    ¥{(product.original_price ?? 0).toLocaleString()}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </Link>
-                                );
-            })}
+            <main className="page">
+                <div className="shop-container">
+                    {/* 見出し: 写真の上に文字を重ねず、写真と見出しを分ける */}
+                    <header className="page-header !border-b-0 !mb-0">
+                        <Link to="/features" className="shop-text-link mb-8">特集・読みもの</Link>
+                        <p className="shop-eyebrow mt-8">{collection.tag || 'Journal'}</p>
+                        <h1>{collection.title}</h1>
+                        {collection.subtitle && <p className="page-header-lead">{collection.subtitle}</p>}
+                    </header>
+                    {collection.cover_image_url && (
+                        <div className="aspect-[21/9] overflow-hidden bg-[color:var(--rp-photo-bg)]">
+                            <img src={collection.cover_image_url} alt={collection.title} className="w-full h-full object-cover" fetchPriority="high" />
                         </div>
+                    )}
+
+                    {/* 本文 */}
+                    {(collection.content || collection.description) && (
+                        <article className="rp-article max-w-[40em] mx-auto py-16">
+                            {collection.content ? renderContent(collection.content) : <p>{collection.description}</p>}
+                        </article>
+                    )}
+
+                    {/* 特集の犬服 */}
+                    <section className="page-section">
+                        <div className="shop-section-heading">
+                            <div><p className="shop-eyebrow">Items</p><h2>この特集の犬服</h2><p>{products.length}点</p></div>
+                        </div>
+                        {products.length === 0 ? (
+                            <p className="py-16 text-center text-sm text-[color:var(--rp-muted)]">現在、犬服の登録がありません。</p>
+                        ) : (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-10 md:gap-x-6">
+                                {products.map((product) => <ProductCard key={product.id} product={product} />)}
+                            </div>
+                        )}
+                    </section>
+
+                    {/* おすすめ商品 */}
+                    {recommended.length > 0 && (
+                        <section className="page-section">
+                            <div className="shop-section-heading">
+                                <div><p className="shop-eyebrow">Recommended</p><h2>あわせておすすめ</h2></div>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-10 md:gap-x-6">
+                                {recommended.map((product) => <ProductCard key={product.id} product={product} />)}
+                            </div>
+                        </section>
+                    )}
+
+                    <div className="shop-section-more !mt-0 pb-24">
+                        <Link to="/features" className="rp-btn rp-btn-outline">特集一覧へ</Link>
                     </div>
                 </div>
-            )}
+            </main>
 
             <Footer />
         </div>

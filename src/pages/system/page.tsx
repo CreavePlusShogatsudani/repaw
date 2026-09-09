@@ -1,8 +1,8 @@
+import { Link } from 'react-router-dom';
 import PageMeta from '../../components/PageMeta';
+import PageHeader from '../../components/PageHeader';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 const PROCESS_STEPS = [
   {
@@ -99,240 +99,123 @@ const faqs = [
   }
 ];
 
-const serif = { fontFamily: "'Playfair Display', serif" };
-
 export default function SystemPage() {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const navigate = useNavigate();
-
-  const toggleFaq = (index: number) => {
-    setOpenFaq(openFaq === index ? null : index);
-  };
-
   return (
     <div className="min-h-screen bg-white">
       <PageMeta title="買取・寄付の仕組み" description="RePawの犬服買取から動物保護団体への寄付までの流れをご説明します。" path="/system" />
       <Navigation />
 
-      {/* Hero Section */}
-      <section className="relative h-96 md:h-[28rem] flex items-center justify-center overflow-hidden bg-orange-950">
+      <main className="page">
+        <div className="shop-container">
+          <PageHeader eyebrow="How it works" title="買取・寄付の仕組み" lead="犬服の買取から、動物保護団体への寄付までの流れをご説明します。" />
 
-        <div className="relative z-10 text-center text-white px-6">
-          <h1 className="text-5xl md:text-6xl font-bold mb-4" style={serif}>
-            Buy &amp; Donate System
-          </h1>
-          <p className="text-lg md:text-xl">買取・寄付の仕組み</p>
-        </div>
-      </section>
-
-      {/* Process Section */}
-      <section className="py-20 md:py-28 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-14 md:mb-20">
-            <p className="text-orange-600 italic text-lg md:text-xl mb-3" style={serif}>Process</p>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">買取の流れ</h2>
-            <p className="text-base md:text-lg text-gray-600">簡単4ステップで買取完了</p>
-          </div>
-
-          <div className="relative grid md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
-            {/* 縫い目のつなぎ線（PC） */}
-            <div className="hidden lg:block absolute top-10 left-[12.5%] right-[12.5%] border-t-2 border-dashed border-orange-300" aria-hidden="true"></div>
-            {PROCESS_STEPS.map((step, index) => (
-              <div key={index} className="relative text-center">
-                <div className="w-20 h-20 flex items-center justify-center bg-orange-100 text-orange-600 rounded-full mx-auto mb-5 relative z-10">
-                  <i className={`${step.icon} text-3xl`}></i>
+          {/* Process */}
+          <section className="page-section">
+            <p className="shop-eyebrow">Process</p>
+            <h2>買取の流れ</h2>
+            <p className="mt-3 text-sm text-[color:var(--rp-muted)]">簡単4ステップで買取完了</p>
+            <div className="rp-steps mt-10">
+              {PROCESS_STEPS.map((step) => (
+                <div key={step.title}>
+                  <span className="rp-num">{step.number}</span>
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
                 </div>
-                <div className="text-2xl md:text-3xl text-orange-300 italic mb-2" style={serif}>{step.number}</div>
-                <h3 className="text-xl font-bold mb-3">{step.title}</h3>
-                <p className="text-base leading-relaxed text-gray-700 text-left md:text-center max-w-xs mx-auto">{step.description}</p>
+              ))}
+            </div>
+          </section>
+
+          {/* Pricing */}
+          <section className="page-section">
+            <p className="shop-eyebrow">Pricing</p>
+            <h2>買取価格の目安</h2>
+            <p className="mt-3 text-sm text-[color:var(--rp-muted)]">状態とブランドに応じて適正価格で買取</p>
+            <div className="rp-rows mt-10">
+              {RANKS.map((rank) => (
+                <div key={rank.rank}>
+                  <h3>{rank.rank}</h3>
+                  <p>{rank.condition}。{rank.note}。</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Donation */}
+          <section className="page-section">
+            <p className="shop-eyebrow">Donation</p>
+            <h2>寄付の仕組み</h2>
+            <p className="mt-3 text-sm text-[color:var(--rp-muted)]">あなたの選択が動物保護活動を支えます</p>
+            <div className="rp-rows mt-10">
+              <div>
+                <h3>ルート① 売主からの直接寄付</h3>
+                <div>
+                  <p>買取査定後、「寄付する」を選択すると、買取金額の<strong>全額</strong>を動物保護NPOへ寄付します。</p>
+                  <dl className="mt-4 text-sm text-[color:var(--rp-muted)]">
+                    <div className="flex gap-4"><dt>例：買取査定額</dt><dd>¥5,000</dd></div>
+                    <div className="flex gap-4"><dt>寄付額</dt><dd>¥5,000（全額が動物保護団体へ）</dd></div>
+                  </dl>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section className="py-20 md:py-28 px-6 bg-orange-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-14 md:mb-20">
-            <p className="text-orange-600 italic text-lg md:text-xl mb-3" style={serif}>Pricing</p>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">買取価格の目安</h2>
-            <p className="text-base md:text-lg text-gray-600">状態とブランドに応じて適正価格で買取</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-            {RANKS.map((rank, index) => (
-              <div
-                key={index}
-                className={`bg-white rounded-3xl p-8 text-center border ${rank.featured ? 'border-orange-300 shadow-md' : 'border-orange-100'}`}
-              >
-                <div className={`w-16 h-16 flex items-center justify-center rounded-full mx-auto mb-6 ${rank.featured ? 'bg-orange-600 text-white' : 'bg-orange-100 text-orange-600'}`}>
-                  <i className={`${rank.icon} text-3xl`}></i>
-                </div>
-                <h3 className="text-xl font-bold mb-2">{rank.rank}</h3>
-                <p className="text-base text-gray-700 mb-5">{rank.condition}</p>
-                <div className={`text-4xl font-bold mb-2 ${rank.featured ? 'text-orange-600' : 'text-gray-700'}`}>{rank.rate}</div>
-                <p className="text-sm text-gray-500">{rank.note}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Donation Section */}
-      <section className="py-20 md:py-28 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-14 md:mb-20">
-            <p className="text-orange-600 italic text-lg md:text-xl mb-3" style={serif}>Donation</p>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">寄付の仕組み</h2>
-            <p className="text-base md:text-lg text-gray-600">あなたの選択が動物保護活動を支えます</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 mb-16 md:mb-24">
-            {/* ルート1 */}
-            <div className="bg-white rounded-3xl p-8 border border-orange-100 shadow-sm">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 flex items-center justify-center bg-orange-600 rounded-xl flex-shrink-0">
-                  <i className="ri-hand-heart-line text-2xl text-white"></i>
-                </div>
-                <h3 className="text-xl md:text-2xl font-bold">ルート① 売主からの直接寄付</h3>
-              </div>
-
-              <p className="text-base leading-relaxed text-gray-700 mb-6">
-                買取査定後、「寄付する」を選択すると、買取金額の<strong className="text-orange-600 font-bold">全額</strong>を動物保護NPOへ寄付します。
-              </p>
-
-              <div className="bg-orange-50 rounded-2xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-base text-gray-600">例：買取査定額</span>
-                  <span className="text-2xl font-bold">¥5,000</span>
-                </div>
-                <div className="border-t border-dashed border-orange-300 pt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-base font-bold">寄付額</span>
-                    <span className="text-3xl font-bold text-orange-600">¥5,000</span>
-                  </div>
-                  <p className="text-sm text-gray-500 mt-2">全額が動物保護団体へ</p>
+              <div>
+                <h3>ルート② 販売収益からの寄付</h3>
+                <div>
+                  <p>商品が販売された際、販売価格の<strong>5%</strong>を自動的にNPOへ寄付します。入金を選んだ場合でも、販売時に寄付が行われます。</p>
+                  <dl className="mt-4 text-sm text-[color:var(--rp-muted)]">
+                    <div className="flex gap-4"><dt>例：販売価格</dt><dd>¥8,000</dd></div>
+                    <div className="flex gap-4"><dt>寄付額（5%）</dt><dd>¥400（販売時に自動寄付）</dd></div>
+                  </dl>
                 </div>
               </div>
             </div>
+          </section>
 
-            {/* ルート2 */}
-            <div className="bg-white rounded-3xl p-8 border border-orange-100 shadow-sm">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 flex items-center justify-center bg-orange-600 rounded-xl flex-shrink-0">
-                  <i className="ri-shopping-cart-line text-2xl text-white"></i>
-                </div>
-                <h3 className="text-xl md:text-2xl font-bold">ルート② 販売収益からの寄付</h3>
-              </div>
-
-              <p className="text-base leading-relaxed text-gray-700 mb-6">
-                商品が販売された際、販売価格の<strong className="text-orange-600 font-bold">5%</strong>を自動的にNPOへ寄付します。入金を選んだ場合でも、販売時に寄付が行われます。
-              </p>
-
-              <div className="bg-orange-50 rounded-2xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-base text-gray-600">例：販売価格</span>
-                  <span className="text-2xl font-bold">¥8,000</span>
-                </div>
-                <div className="border-t border-dashed border-orange-300 pt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-base font-bold">寄付額（5%）</span>
-                    <span className="text-3xl font-bold text-orange-600">¥400</span>
-                  </div>
-                  <p className="text-sm text-gray-500 mt-2">販売時に自動寄付</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 寄付先の説明 */}
-          <div className="max-w-3xl mx-auto">
-
-            <div>
-              <h3 className="text-2xl md:text-3xl font-bold mb-6">寄付が支える活動</h3>
-              <p className="text-base md:text-lg leading-loose text-gray-700 mb-8">
+          {/* 寄付が支える活動 */}
+          <section className="page-section">
+            <h2>寄付が支える活動</h2>
+            <div className="rp-prose mt-8">
+              <p>
                 RePawでは、2つのルートから集まった寄付金を動物保護団体へ届けています。あなたの選択が、保護犬・保護猫の医療費、食費、シェルター運営費として活用され、多くの命を救う活動に繋がります。
               </p>
+            </div>
+            <div className="rp-rows mt-10">
+              {SUPPORT_ITEMS.map((item) => (
+                <div key={item.title}>
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-6 text-sm text-[color:var(--rp-muted)]">寄付実績は定期的に公開し、透明性を保っています。</p>
+          </section>
 
-              <div className="space-y-5">
-                {SUPPORT_ITEMS.map((item, index) => (
-                  <div key={index} className="flex items-start gap-4">
-                    <div className="w-12 h-12 flex items-center justify-center flex-shrink-0 bg-orange-100 text-orange-600 rounded-full">
-                      <i className={`${item.icon} text-2xl`}></i>
-                    </div>
-                    <div>
-                      <h4 className="text-base md:text-lg font-bold mb-1">{item.title}</h4>
-                      <p className="text-base text-gray-700">{item.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* FAQ */}
+          <section className="page-section">
+            <p className="shop-eyebrow">FAQ</p>
+            <h2>よくある質問</h2>
+            <div className="rp-faq mt-10">
+              {faqs.map((faq) => (
+                <details key={faq.question}>
+                  <summary>{faq.question}<i className="ri-arrow-down-s-line" aria-hidden="true"></i></summary>
+                  <div className="rp-faq-answer">{faq.answer}</div>
+                </details>
+              ))}
+            </div>
+          </section>
+        </div>
 
-              <div className="mt-8 pt-6 border-t border-dashed border-orange-300">
-                <p className="text-base text-gray-700">
-                  <i className="ri-information-line text-orange-600 mr-2"></i>
-                  寄付実績は定期的に公開し、透明性を保っています。
-                </p>
-              </div>
+        {/* CTA */}
+        <section className="rp-band page-section">
+          <div className="shop-container">
+            <h2>今すぐ買取申し込み</h2>
+            <div className="rp-prose mt-6">
+              <p>使わなくなった犬服を、新しい命へ繋げませんか？</p>
+            </div>
+            <div className="mt-8">
+              <Link to="/buyback" className="rp-btn rp-btn-black">買取を申し込む</Link>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="py-20 md:py-28 px-6 bg-orange-50">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-14 md:mb-16">
-            <p className="text-orange-600 italic text-lg md:text-xl mb-3" style={serif}>FAQ</p>
-            <h2 className="text-4xl md:text-5xl font-bold">よくある質問</h2>
-          </div>
-
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl border border-orange-100 overflow-hidden hover:shadow-md transition-shadow"
-              >
-                <button
-                  onClick={() => toggleFaq(index)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left cursor-pointer"
-                >
-                  <span className="text-base md:text-lg font-bold text-gray-900 pr-4">{faq.question}</span>
-                  <div className={`w-8 h-8 flex items-center justify-center rounded-full bg-orange-600 text-white flex-shrink-0 transition-transform ${
-                    openFaq === index ? 'rotate-180' : ''
-                  }`}>
-                    <i className="ri-arrow-down-s-line text-xl"></i>
-                  </div>
-                </button>
-                {openFaq === index && (
-                  <div className="px-6 py-5 bg-orange-50/60 border-t border-dashed border-orange-200">
-                    <p className="text-base leading-relaxed text-gray-700">{faq.answer}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 md:py-28 px-6 bg-orange-600">
-        <div className="max-w-4xl mx-auto text-center text-white">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            今すぐ買取申し込み
-          </h2>
-          <p className="text-base md:text-lg leading-relaxed text-orange-50 mb-10">
-            使わなくなった犬服を、新しい命へ繋げませんか？
-          </p>
-          <button
-            onClick={() => navigate('/buyback')}
-            className="px-12 py-4 bg-white text-orange-600 rounded-full text-sm md:text-base font-bold hover:bg-orange-50 transition-colors whitespace-nowrap cursor-pointer"
-          >
-            買取を申し込む
-          </button>
-        </div>
-      </section>
+        </section>
+      </main>
 
       <Footer />
     </div>

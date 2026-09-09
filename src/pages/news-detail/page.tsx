@@ -15,34 +15,19 @@ interface NewsArticle {
     published_at: string;
 }
 
-// "## 見出し" を <h2> に、それ以外は段落として描画するシンプルなレンダラー
+// 本文の記法: `# 大見出し` / `## 見出し` / `![alt](url)`。特集と同じルール。
+// 「##見出し」のようにスペース無しで書かれても見出しとして扱う
 function renderContent(text: string) {
-    const lines = text.split('\n');
-    const elements: React.ReactNode[] = [];
-    let i = 0;
-    while (i < lines.length) {
-        const line = lines[i];
-        if (line.startsWith('## ')) {
-            elements.push(
-                <h2 key={i} className="text-2xl font-bold mt-8 mb-4">{line.slice(3)}</h2>
-            );
-            i++;
-        } else if (line.startsWith('# ')) {
-            elements.push(
-                <h1 key={i} className="text-3xl font-bold mt-10 mb-4">{line.slice(2)}</h1>
-            );
-            i++;
-        } else if (line === '') {
-            elements.push(<div key={i} className="h-4" />);
-            i++;
-        } else {
-            elements.push(
-                <p key={i} className="leading-relaxed text-gray-700">{line}</p>
-            );
-            i++;
-        }
-    }
-    return elements;
+    return text.split('\n').map((line, i) => {
+        const h2 = line.match(/^##\s*(.+)$/);
+        if (h2) return <h2 key={i}>{h2[1].trim()}</h2>;
+        const h1 = line.match(/^#\s*(.+)$/);
+        if (h1) return <h2 key={i}>{h1[1].trim()}</h2>;
+        if (line.trim() === '') return null;
+        const imgMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+        if (imgMatch) return <img key={i} src={imgMatch[2]} alt={imgMatch[1]} loading="lazy" />;
+        return <p key={i}>{line}</p>;
+    });
 }
 
 export default function NewsDetailPage() {
@@ -75,7 +60,7 @@ export default function NewsDetailPage() {
                 return;
             }
             setNews(detailRes.data);
-            setRelatedNews(listRes.data || []);
+            setRelatedNews((listRes.data as NewsArticle[]) || []);
             setLoading(false);
         };
         fetchData();
@@ -124,73 +109,50 @@ export default function NewsDetailPage() {
             />
             <Navigation />
 
-            <div className="pt-32 pb-24 px-6">
-                <div className="max-w-4xl mx-auto">
-                    <Link to="/news" className="inline-flex items-center gap-2 text-gray-600 hover:text-black mb-8">
-                        <i className="ri-arrow-left-line"></i>
-                        お知らせ一覧に戻る
-                    </Link>
+            <main className="page">
+                <div className="shop-container">
+                    <article className="max-w-[44em] mx-auto pt-12 pb-24">
+                        <Link to="/news" className="shop-text-link">お知らせ一覧</Link>
 
-                    <div className="flex items-center gap-3 mb-4">
-                        <span className="text-sm text-gray-500">{formatDate(news.published_at)}</span>
-                        <span className="px-3 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full whitespace-nowrap">
-                            {news.category}
-                        </span>
-                    </div>
+                        <header className="mt-10 pb-8 border-b border-[color:var(--rp-line)]">
+                            <div className="flex items-center gap-4">
+                                <time dateTime={news.published_at} className="text-xs tracking-[.04em] text-[color:var(--rp-muted)]">{formatDate(news.published_at)}</time>
+                                <span className="rp-badge">{news.category}</span>
+                            </div>
+                            <h1 className="mt-4 text-[26px] md:text-[34px] font-medium tracking-[.06em] leading-[1.5]">{news.title}</h1>
+                            {news.excerpt && <p className="mt-4 text-sm leading-7 text-[color:var(--rp-muted)]">{news.excerpt}</p>}
+                        </header>
 
-                    <h1 className="text-4xl md:text-5xl font-bold mb-8" style={{ fontFamily: "'Playfair Display', serif" }}>
-                        {news.title}
-                    </h1>
+                        {news.thumbnail_url && (
+                            <div className="mt-10 aspect-[16/9] overflow-hidden bg-[color:var(--rp-photo-bg)]">
+                                <img src={news.thumbnail_url} alt={news.title} className="w-full h-full object-cover" fetchPriority="high" />
+                            </div>
+                        )}
 
-                    {news.thumbnail_url && (
-                        <div className="w-full h-96 bg-gray-100 rounded-lg overflow-hidden mb-12">
-                            <img src={news.thumbnail_url} alt={news.title} className="w-full h-full object-cover object-top" />
+                        <div className="rp-article mt-10">
+                            {news.content ? renderContent(news.content) : null}
                         </div>
-                    )}
+                    </article>
 
-                    {/* Content */}
-                    {news.content ? (
-                        <div className="text-base space-y-2">
-                            {renderContent(news.content)}
-                        </div>
-                    ) : news.excerpt ? (
-                        <p className="text-gray-700 leading-relaxed text-lg">{news.excerpt}</p>
-                    ) : null}
-
-                    {/* Related */}
                     {relatedNews.length > 0 && (
-                        <div className="mt-16 pt-12 border-t border-gray-200">
-                            <h2 className="text-2xl font-bold mb-8">関連するお知らせ</h2>
-                            <div className="grid md:grid-cols-3 gap-6">
+                        <section className="page-section pb-24">
+                            <div className="shop-section-heading">
+                                <div><p className="shop-eyebrow">More</p><h2>ほかのお知らせ</h2></div>
+                                <Link to="/news" className="shop-text-link">すべて見る</Link>
+                            </div>
+                            <div>
                                 {relatedNews.map(item => (
-                                    <Link key={item.id} to={`/news/${item.id}`} className="group">
-                                        <div className="w-full h-48 bg-gray-100 rounded-lg overflow-hidden mb-3">
-                                            {item.thumbnail_url ? (
-                                                <img
-                                                    src={item.thumbnail_url}
-                                                    alt={item.title}
-                                                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                                    <i className="ri-newspaper-line text-3xl"></i>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className="text-xs text-gray-500">{formatDate(item.published_at)}</span>
-                                            <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full whitespace-nowrap">
-                                                {item.category}
-                                            </span>
-                                        </div>
-                                        <h3 className="text-sm font-bold group-hover:underline line-clamp-2">{item.title}</h3>
+                                    <Link key={item.id} to={`/news/${item.id}`} className="group grid grid-cols-[110px_1fr] md:grid-cols-[140px_110px_1fr] items-center gap-x-6 gap-y-2 py-5 border-b border-[color:var(--rp-line)]">
+                                        <time dateTime={item.published_at} className="text-xs tracking-[.04em] text-[color:var(--rp-muted)]">{formatDate(item.published_at)}</time>
+                                        <span className="rp-badge justify-self-start">{item.category}</span>
+                                        <h3 className="col-span-2 md:col-span-1 text-sm font-medium leading-relaxed group-hover:underline underline-offset-4">{item.title}</h3>
                                     </Link>
                                 ))}
                             </div>
-                        </div>
+                        </section>
                     )}
                 </div>
-            </div>
+            </main>
 
             <Footer />
         </div>
