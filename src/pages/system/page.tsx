@@ -33,30 +33,18 @@ const PROCESS_STEPS = [
   }
 ];
 
-const RANKS = [
+const APPRAISAL_POINTS = [
   {
-    icon: 'ri-star-line',
-    rank: 'Aランク',
-    condition: '新品同様・未使用品',
-    rate: '50-70%',
-    note: '定価の50-70%で買取',
-    featured: true,
+    title: '状態',
+    description: '汚れ・毛玉・ほつれ・におい・ゴムの伸びを確認し、A〜Cのランクを付けます。写真では分からない部分も、現物で丁寧に見ます。',
   },
   {
-    icon: 'ri-star-half-line',
-    rank: 'Bランク',
-    condition: '使用感少ない美品',
-    rate: '30-50%',
-    note: '定価の30-50%で買取',
-    featured: false,
+    title: 'ブランドと需要',
+    description: 'ブランド、サイズ、季節、人気の傾向をもとに、次の飼い主さんに届きやすい価格から逆算して買取額を決めます。',
   },
   {
-    icon: 'ri-star-s-line',
-    rank: 'Cランク',
-    condition: '使用感あり・良品',
-    rate: '10-30%',
-    note: '定価の10-30%で買取',
-    featured: false,
+    title: 'お受けできないもの',
+    description: '著しい汚れや破損、においが強いもの、犬服以外のものはお受けできない場合があります。その場合は申し込み時に選んだ方法（返送または寄付）でお返しします。',
   },
 ];
 
@@ -132,20 +120,20 @@ export default function SystemPage() {
           </div>
         </section>
 
-        {/* 買取価格の目安: 数字を大きく */}
+        {/* 査定の考え方: 率や目安額は出さない（トラブル防止）。決まり方と受けられない条件だけ */}
         <section className="rp-band">
           <div className="shop-container">
             <div className="page-section-center">
-              <p className="shop-eyebrow">Pricing</p>
-              <h2 className="text-[32px] font-medium tracking-[.1em] leading-snug">買取価格の目安</h2>
-              <p className="page-section-lead">状態とブランドに応じて、定価を基準に査定します。</p>
+              <p className="shop-eyebrow">Appraisal</p>
+              <h2 className="text-[32px] font-medium tracking-[.1em] leading-snug">査定の考え方</h2>
+              <p className="page-section-lead">届いた服を1点ずつ確認し、状態とブランド、需要をもとに買取額をご案内します。査定結果にご納得いただけない場合は、無料で返送いたします。</p>
             </div>
-            <div className="rp-stats mt-14 bg-white">
-              {RANKS.map((r) => (
-                <div key={r.rank}>
-                  <p className="text-[13px] tracking-[.1em] text-[color:var(--rp-muted)]">{r.rank}</p>
-                  <p className="rp-stat-num mt-4">{r.rate}</p>
-                  <p className="rp-stat-label">{r.condition}。{r.note}</p>
+            <div className="rp-numbered mt-14">
+              {APPRAISAL_POINTS.map((item, i) => (
+                <div key={item.title}>
+                  <span className="rp-num">0{i + 1}</span>
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
                 </div>
               ))}
             </div>

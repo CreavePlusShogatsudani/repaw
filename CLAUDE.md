@@ -285,6 +285,7 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 - 状態ランク: `src/lib/conditions.ts`
 - カテゴリ・サイズ: `src/lib/productOptions.ts`
 - 送料: DB の `calc_shipping_fee()`（表示側もこの値に合わせる）
+- 買取価格: 率や目安額を公開しない（トラブル防止。2026-09-10 決定）。FAQ・System ページ・問い合わせ AI の FAQ 文に「定価の○%」を書かない
 
 ### 画像アップロード
 - Canvas API で圧縮（最大5MB・最大1920px）
