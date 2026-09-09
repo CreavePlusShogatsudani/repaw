@@ -49,6 +49,7 @@ const AdminProductFormPage = lazyWithRetry(() => import('../pages/admin/products
 const AdminOrdersPage = lazyWithRetry(() => import('../pages/admin/orders/page'));
 const AdminBuybackPage = lazyWithRetry(() => import('../pages/admin/buyback/page'));
 const AdminBuybackDetailPage = lazyWithRetry(() => import('../pages/admin/buyback/detail'));
+const AdminPhotoQueuePage = lazyWithRetry(() => import('../pages/admin/photo-queue/page'));
 const AdminInquiriesPage = lazyWithRetry(() => import('../pages/admin/inquiries/page'));
 const AdminUsersPage = lazyWithRetry(() => import('../pages/admin/users/page'));
 const AdminMembersPage = lazyWithRetry(() => import('../pages/admin/members/page'));
@@ -181,6 +182,10 @@ const routes: RouteObject[] = [
       {
         path: 'buyback/:id',
         element: <AdminBuybackDetailPage />,
+      },
+      {
+        path: 'photo-queue',
+        element: <AdminPhotoQueuePage />,
       },
       {
         path: 'inquiries',

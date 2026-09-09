@@ -238,6 +238,11 @@ export default function AdminProductFormPage() {
         }
 
         const finalImages = [...existingImages, ...uploadedUrls];
+        if (status === 'published' && finalImages.length === 0) {
+            alert('写真が1枚も無い商品は公開できません。写真を追加するか、ステータスを「非公開 (下書き)」にしてください。');
+            setSaving(false);
+            return;
+        }
 
         const productData = {
             name,

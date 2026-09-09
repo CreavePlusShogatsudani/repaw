@@ -69,6 +69,7 @@ src/
 │       ├── products/       # 商品管理 (page.tsx / form.tsx)
 │       ├── orders/         # 注文管理
 │       ├── buyback/        # 買取申込管理（page: 一覧 / detail: 1点ごとの査定）
+│       ├── photo-queue/    # 撮影待ち（買取確定した服 → 一眼レフ撮影 → 公開）
 │       ├── inquiries/      # 問い合わせ管理（AI下書きの承認送信）
 │       ├── members/        # ユーザー一覧
 │       ├── users/          # 管理者アカウント
@@ -84,7 +85,7 @@ src/
     └── index.ts
 
 supabase/
-├── migrations/             # 000_baseline → 004 → 005 → 006 → 007 → 008 → 009 → 010（本番適用済み）
+├── migrations/             # 000_baseline → 004 → 005 → 006 → 007 → 008 → 009 → 010 → 011（本番適用済み）
 ├── functions/
 │   ├── create-payment-intent/   # 決済開始（金額はDBが決める）
 │   ├── stripe-webhook/          # 決済確定 → finalize_order
@@ -217,7 +218,7 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 5. ユーザーは `/buyback/response/:id` で内訳を見て、寄付 / 振込 / 全点着払い返送 を申込全体で1回回答 → RPC `respond_buyback`
    - 寄付・振込のとき、買取可の服は awaiting_photo になり、下書き商品（status: draft、写真なし）が自動作成されて `product_id` に紐づく
 6. 管理者が「振込済み / 寄付処理済み」→ completed
-7. 一眼レフで撮影 → 下書き商品に写真を入れて公開（撮影待ちリストは段階 C で追加予定）
+7. 管理画面「撮影待ち」（/admin/photo-queue）から下書き商品を開き、一眼レフの写真を入れて公開。写真が入ると photographed、公開で listed、売り切れで sold に服の status が自動で進む（011 のトリガー）。写真が無い商品は公開できない
 - 買取価格の率・目安は公開しない。査定額に不同意なら全点返送（着払い）か全点寄付
 - ステータスと表示名の定義は `src/lib/buyback.ts`
 
@@ -243,11 +244,12 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 
 | メニュー | パス | 機能 |
 |----------|------|------|
-| ダッシュボード | /admin | 商品数・注文数・売上 |
+| ダッシュボード | /admin | 商品数・注文数・売上・撮影待ち・対応が必要な買取 |
 | 商品管理 | /admin/products | CRUD・画像アップロード・実寸・ステータス（公開/下書き/売り切れ） |
 | ニュース管理 | /admin/news | 記事 CRUD・公開管理 |
 | 注文管理 | /admin/orders | 注文一覧・ステータス更新 |
-| 買取申込管理 | /admin/buyback | 査定・ステータス管理・商品登録への引き継ぎ |
+| 買取申込管理 | /admin/buyback | キット送付・到着・1点ごとの査定（AI読み取り）・査定額提示・完了 |
+| 撮影待ち | /admin/photo-queue | 買取確定した服の撮影・公開状況 |
 | 問い合わせ管理 | /admin/inquiries | ステータスフィルタ（既定: 承認待ち）・AI下書き編集・承認送信 |
 | ユーザー一覧 | /admin/members | |
 | 管理者アカウント | /admin/users | is_admin の付与・剥奪 |
