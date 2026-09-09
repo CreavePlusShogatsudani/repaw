@@ -25,3 +25,6 @@ npm-debug.log*
 # Cache
 .cache/
 .eslintcache
+
+# Lazyweb design research（参考画像が大きいためコミットしない）
+.lazyweb/

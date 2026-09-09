@@ -286,7 +286,7 @@ export default function ProductDetail() {
                 <p className="product-donation mt-4">
                   <i className="ri-heart-3-fill" aria-hidden="true"></i>
                   このお買い物から ¥{donationAmount(product.price).toLocaleString()} を保護犬・保護猫の支援に寄付
-                  <span className="font-normal opacity-80">（{DONATION_RATE_LABEL}）</span>
+                  <span className="text-[color:var(--rp-muted)]">（{DONATION_RATE_LABEL}）</span>
                 </p>
               </div>
 
@@ -380,7 +380,7 @@ export default function ProductDetail() {
                   ) : (
                   <button
                     onClick={addToCart}
-                    className="flex-1 bg-[#f0641f] text-white py-3 md:py-4 rounded-full text-sm md:text-base font-bold hover:bg-[#d3520f] transition-colors cursor-pointer whitespace-nowrap"
+                    className="flex-1 bg-[#161616] text-white py-3 md:py-4 rounded-sm text-sm md:text-base font-medium tracking-wider hover:bg-[#333] transition-colors cursor-pointer whitespace-nowrap"
                   >
                     カートに追加
                   </button>
@@ -389,7 +389,7 @@ export default function ProductDetail() {
                     aria-label={isFavorite ? 'お気に入りから削除' : 'お気に入りに追加'}
                     aria-pressed={isFavorite}
                     onClick={toggleFavorite}
-                    className={`px-4 md:px-6 py-3 md:py-4 border-2 rounded-full transition-colors cursor-pointer ${isFavorite
+                    className={`px-4 md:px-6 py-3 md:py-4 border rounded-sm transition-colors cursor-pointer ${isFavorite
                       ? 'border-red-500 bg-red-50'
                       : 'border-gray-300 hover:bg-gray-50'
                       }`}
@@ -410,7 +410,7 @@ export default function ProductDetail() {
                         ? <img src={product.previous_owner.dog_photo_url} alt={`${product.previous_owner.dog_name}ちゃん`} />
                         : <div className="owner-placeholder"><i className="ri-emotion-happy-line text-3xl text-white"></i></div>}
                       <div>
-                        <p className="owner-name !text-xl">{product.previous_owner.dog_name}ちゃん</p>
+                        <p className="owner-name !text-lg">{product.previous_owner.dog_name}ちゃん</p>
                         {product.previous_owner.story && <p className="text-sm text-slate-700 leading-relaxed mt-1">{product.previous_owner.story}</p>}
                         {(product.previous_owner.instagram || product.seller_instagram) && (
                           <a

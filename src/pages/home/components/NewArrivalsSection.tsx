@@ -27,7 +27,7 @@ export default function NewArrivalsSection() {
     <section id="items" className="shop-container shop-section">
       <div className="shop-section-heading" data-reveal>
         <div><h2>新しく届いた犬服</h2><p>毎週入荷。気になる子はお早めに。</p></div>
-        <Link to="/products" className="shop-text-link">すべて見る <i className="ri-arrow-right-line" aria-hidden="true"></i></Link>
+        <Link to="/products" className="shop-text-link">すべて見る</Link>
       </div>
       {loading ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-8 md:gap-x-6" role="status" aria-label="商品を読み込んでいます">

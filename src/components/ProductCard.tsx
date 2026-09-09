@@ -17,14 +17,8 @@ export default function ProductCard({ product }: { product: Product }) {
         ) : <span className="text-xs text-slate-500">写真準備中</span>}
         {status && <span className="product-status">{status}</span>}
       </div>
-      {/* 前のオーナー: 登録がある場合だけ「○○ちゃんのおさがり」。写真の上には重ねず、下に置く */}
-      {owner && (
-        <p className="product-card-owner">
-          {owner.dog_photo_url ? <img src={owner.dog_photo_url} alt="" loading="lazy" /> : <span className="avatar" aria-hidden="true"><i className="ri-emotion-happy-line text-sm"></i></span>}
-          {owner.dog_name}ちゃんのおさがり
-        </p>
-      )}
-      <h3 className="group-hover:underline underline-offset-4">{product.brand?.trim() ? `${product.brand} / ${product.name}` : product.name}</h3>
+      {product.brand?.trim() && <p className="product-card-brand">{product.brand}</p>}
+      <h3 className={product.brand?.trim() ? '' : 'mt-3'}>{product.name}</h3>
       {(product.size?.trim() || condition) && (
         <p className="product-card-meta">
           {product.size?.trim() && <span>サイズ {product.size}</span>}
@@ -40,6 +34,13 @@ export default function ProductCard({ product }: { product: Product }) {
         <span>¥{product.price.toLocaleString()}</span>
         {discounted && <del>¥{product.original_price!.toLocaleString()}</del>}
       </p>
+      {/* 前のオーナー: 登録がある場合だけ最終行に「○○ちゃんのおさがり」。写真の上には重ねない */}
+      {owner && (
+        <p className="product-card-owner">
+          {owner.dog_photo_url ? <img src={owner.dog_photo_url} alt="" loading="lazy" /> : <span className="avatar" aria-hidden="true"><i className="ri-emotion-happy-line text-xs"></i></span>}
+          {owner.dog_name}ちゃんのおさがり
+        </p>
+      )}
     </Link>
   );
 }
