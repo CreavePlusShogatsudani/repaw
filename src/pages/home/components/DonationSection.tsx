@@ -7,6 +7,7 @@ export default function DonationSection() {
     <section id="service" className="shop-donation">
       <div className="shop-container shop-donation-inner" data-reveal>
         <div>
+          <p className="shop-eyebrow">Impact</p>
           <h2>お買い物が、<br />動物たちの支援になる。</h2>
           <p className="mt-4 text-sm leading-8 text-[color:var(--rp-text)] max-w-[34em]">RePawで買った犬服の販売価格の{DONATION_RATE_LABEL}を、動物保護団体へ寄付しています。特別なことをしなくても、好きな服を選ぶだけで支援になります。</p>
           <dl className="donation-facts">
@@ -17,6 +18,7 @@ export default function DonationSection() {
           <Link to="/impact" className="shop-text-link mt-7">取り組みと実績を見る</Link>
         </div>
         <div>
+          <p className="shop-eyebrow">Pass it on</p>
           <h2>着なくなった服も、<br />次の子へ。</h2>
           <ol className="shop-steps mt-6">
             <li><span>1</span><div><h3>フォームから申し込み</h3><p>ログインして、譲りたい犬服の情報を送るだけ。</p></div></li>

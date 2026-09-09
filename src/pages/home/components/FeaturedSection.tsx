@@ -30,7 +30,7 @@ export default function FeaturedSection() {
     return (
         <section className="shop-container shop-section shop-featured">
             <div className="shop-section-heading">
-                <div><p className="shop-eyebrow">JOURNAL</p><h2>犬と暮らす、日々のこと</h2></div>
+                <div><p className="shop-eyebrow">Journal</p><h2>犬と暮らす、日々のこと</h2></div>
                 <Link to="/features" className="shop-text-link">特集一覧 <span aria-hidden="true">→</span></Link>
             </div>
             <div className={collections.length === 1 ? '' : 'grid md:grid-cols-2 gap-10'}>

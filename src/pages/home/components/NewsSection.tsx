@@ -34,7 +34,7 @@ export default function NewsSection() {
     return (
         <section className="shop-container shop-section shop-news">
             <div className="shop-section-heading">
-                <div><p className="shop-eyebrow">NEWS</p><h2>お店からのお知らせ</h2></div>
+                <div><p className="shop-eyebrow">News</p><h2>お店からのお知らせ</h2></div>
                 <Link to="/news" className="shop-text-link">すべて見る <span aria-hidden="true">→</span></Link>
             </div>
             <div>

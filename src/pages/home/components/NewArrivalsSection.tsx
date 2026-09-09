@@ -26,7 +26,7 @@ export default function NewArrivalsSection() {
   return (
     <section id="items" className="shop-container shop-section">
       <div className="shop-section-heading" data-reveal>
-        <div><h2>新しく届いた犬服</h2><p>毎週入荷。気になる子はお早めに。</p></div>
+        <div><p className="shop-eyebrow">New Arrivals</p><h2>新しく届いた犬服</h2><p>毎週入荷。気になる子はお早めに。</p></div>
         <Link to="/products" className="shop-text-link">すべて見る</Link>
       </div>
       {loading ? (

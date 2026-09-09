@@ -18,10 +18,10 @@ export default function HomePage() {
       <main className="shop-home">
       <HeroSection />
       <NewArrivalsSection />
-      <OwnersSection />
       <ExploreSection />
-      <DonationSection />
+      <OwnersSection />
       <FeaturedSection />
+      <DonationSection />
       <NewsSection />
       <ContactSection />
       </main>
