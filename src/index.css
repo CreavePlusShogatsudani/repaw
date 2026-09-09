@@ -373,3 +373,84 @@ html { scroll-padding-top: 96px; }
 @media (max-width: 767px) { .rp-band h2 { font-size: 22px; } }
 .page-header + .page-section { padding-top: 0; border-top: 0; }
 .rp-rows p, .rp-faq .rp-faq-answer { max-width: 44em; }
+
+/* ==========================================================
+   下層ページの編集レイヤー: 中央寄せの見出し、宣言文、写真の帯、数字、2カラム、写真の上の CTA
+   ========================================================== */
+.page-header { text-align: center; padding: 80px 0 56px; border-bottom: 0; margin-bottom: 0; }
+.page-header h1 { font-size: 44px; letter-spacing: .1em; }
+.page-header-lead { margin: 18px auto 0; font-size: 16px; line-height: 2; color: var(--rp-text); max-width: 34em; }
+.page-header-left { text-align: left; }
+.page-header-left .page-header-lead { margin-left: 0; }
+.page-header + .page-section { padding-top: 0; }
+.page-section { padding-block: 96px; }
+.page-section h2 { font-size: 32px; letter-spacing: .1em; }
+.page-section-center { text-align: center; }
+.page-section-center .rp-prose, .page-section-center .page-section-lead { margin-inline: auto; }
+.page-section-lead { margin-top: 16px; font-size: 15px; line-height: 2; color: var(--rp-muted); max-width: 36em; }
+.rp-prose { font-size: 16px; line-height: 2.1; }
+/* 宣言文: 中央・大きめ・短く */
+.rp-manifesto { text-align: center; font-size: clamp(20px, 2.2vw, 26px); line-height: 2; letter-spacing: .06em; font-weight: 400; max-width: 26em; margin: 0 auto; }
+.rp-manifesto strong { font-weight: 500; }
+/* 商品写真の帯（全幅） */
+.rp-mosaic { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+.rp-mosaic a { display: block; aspect-ratio: 4 / 5; background: var(--rp-photo-bg); overflow: hidden; }
+.rp-mosaic img { width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; transition: transform .6s ease; }
+.rp-mosaic a:hover img { transform: scale(1.04); }
+/* 写真 + テキストの 2 カラム */
+.rp-split { display: grid; grid-template-columns: 5fr 6fr; gap: 72px; align-items: center; }
+.rp-split-reverse > :first-child { order: 2; }
+.rp-figure { aspect-ratio: 4 / 5; overflow: hidden; background: var(--rp-photo-bg); }
+.rp-figure img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 65%; }
+/* 数字の行 */
+.rp-stats { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--rp-line); border-bottom: 1px solid var(--rp-line); }
+.rp-stats > div { padding: 40px 24px; text-align: center; }
+.rp-stats > div + div { border-left: 1px solid var(--rp-line); }
+.rp-stat-num { font-family: 'Playfair Display', serif; font-size: 56px; line-height: 1; letter-spacing: -.01em; }
+.rp-stat-num small { font-size: 22px; margin-left: 4px; }
+.rp-stat-label { margin-top: 14px; font-size: 13px; letter-spacing: .06em; color: var(--rp-muted); }
+/* 番号付きの 3 カラム */
+.rp-numbered { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; }
+.rp-numbered > div { border-top: 1px solid var(--rp-ink); padding-top: 24px; }
+.rp-numbered .rp-num { font-family: 'Playfair Display', serif; font-style: italic; font-size: 40px; line-height: 1; color: var(--rp-ink); }
+.rp-numbered h3 { margin-top: 18px; font-size: 18px; font-weight: 500; letter-spacing: .04em; }
+.rp-numbered p { margin-top: 12px; font-size: 14px; line-height: 2; color: var(--rp-text); }
+.rp-steps { gap: 40px; }
+.rp-steps .rp-num { font-size: 40px; font-style: italic; color: var(--rp-ink); }
+.rp-steps h3 { margin-top: 18px; font-size: 17px; }
+.rp-steps p { font-size: 14px; color: var(--rp-text); }
+.rp-rows h3 { font-size: 18px; }
+.rp-rows > div { padding: 32px 0; }
+/* 写真の上の CTA */
+.rp-band-photo { position: relative; min-height: 480px; display: flex; align-items: center; justify-content: center; overflow: hidden; color: #fff; text-align: center; }
+.rp-band-photo > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+.rp-band-photo::before { content: ''; position: absolute; inset: 0; background: linear-gradient(rgba(20,20,20,.45), rgba(20,20,20,.65)); }
+.rp-band-photo-inner { position: relative; padding: 72px 24px; max-width: 48em; }
+.rp-band-photo h2 { font-size: clamp(26px, 3vw, 38px); font-weight: 500; letter-spacing: .1em; line-height: 1.5; text-shadow: 0 1px 12px rgba(0,0,0,.25); }
+.rp-band-photo p { margin-top: 18px; font-size: 15px; line-height: 2; color: rgba(255,255,255,.92); }
+.rp-btn-ghost { border: 1px solid rgba(255,255,255,.8); color: #fff; background: transparent; }
+.rp-btn-ghost:hover { background: rgba(255,255,255,.12); }
+/* タブを中央に */
+.rp-tabs-center { justify-content: center; }
+.rp-faq summary { font-size: 16px; padding: 24px 0; }
+@media (max-width: 1023px) {
+  .rp-mosaic { grid-template-columns: repeat(3, 1fr); }
+  .rp-split { grid-template-columns: 1fr; gap: 32px; }
+  .rp-split-reverse > :first-child { order: 0; }
+  .rp-numbered { grid-template-columns: 1fr; gap: 32px; }
+}
+@media (max-width: 767px) {
+  .page-header { padding: 48px 0 32px; }
+  .page-header h1 { font-size: 30px; }
+  .page-header-lead { font-size: 14px; }
+  .page-section { padding-block: 56px; }
+  .page-section h2 { font-size: 24px; }
+  .rp-manifesto { font-size: 18px; }
+  .rp-mosaic { grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .rp-stats { grid-template-columns: 1fr; }
+  .rp-stats > div + div { border-left: 0; border-top: 1px solid var(--rp-line); }
+  .rp-stats > div { padding: 28px 16px; }
+  .rp-stat-num { font-size: 44px; }
+  .rp-band-photo { min-height: 400px; }
+  .rp-rows > div { padding: 22px 0; }
+}

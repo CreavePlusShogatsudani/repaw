@@ -3,7 +3,7 @@ import PageHeader from '../../components/PageHeader';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import CtaBand from '../../components/CtaBand';
 
 const FAQ_CATEGORIES = [
   {
@@ -140,14 +140,10 @@ export default function FAQPage() {
 
       <main className="page">
         <div className="shop-container">
-          <PageHeader eyebrow="FAQ" title="よくある質問" lead="RePawの購入・買取・寄付についてよくある質問をまとめました。" />
+          <PageHeader eyebrow="FAQ" title="よくある質問" lead="購入・買取・寄付・アカウントについて、よくいただく質問をまとめました。" />
 
-          <section className="page-section">
-            <h2>お困りのことはありませんか？</h2>
-            <p className="mt-3 text-sm text-[color:var(--rp-muted)]">カテゴリーから質問を選んでください</p>
-
-            {/* Category Tabs */}
-            <div className="rp-tabs mt-10" role="tablist">
+          <section className="page-section !pt-0 max-w-[52em] mx-auto">
+            <div className="rp-tabs rp-tabs-center" role="tablist">
               {FAQ_CATEGORIES.map((category) => (
                 <button
                   key={category.id}
@@ -160,9 +156,8 @@ export default function FAQPage() {
               ))}
             </div>
 
-            {/* Questions */}
             {currentCategory && (
-              <div className="rp-faq" key={currentCategory.id}>
+              <div className="rp-faq mt-2" key={currentCategory.id}>
                 {currentCategory.questions.map((item) => (
                   <details key={item.question}>
                     <summary>{item.question}<i className="ri-arrow-down-s-line" aria-hidden="true"></i></summary>
@@ -174,18 +169,12 @@ export default function FAQPage() {
           </section>
         </div>
 
-        {/* Contact CTA */}
-        <section className="rp-band page-section">
-          <div className="shop-container">
-            <h2>解決しない場合は</h2>
-            <div className="rp-prose mt-6">
-              <p>お探しの情報が見つからない場合は、お気軽にお問い合わせください。サポートチームが丁寧にご対応いたします。</p>
-            </div>
-            <div className="mt-8">
-              <Link to="/contact" className="rp-btn rp-btn-black">お問い合わせ</Link>
-            </div>
-          </div>
-        </section>
+        <CtaBand
+          title="解決しない場合は、お気軽に。"
+          text="お探しの情報が見つからない場合は、お問い合わせフォームからご連絡ください。サポートチームが丁寧にご対応いたします。"
+          primary={{ to: '/contact', label: 'お問い合わせ' }}
+          secondary={{ to: '/products', label: '犬服を探す' }}
+        />
       </main>
 
       <Footer />

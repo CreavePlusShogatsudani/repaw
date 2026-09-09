@@ -1,6 +1,8 @@
-import { Link } from 'react-router-dom';
 import PageMeta from '../../components/PageMeta';
 import PageHeader from '../../components/PageHeader';
+import ProductMosaic from '../../components/ProductMosaic';
+import CtaBand from '../../components/CtaBand';
+import { DONATION_RATE_LABEL } from '../../lib/donation';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 
@@ -108,13 +110,17 @@ export default function SystemPage() {
       <main className="page">
         <div className="shop-container">
           <PageHeader eyebrow="How it works" title="買取・寄付の仕組み" lead="犬服の買取から、動物保護団体への寄付までの流れをご説明します。" />
+        </div>
 
-          {/* Process */}
-          <section className="page-section">
-            <p className="shop-eyebrow">Process</p>
-            <h2>買取の流れ</h2>
-            <p className="mt-3 text-sm text-[color:var(--rp-muted)]">簡単4ステップで買取完了</p>
-            <div className="rp-steps mt-10">
+        {/* 買取の流れ: 4 ステップ */}
+        <section className="page-section !pt-6">
+          <div className="shop-container">
+            <div className="page-section-center">
+              <p className="shop-eyebrow">Process</p>
+              <h2>買取の流れ</h2>
+              <p className="page-section-lead">申し込みから入金・寄付まで、4つのステップで完了します。</p>
+            </div>
+            <div className="rp-steps mt-16">
               {PROCESS_STEPS.map((step) => (
                 <div key={step.title}>
                   <span className="rp-num">{step.number}</span>
@@ -123,98 +129,116 @@ export default function SystemPage() {
                 </div>
               ))}
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* Pricing */}
-          <section className="page-section">
-            <p className="shop-eyebrow">Pricing</p>
-            <h2>買取価格の目安</h2>
-            <p className="mt-3 text-sm text-[color:var(--rp-muted)]">状態とブランドに応じて適正価格で買取</p>
-            <div className="rp-rows mt-10">
-              {RANKS.map((rank) => (
-                <div key={rank.rank}>
-                  <h3>{rank.rank}</h3>
-                  <p>{rank.condition}。{rank.note}。</p>
+        {/* 買取価格の目安: 数字を大きく */}
+        <section className="rp-band">
+          <div className="shop-container">
+            <div className="page-section-center">
+              <p className="shop-eyebrow">Pricing</p>
+              <h2 className="text-[32px] font-medium tracking-[.1em] leading-snug">買取価格の目安</h2>
+              <p className="page-section-lead">状態とブランドに応じて、定価を基準に査定します。</p>
+            </div>
+            <div className="rp-stats mt-14 bg-white">
+              {RANKS.map((r) => (
+                <div key={r.rank}>
+                  <p className="text-[13px] tracking-[.1em] text-[color:var(--rp-muted)]">{r.rank}</p>
+                  <p className="rp-stat-num mt-4">{r.rate}</p>
+                  <p className="rp-stat-label">{r.condition}。{r.note}</p>
                 </div>
               ))}
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* Donation */}
-          <section className="page-section">
-            <p className="shop-eyebrow">Donation</p>
-            <h2>寄付の仕組み</h2>
-            <p className="mt-3 text-sm text-[color:var(--rp-muted)]">あなたの選択が動物保護活動を支えます</p>
-            <div className="rp-rows mt-10">
+        {/* 寄付の仕組み: 2つのルート */}
+        <section className="page-section">
+          <div className="shop-container">
+            <div className="rp-split">
+              <figure className="rp-figure">
+                <img src="/images/repaw-dog.jpg" alt="ハーネスを着て飼い主の膝に座るトイプードル" loading="lazy" />
+              </figure>
               <div>
-                <h3>ルート① 売主からの直接寄付</h3>
-                <div>
-                  <p>買取査定後、「寄付する」を選択すると、買取金額の<strong>全額</strong>を動物保護NPOへ寄付します。</p>
-                  <dl className="mt-4 text-sm text-[color:var(--rp-muted)]">
-                    <div className="flex gap-4"><dt>例：買取査定額</dt><dd>¥5,000</dd></div>
-                    <div className="flex gap-4"><dt>寄付額</dt><dd>¥5,000（全額が動物保護団体へ）</dd></div>
-                  </dl>
-                </div>
-              </div>
-              <div>
-                <h3>ルート② 販売収益からの寄付</h3>
-                <div>
-                  <p>商品が販売された際、販売価格の<strong>5%</strong>を自動的にNPOへ寄付します。入金を選んだ場合でも、販売時に寄付が行われます。</p>
-                  <dl className="mt-4 text-sm text-[color:var(--rp-muted)]">
-                    <div className="flex gap-4"><dt>例：販売価格</dt><dd>¥8,000</dd></div>
-                    <div className="flex gap-4"><dt>寄付額（5%）</dt><dd>¥400（販売時に自動寄付）</dd></div>
-                  </dl>
+                <p className="shop-eyebrow">Donation</p>
+                <h2>寄付の仕組み</h2>
+                <p className="page-section-lead">あなたの選択が、動物保護活動を支えます。</p>
+                <div className="mt-10 space-y-10">
+                  <div className="grid grid-cols-[56px_1fr] gap-4">
+                    <span className="font-['Playfair_Display'] italic text-[28px] leading-none">01</span>
+                    <div>
+                      <h3 className="text-[18px] font-medium tracking-[.04em]">売主からの直接寄付</h3>
+                      <p className="mt-3 text-[14px] leading-8">買取査定後、「寄付する」を選択すると、買取金額の全額を動物保護NPOへ寄付します。</p>
+                      <dl className="mt-4 grid grid-cols-[8em_1fr] gap-y-1 text-[13px] text-[color:var(--rp-muted)]">
+                        <dt>例：買取査定額</dt><dd>¥5,000</dd>
+                        <dt>寄付額</dt><dd>¥5,000（全額）</dd>
+                      </dl>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-[56px_1fr] gap-4">
+                    <span className="font-['Playfair_Display'] italic text-[28px] leading-none">02</span>
+                    <div>
+                      <h3 className="text-[18px] font-medium tracking-[.04em]">販売収益からの寄付</h3>
+                      <p className="mt-3 text-[14px] leading-8">商品が販売された際、販売価格の{DONATION_RATE_LABEL}を自動的にNPOへ寄付します。入金を選んだ場合でも、販売時に寄付が行われます。</p>
+                      <dl className="mt-4 grid grid-cols-[8em_1fr] gap-y-1 text-[13px] text-[color:var(--rp-muted)]">
+                        <dt>例：販売価格</dt><dd>¥8,000</dd>
+                        <dt>寄付額（{DONATION_RATE_LABEL}）</dt><dd>¥400</dd>
+                      </dl>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* 寄付が支える活動 */}
-          <section className="page-section">
-            <h2>寄付が支える活動</h2>
-            <div className="rp-prose mt-8">
-              <p>
-                RePawでは、2つのルートから集まった寄付金を動物保護団体へ届けています。あなたの選択が、保護犬・保護猫の医療費、食費、シェルター運営費として活用され、多くの命を救う活動に繋がります。
-              </p>
+        <ProductMosaic />
+
+        {/* 寄付が支える活動 */}
+        <section className="page-section">
+          <div className="shop-container">
+            <div className="page-section-center">
+              <p className="shop-eyebrow">Support</p>
+              <h2>寄付が支える活動</h2>
+              <p className="page-section-lead">2つのルートから集まった寄付金は、保護犬・保護猫の医療費、食費、シェルター運営費として活用されます。</p>
             </div>
-            <div className="rp-rows mt-10">
-              {SUPPORT_ITEMS.map((item) => (
+            <div className="rp-numbered mt-16">
+              {SUPPORT_ITEMS.map((item, i) => (
                 <div key={item.title}>
+                  <span className="rp-num">0{i + 1}</span>
                   <h3>{item.title}</h3>
                   <p>{item.description}</p>
                 </div>
               ))}
             </div>
-            <p className="mt-6 text-sm text-[color:var(--rp-muted)]">寄付実績は定期的に公開し、透明性を保っています。</p>
-          </section>
+            <p className="mt-12 text-center text-[13px] text-[color:var(--rp-muted)]">寄付実績は定期的に公開し、透明性を保っています。</p>
+          </div>
+        </section>
 
-          {/* FAQ */}
-          <section className="page-section">
-            <p className="shop-eyebrow">FAQ</p>
-            <h2>よくある質問</h2>
-            <div className="rp-faq mt-10">
-              {faqs.map((faq) => (
-                <details key={faq.question}>
-                  <summary>{faq.question}<i className="ri-arrow-down-s-line" aria-hidden="true"></i></summary>
-                  <div className="rp-faq-answer">{faq.answer}</div>
+        {/* FAQ */}
+        <section className="page-section">
+          <div className="shop-container max-w-[52em]">
+            <div className="page-section-center">
+              <p className="shop-eyebrow">FAQ</p>
+              <h2>よくある質問</h2>
+            </div>
+            <div className="rp-faq mt-12">
+              {faqs.map((item) => (
+                <details key={item.question}>
+                  <summary>{item.question}<i className="ri-arrow-down-s-line" aria-hidden="true"></i></summary>
+                  <div className="rp-faq-answer">{item.answer}</div>
                 </details>
               ))}
             </div>
-          </section>
-        </div>
-
-        {/* CTA */}
-        <section className="rp-band page-section">
-          <div className="shop-container">
-            <h2>今すぐ買取申し込み</h2>
-            <div className="rp-prose mt-6">
-              <p>使わなくなった犬服を、新しい命へ繋げませんか？</p>
-            </div>
-            <div className="mt-8">
-              <Link to="/buyback" className="rp-btn rp-btn-black">買取を申し込む</Link>
-            </div>
           </div>
         </section>
+
+        <CtaBand
+          title="着なくなった服を、新しい命へ。"
+          text="申し込みは数分で完了します。届いた服は状態を見て査定し、入金か寄付かをお選びいただけます。"
+          primary={{ to: '/buyback', label: '買取を申し込む' }}
+          secondary={{ to: '/faq', label: 'よくある質問' }}
+        />
       </main>
 
       <Footer />

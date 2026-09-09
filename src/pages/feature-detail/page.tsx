@@ -101,7 +101,7 @@ export default function FeatureDetailPage() {
             <main className="page">
                 <div className="shop-container">
                     {/* 見出し: 写真の上に文字を重ねず、写真と見出しを分ける */}
-                    <header className="page-header !border-b-0 !mb-0">
+                    <header className="page-header page-header-left !pt-10 !pb-8">
                         <Link to="/features" className="shop-text-link mb-8">特集・読みもの</Link>
                         <p className="shop-eyebrow mt-8">{collection.tag || 'Journal'}</p>
                         <h1>{collection.title}</h1>
