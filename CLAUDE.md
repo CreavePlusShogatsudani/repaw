@@ -49,7 +49,8 @@ src/
 │   ├── conditions.ts       # 状態ランク A/B/C の唯一の定義
 │   ├── productOptions.ts   # カテゴリ・サイズ選択肢の唯一の定義（管理画面と公開側で共有）
 │   ├── donation.ts         # 寄付率 5% の唯一の定義（商品詳細の寄付額・トップの案内）
-│   └── products.ts         # 公開側の商品 select（previous_owners を join）と Instagram URL
+│   ├── products.ts         # 公開側の商品 select（previous_owners を join）と Instagram URL
+│   └── buyback.ts          # 買取のステータス・表示名・服1点の型
 ├── pages/
 │   ├── home/               # トップページ（Hero / NewArrivals / Owners / Explore / Donation / Featured / News / Contact）
 │   ├── items/              # 商品一覧（?size= でフィルタ）
@@ -67,7 +68,7 @@ src/
 │       ├── dashboard/
 │       ├── products/       # 商品管理 (page.tsx / form.tsx)
 │       ├── orders/         # 注文管理
-│       ├── buyback/        # 買取申込管理
+│       ├── buyback/        # 買取申込管理（page: 一覧 / detail: 1点ごとの査定）
 │       ├── inquiries/      # 問い合わせ管理（AI下書きの承認送信）
 │       ├── members/        # ユーザー一覧
 │       ├── users/          # 管理者アカウント
@@ -83,7 +84,7 @@ src/
     └── index.ts
 
 supabase/
-├── migrations/             # 000_baseline → 004 → 005 → 006 → 007 → 008 → 009（本番適用済み）
+├── migrations/             # 000_baseline → 004 → 005 → 006 → 007 → 008 → 009 → 010（本番適用済み）
 ├── functions/
 │   ├── create-payment-intent/   # 決済開始（金額はDBが決める）
 │   ├── stripe-webhook/          # 決済確定 → finalize_order
@@ -161,10 +162,16 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 | user_id | uuid | 申込はログイン必須 |
 | name / email / phone / address / instagram | text | プロフィールからプリフィル |
 | item_type / item_description / condition / purchase_date / message | text | |
-| status | text | pending → reviewing → quoted → accepted → completed / rejected |
+| status | text | pending → kit_sent → received → quoted → accepted → completed。途中で returned / rejected |
 | estimated_price / admin_note | integer / text | 管理者が入力 |
+| return_preference | text | 買取不可・不同意時の扱い: `donate` / `return_cod` |
+| kit_sent_at / received_at / paid_at | timestamptz | 送付型の日時 |
 | payout_method | text | `donate`（全額寄付） / `transfer`（振込。販売時5%を自動寄付） |
-| bank_* / user_responded_at | | ユーザーの査定回答。**RPC `respond_buyback()` 経由でのみ書ける**（007） |
+| bank_* / user_responded_at | | ユーザーの査定回答。**RPC `respond_buyback()` 経由でのみ書ける**（010） |
+
+### buyback_items（服1点）/ buyback_item_internal（社内）
+- items: request_id、intake_photos、has_tag、brand、item_type、color、size_label、material、実寸3項目、rank、appraisal_comment（本人に見せる）、decision（buyable / not_buyable）、reject_reason、buyback_price、product_id、status（pending → appraised → awaiting_photo → photographed → listed → sold、rejected / returned）
+- internal: condition_notes、ai_reading、sale_price。管理者だけが読める（RLS）
 
 ### inquiries（問い合わせ）
 | カラム | 型 | 備考 |
@@ -201,11 +208,17 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 3. `stripe-webhook` が `finalize_order()` で注文・明細・sold_out を1トランザクションで確定（冪等）
 - 再開手順: `src/pages/checkout/page.tsx` の `CHECKOUT_ENABLED` を true にする。**カート側の「購入手続きへ進む」は別途 disabled ハードコードのため要修正**
 
-### 買取
-1. `/buyback`（ログイン必須）→ `buyback_requests` に insert（status: pending）
-2. 管理画面で査定額を入力し status を `quoted` に → マイページの買取履歴に「査定結果を確認して回答する」が出る
-3. `/buyback/response/:id` で寄付／振込を選択 → RPC `respond_buyback` が `accepted` に更新
-4. 管理者が `completed` にすると「この買取から商品を登録する」ボタンで商品フォームへ（Instagram・説明・カテゴリを引き継ぐ）
+### 買取（送付型・服1点ごとの査定）
+1. `/buyback`（ログイン必須、写真添付なし）。「買取できない服の扱い」（寄付 / 着払い返送）を申込時に選ぶ → `buyback_requests`（status: pending）
+2. 管理画面 `/admin/buyback/:id`: 「配送キットを送った」→ kit_sent、「商品が届いた」→ received
+3. 到着した服を「服を追加」で1点ずつ登録（`buyback_items`）。スマホで撮影（タグ・全体・気になる箇所）、ブランド・種類・色・サイズ表記・素材・実寸、可否、ランク、本人に見せる一言、買取額を入力。社内メモと販売予定価格は `buyback_item_internal`（管理者のみ）
+4. 「査定額を提示する」→ 服は appraised / rejected、申込は quoted（全点不可なら rejected）
+5. ユーザーは `/buyback/response/:id` で内訳を見て、寄付 / 振込 / 全点着払い返送 を申込全体で1回回答 → RPC `respond_buyback`
+   - 寄付・振込のとき、買取可の服は awaiting_photo になり、下書き商品（status: draft、写真なし）が自動作成されて `product_id` に紐づく
+6. 管理者が「振込済み / 寄付処理済み」→ completed
+7. 一眼レフで撮影 → 下書き商品に写真を入れて公開（撮影待ちリストは段階 C で追加予定）
+- 買取価格の率・目安は公開しない。査定額に不同意なら全点返送（着払い）か全点寄付
+- ステータスと表示名の定義は `src/lib/buyback.ts`
 
 ### 問い合わせ（AI 一次対応・段階制）
 1. `/contact`（ログイン必須。件名・本文・任意で自分の注文を選択）→ Edge Function `handle-inquiry`

@@ -17,7 +17,8 @@ export default function BuybackPage() {
     condition: '',
     purchaseDate: '',
     instagram: '',
-    message: ''
+    message: '',
+    returnPreference: 'donate'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -59,6 +60,7 @@ export default function BuybackPage() {
         item_description: formData.itemDescription,
         condition: formData.condition,
         purchase_date: formData.purchaseDate,
+        return_preference: formData.returnPreference,
         instagram: formData.instagram || null,
         message: formData.message,
       });
@@ -77,6 +79,7 @@ export default function BuybackPage() {
         purchaseDate: '',
         instagram: '',
         message: '',
+        returnPreference: 'donate',
       });
     } catch (error) {
       setSubmitStatus('error');
@@ -251,6 +254,25 @@ export default function BuybackPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-sm focus:ring-2 focus:ring-[#161616] focus:border-transparent text-sm"
                   placeholder="2023年春頃"
                 />
+              </div>
+
+              {/* 買取できない服・査定に不同意のときの扱い（送付型のため事前に決めてもらう） */}
+              <div>
+                <p className="block text-sm font-medium text-gray-700 mb-2">
+                  買取できない服があった場合 <span className="text-red-500">*</span>
+                </p>
+                <div className="space-y-2">
+                  {[
+                    { value: 'donate', label: '寄付に回す（動物保護団体へ届けます）' },
+                    { value: 'return_cod', label: '着払いで返送してもらう' },
+                  ].map((opt) => (
+                    <label key={opt.value} className={`flex items-center gap-3 p-4 rounded-sm border cursor-pointer text-sm ${formData.returnPreference === opt.value ? 'border-[#161616] bg-[#f3f2ee]' : 'border-gray-300'}`}>
+                      <input type="radio" name="returnPreference" value={opt.value} checked={formData.returnPreference === opt.value} onChange={handleChange} className="accent-[#161616]" />
+                      {opt.label}
+                    </label>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-2">著しい汚れや破損、においが強いものはお受けできない場合があります。査定額にご納得いただけない場合も、全点を着払いで返送できます。</p>
               </div>
 
               <div>

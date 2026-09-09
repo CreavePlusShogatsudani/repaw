@@ -6,6 +6,8 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import type { Product } from '../../types';
 import PageMeta from '../../components/PageMeta';
+import { BUYBACK_ITEM_PUBLIC_SELECT, REQUEST_STATUS_USER, ITEM_STATUS_USER, itemDisplayName, requestTotal, type BuybackItem } from '../../lib/buyback';
+import { DONATION_RATE } from '../../lib/donation';
 
 interface OrderItemWithProduct {
   id: string;
@@ -30,13 +32,11 @@ interface FavoriteProduct {
 
 interface BuybackRequest {
   id: string;
-  item_type: string | null;
-  item_description: string | null;
-  condition: string | null;
-  status: 'pending' | 'reviewing' | 'quoted' | 'accepted' | 'completed' | 'rejected';
-  estimated_price: number | null;
+  status: string;
   payout_method: 'donate' | 'transfer' | null;
+  return_preference: 'donate' | 'return_cod';
   created_at: string;
+  buyback_items: BuybackItem[];
 }
 
 interface Inquiry {
@@ -144,11 +144,15 @@ export default function MyPage() {
     setBuybackLoading(true);
     supabase
       .from('buyback_requests')
-      .select('id, item_type, item_description, condition, status, estimated_price, payout_method, created_at')
+      .select(`id, status, payout_method, return_preference, created_at, buyback_items(${BUYBACK_ITEM_PUBLIC_SELECT})`)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
-        setBuybackRequests((data as BuybackRequest[]) || []);
+        const rows = ((data as unknown as BuybackRequest[]) || []).map((r) => ({
+          ...r,
+          buyback_items: [...(r.buyback_items || [])].sort((a, b) => a.sort_order - b.sort_order),
+        }));
+        setBuybackRequests(rows);
         setBuybackLoading(false);
       });
   }, [activeTab, user]);
@@ -184,11 +188,11 @@ export default function MyPage() {
   }, [activeTab, user]);
 
   const donateTotal = buybackRequests
-    .filter(r => r.payout_method === 'donate' && r.estimated_price)
-    .reduce((sum, r) => sum + (r.estimated_price ?? 0), 0);
+    .filter(r => r.payout_method === 'donate')
+    .reduce((sum, r) => sum + requestTotal(r.buyback_items), 0);
   const transferDonation = buybackRequests
-    .filter(r => r.payout_method === 'transfer' && r.estimated_price)
-    .reduce((sum, r) => sum + Math.floor((r.estimated_price ?? 0) * 0.05), 0);
+    .filter(r => r.payout_method === 'transfer')
+    .reduce((sum, r) => sum + Math.floor(requestTotal(r.buyback_items) * DONATION_RATE), 0);
   const donationTotal = donateTotal + transferDonation;
 
   const handleSaveProfile = async () => {
@@ -652,59 +656,68 @@ export default function MyPage() {
               {buybackLoading ? (
                 <div className="text-center py-16 text-gray-500">読み込み中...</div>
               ) : buybackRequests.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {buybackRequests.map((req) => {
-                    const statusMap: Record<string, { label: string; color: string }> = {
-                      pending:   { label: '受付済み',         color: 'bg-[#f3f2ee] text-[#6f6f6a]' },
-                      reviewing: { label: '査定中',           color: 'bg-[#e6e6e1] text-[#2a2a28]' },
-                      quoted:    { label: '査定額が届いています', color: 'bg-[#e6e6e1] text-[#2a2a28]' },
-                      accepted:  { label: '回答済み',         color: 'bg-[#e6e6e1] text-[#2a2a28]' },
-                      completed: { label: '完了',             color: 'bg-[#161616] text-white' },
-                      rejected:  { label: '対応不可',         color: 'bg-[#f3f2ee] text-[#6f6f6a] line-through' },
-                    };
-                    const statusInfo = statusMap[req.status] || statusMap.pending;
-                    const date = new Date(req.created_at).toLocaleDateString('ja-JP', {
-                      year: 'numeric', month: 'long', day: 'numeric',
-                    });
+                    const date = new Date(req.created_at).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+                    const showPrices = ['quoted', 'accepted', 'completed', 'returned'].includes(req.status);
+                    const total = requestTotal(req.buyback_items);
                     return (
                       <div key={req.id} className="bg-white border border-[#e6e6e1] rounded-sm p-6">
-                        <div className="flex justify-between items-start mb-4">
+                        <div className="flex justify-between items-start gap-4 mb-2">
                           <div>
-                            <p className="text-sm text-gray-600 mb-1">
-                              申込番号: {req.id.split('-')[0].toUpperCase()}
-                            </p>
+                            <p className="text-sm text-gray-600 mb-1">申込番号: {req.id.split('-')[0].toUpperCase()}</p>
                             <p className="text-sm text-gray-600">申込日: {date}</p>
                           </div>
-                          <span className={`px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap ${statusInfo.color}`}>
-                            {statusInfo.label}
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap ${req.status === 'quoted' ? 'bg-[#161616] text-white' : 'bg-[#f3f2ee] text-[#2a2a28]'}`}>
+                            {REQUEST_STATUS_USER[req.status] || REQUEST_STATUS_USER.pending}
                           </span>
                         </div>
-                        <div className="grid md:grid-cols-3 gap-4">
-                          <div>
-                            <p className="text-sm text-gray-600 mb-1">カテゴリー</p>
-                            <p className="font-medium">{req.item_type || '-'}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-600 mb-1">商品の状態</p>
-                            <p className="font-medium">{req.condition || '-'}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-600 mb-1">査定金額</p>
-                            <p className="font-bold text-lg">
-                              {req.estimated_price != null
-                                ? `¥${req.estimated_price.toLocaleString()}`
-                                : '査定中'}
-                            </p>
-                          </div>
+
+                        {/* 服1点ごとの内訳。査定前は「査定中」だけ見せる */}
+                        <div className="mt-4 border-t border-[#e6e6e1]">
+                          {req.buyback_items.length === 0 ? (
+                            <p className="py-4 text-sm text-gray-500">お送りいただいた服が届きしだい、1点ずつ査定します。</p>
+                          ) : req.buyback_items.map((item) => (
+                            <div key={item.id} className="grid grid-cols-[64px_1fr_auto] gap-4 py-4 border-b border-[#e6e6e1] items-start">
+                              <div className="aspect-[4/5] bg-[#f1f0ec] overflow-hidden">
+                                {item.intake_photos?.[0] && <img src={item.intake_photos[0]} alt="" className="w-full h-full object-cover" />}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium">{showPrices ? itemDisplayName(item) : '査定中の服'}</p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  {ITEM_STATUS_USER[item.status] || '査定中'}
+                                  {showPrices && item.rank && item.decision === 'buyable' ? ` · ${item.rank}ランク` : ''}
+                                </p>
+                                {showPrices && item.decision === 'not_buyable' && item.reject_reason && (
+                                  <p className="text-xs text-gray-500 mt-1">買取不可：{item.reject_reason}</p>
+                                )}
+                                {showPrices && item.decision === 'buyable' && item.appraisal_comment && (
+                                  <p className="text-xs leading-5 text-gray-600 mt-1">{item.appraisal_comment}</p>
+                                )}
+                              </div>
+                              <p className="text-sm font-medium tabular-nums text-right">
+                                {showPrices && item.decision === 'buyable' ? `¥${(item.buyback_price ?? 0).toLocaleString()}` : ''}
+                              </p>
+                            </div>
+                          ))}
                         </div>
+
+                        {showPrices && (
+                          <div className="flex justify-between items-baseline pt-4">
+                            <p className="text-sm text-gray-600">
+                              買取額 合計
+                              {req.payout_method === 'donate' && <span className="ml-2 text-xs">全額寄付</span>}
+                              {req.payout_method === 'transfer' && <span className="ml-2 text-xs">振込（販売時に{Math.floor(total * DONATION_RATE).toLocaleString()}円を寄付）</span>}
+                            </p>
+                            <p className="text-lg font-medium tabular-nums">¥{total.toLocaleString()}</p>
+                          </div>
+                        )}
+
                         {req.status === 'quoted' && (
                           <div className="mt-4 pt-4 border-t border-[#e6e6e1]">
-                            <p className="text-sm text-[#2a2a28] mb-3">査定額が確定しました。受け取り方法をお選びください。</p>
-                            <Link
-                              to={`/buyback/response/${req.id}`}
-                              className="inline-block px-6 py-3 bg-[#161616] text-white text-sm font-medium rounded-sm hover:bg-[#333] transition-colors"
-                            >
-                              査定結果を確認して回答する →
+                            <p className="text-sm text-[#2a2a28] mb-3">査定が完了しました。受け取り方法をお選びください。</p>
+                            <Link to={`/buyback/response/${req.id}`} className="inline-block px-6 py-3 bg-[#161616] text-white text-sm font-medium rounded-sm hover:bg-[#333] transition-colors">
+                              査定結果を確認して回答する
                             </Link>
                           </div>
                         )}

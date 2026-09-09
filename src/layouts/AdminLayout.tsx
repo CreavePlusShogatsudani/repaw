@@ -48,7 +48,7 @@ export default function AdminLayout() {
         supabase
             .from('buyback_requests')
             .select('id', { count: 'exact', head: true })
-            .in('status', ['pending', 'accepted'])
+            .in('status', ['pending', 'received', 'accepted'])
             .then(({ count }) => setBuybackBadge(count ?? 0));
     }, [location.pathname]);
 

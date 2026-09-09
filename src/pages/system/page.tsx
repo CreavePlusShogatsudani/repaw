@@ -77,7 +77,7 @@ const faqs = [
   },
   {
     question: '査定額に納得できない場合は？',
-    answer: '査定額にご納得いただけない場合、無料で返送いたします。返送料も当社が負担します。'
+    answer: '査定額にご納得いただけない場合は、全点を着払いで返送するか、全点を寄付に回すかをお選びいただけます。買取できない服は、お申し込み時に選んだ方法（寄付または着払い返送）で対応します。'
   },
   {
     question: '寄付先の団体はどこですか？',
@@ -126,7 +126,7 @@ export default function SystemPage() {
             <div className="page-section-center">
               <p className="shop-eyebrow">Appraisal</p>
               <h2 className="text-[32px] font-medium tracking-[.1em] leading-snug">査定の考え方</h2>
-              <p className="page-section-lead">届いた服を1点ずつ確認し、状態とブランド、需要をもとに買取額をご案内します。査定結果にご納得いただけない場合は、無料で返送いたします。</p>
+              <p className="page-section-lead">届いた服を1点ずつ確認し、状態とブランド、需要をもとに買取額をご案内します。査定結果にご納得いただけない場合は、全点を着払いで返送するか、寄付に回すかをお選びいただけます。</p>
             </div>
             <div className="rp-numbered mt-14">
               {APPRAISAL_POINTS.map((item, i) => (

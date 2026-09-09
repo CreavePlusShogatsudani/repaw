@@ -2,18 +2,23 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
+import PageHeader from '../../components/PageHeader';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { BUYBACK_ITEM_PUBLIC_SELECT, itemDisplayName, requestTotal, type BuybackItem } from '../../lib/buyback';
+import { DONATION_RATE, DONATION_RATE_LABEL } from '../../lib/donation';
 
 interface BuybackRequest {
   id: string;
-  item_type: string | null;
-  item_description: string | null;
-  estimated_price: number | null;
   status: string;
   payout_method: string | null;
+  return_preference: 'donate' | 'return_cod';
+  buyback_items: BuybackItem[];
 }
 
+type Choice = 'donate' | 'transfer' | 'return';
+
+// 査定結果の確認と回答。服1点ごとの内訳を見せ、申込全体で1回だけ回答する
 export default function BuybackResponsePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -23,7 +28,7 @@ export default function BuybackResponsePage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  const [payoutMethod, setPayoutMethod] = useState<'donate' | 'transfer'>('donate');
+  const [choice, setChoice] = useState<Choice>('donate');
   const [bankName, setBankName] = useState('');
   const [bankBranch, setBankBranch] = useState('');
   const [bankAccountType, setBankAccountType] = useState('普通');
@@ -32,42 +37,40 @@ export default function BuybackResponsePage() {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user) { navigate('/login'); return; }
-    fetchRequest();
-  }, [user, authLoading]);
-
-  const fetchRequest = async () => {
-    const { data, error } = await supabase
+    if (!user) { navigate('/login', { state: { from: `/buyback/response/${id}` } }); return; }
+    supabase
       .from('buyback_requests')
-      .select('id, item_type, item_description, estimated_price, status, payout_method')
+      .select(`id, status, payout_method, return_preference, buyback_items(${BUYBACK_ITEM_PUBLIC_SELECT})`)
       .eq('id', id)
-      .eq('user_id', user!.id)
-      .single();
-
-    if (error || !data) {
-      alert('申込情報が見つかりません。');
-      navigate('/mypage');
-      return;
-    }
-    setRequest(data as BuybackRequest);
-    setLoading(false);
-  };
+      .eq('user_id', user.id)
+      .single()
+      .then(({ data, error }) => {
+        if (error || !data) {
+          alert('申込情報が見つかりません。');
+          navigate('/mypage', { state: { tab: 'sell' } });
+          return;
+        }
+        const req = data as unknown as BuybackRequest;
+        req.buyback_items = [...(req.buyback_items || [])].sort((a, b) => a.sort_order - b.sort_order);
+        setRequest(req);
+        setLoading(false);
+      });
+  }, [user, authLoading, id, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (payoutMethod === 'transfer') {
-      if (!bankName || !bankBranch || !bankAccountNumber || !bankAccountHolder) {
-        alert('口座情報をすべて入力してください。');
-        return;
-      }
+    if (choice === 'transfer' && (!bankName || !bankBranch || !bankAccountNumber || !bankAccountHolder)) {
+      alert('口座情報をすべて入力してください。');
+      return;
     }
+    if (choice === 'return' && !confirm('全点を着払いで返送します。よろしいですか？')) return;
     setSubmitting(true);
 
-    // 一般ユーザーは buyback_requests を直接 UPDATE できないため、回答専用 RPC を使う（007_buyback_response.sql）
+    // 一般ユーザーは buyback_requests を直接 UPDATE できないため、回答専用 RPC を使う（010_buyback_items.sql）
     const { error } = await supabase.rpc('respond_buyback', {
       p_id: id,
-      p_payout_method: payoutMethod,
-      ...(payoutMethod === 'transfer' ? {
+      p_payout_method: choice,
+      ...(choice === 'transfer' ? {
         p_bank_name: bankName,
         p_bank_branch: bankBranch,
         p_bank_account_type: bankAccountType,
@@ -81,8 +84,7 @@ export default function BuybackResponsePage() {
       setSubmitting(false);
       return;
     }
-
-    navigate('/mypage', { state: { tab: 'sell', message: 'response_sent' } });
+    navigate('/mypage', { state: { tab: 'sell' } });
   };
 
   if (loading || authLoading) {
@@ -95,18 +97,22 @@ export default function BuybackResponsePage() {
 
   if (!request) return null;
 
-  // 既に回答済み
-  if (request.payout_method) {
+  const items = request.buyback_items;
+  const buyable = items.filter((i) => i.decision === 'buyable');
+  const rejected = items.filter((i) => i.decision === 'not_buyable');
+  const total = requestTotal(items);
+
+  // 既に回答済み、または回答できる状態ではない
+  if (request.status !== 'quoted') {
     return (
       <div className="min-h-screen bg-white">
         <Navigation />
-        <main className="max-w-2xl mx-auto px-6 py-24 text-center">
-          <i className="ri-checkbox-circle-line text-5xl text-green-500 mb-4 block"></i>
-          <h1 className="text-[26px] md:text-[34px] font-medium tracking-[.08em] mb-4">回答済みです</h1>
-          <p className="text-sm text-[#6f6f6a] leading-relaxed mb-8">この申込への回答は完了しています。</p>
-          <button onClick={() => navigate('/mypage')} className="px-6 py-3 bg-[#161616] text-white rounded-sm hover:bg-[#333]">
-            マイページへ戻る
-          </button>
+        <main className="page">
+          <div className="shop-container max-w-[40em] mx-auto py-24 text-center">
+            <h1 className="text-[26px] font-medium tracking-[.08em]">この申込は回答済みです</h1>
+            <p className="mt-4 text-sm text-[color:var(--rp-muted)]">内容はマイページの買取履歴からご確認いただけます。</p>
+            <button onClick={() => navigate('/mypage', { state: { tab: 'sell' } })} className="rp-btn rp-btn-black mt-8">マイページへ戻る</button>
+          </div>
         </main>
         <Footer />
       </div>
@@ -116,86 +122,93 @@ export default function BuybackResponsePage() {
   return (
     <div className="min-h-screen bg-white">
       <Navigation />
-      <main className="max-w-2xl mx-auto px-6 py-16">
-        <h1 className="text-[26px] md:text-[34px] font-medium tracking-[.08em] mb-2">査定結果のご確認</h1>
-        <p className="text-sm text-[#6f6f6a] leading-relaxed mb-10">査定結果をご確認いただき、受け取り方法をお選びください。</p>
+      <main className="page">
+        <div className="shop-container max-w-[44em] mx-auto pb-24">
+          <PageHeader eyebrow="Appraisal" title="査定結果のご確認" lead="お送りいただいた服を1点ずつ査定しました。内容をご確認のうえ、受け取り方法をお選びください。" />
 
-        {/* 査定結果 */}
-        <div className="bg-[#f3f2ee] border border-[#e6e6e1] rounded-sm p-6 mb-10">
-          <p className="text-sm text-gray-600 mb-1">{request.item_type || '商品'}</p>
-          <p className="text-xs text-gray-400 mb-4">{request.item_description}</p>
-          <div className="flex items-baseline gap-2">
-            <span className="text-gray-600 text-sm">査定額</span>
-            <span className="text-3xl font-bold text-[#161616]">
-              ¥{(request.estimated_price ?? 0).toLocaleString()}
-            </span>
-          </div>
+          {/* 内訳 */}
+          <section className="border-t border-[color:var(--rp-line)]">
+            {items.map((item) => (
+              <div key={item.id} className="grid grid-cols-[88px_1fr_auto] gap-5 py-6 border-b border-[color:var(--rp-line)] items-start">
+                <div className="aspect-[4/5] bg-[color:var(--rp-photo-bg)] overflow-hidden">
+                  {item.intake_photos?.[0] && <img src={item.intake_photos[0]} alt="" className="w-full h-full object-cover" />}
+                </div>
+                <div>
+                  <p className="text-[15px] font-medium tracking-[.02em]">{itemDisplayName(item)}</p>
+                  {item.decision === 'not_buyable' ? (
+                    <p className="mt-2 text-sm text-[color:var(--rp-muted)]">買取不可{item.reject_reason ? `：${item.reject_reason}` : ''}</p>
+                  ) : (
+                    <>
+                      {item.rank && <p className="mt-1 text-xs tracking-[.06em] text-[color:var(--rp-muted)]">{item.rank}ランク</p>}
+                      {item.appraisal_comment && <p className="mt-2 text-sm leading-7 text-[color:var(--rp-text)]">{item.appraisal_comment}</p>}
+                    </>
+                  )}
+                </div>
+                <p className="text-right text-[16px] font-medium tabular-nums">
+                  {item.decision === 'buyable' ? `¥${(item.buyback_price ?? 0).toLocaleString()}` : <span className="text-[color:var(--rp-muted)]">-</span>}
+                </p>
+              </div>
+            ))}
+            <div className="flex justify-between items-baseline py-6">
+              <p className="text-sm tracking-[.06em]">買取額 合計（{buyable.length}点）</p>
+              <p className="text-[28px] font-medium tabular-nums">¥{total.toLocaleString()}</p>
+            </div>
+            {rejected.length > 0 && (
+              <p className="text-sm leading-7 text-[color:var(--rp-muted)] pb-6">
+                買取不可の{rejected.length}点は、お申し込み時にお選びいただいた方法（{request.return_preference === 'return_cod' ? '着払いでの返送' : '寄付'}）で対応します。
+              </p>
+            )}
+          </section>
+
+          {/* 回答 */}
+          <form onSubmit={handleSubmit} className="mt-12 space-y-8">
+            <div>
+              <p className="text-sm tracking-[.06em] mb-4">受け取り方法</p>
+              <div className="space-y-3">
+                {([
+                  { value: 'donate', title: '全額を動物保護団体に寄付する', text: '買取額の全額が保護犬・保護猫の支援に使われます。' },
+                  { value: 'transfer', title: '口座振込で受け取る', text: `買取額をご指定の口座へ振り込みます。商品が販売された際には、販売額の${DONATION_RATE_LABEL}が動物保護団体へ寄付されます。` },
+                  { value: 'return', title: '査定額に納得できないので、全点を返送してもらう', text: '着払いでお返しします。買取不可の服も一緒にお返しします。' },
+                ] as { value: Choice; title: string; text: string }[]).map((opt) => (
+                  <label key={opt.value} className={`flex items-start gap-4 p-5 rounded-sm border cursor-pointer transition-colors ${choice === opt.value ? 'border-[#161616] bg-[#f3f2ee]' : 'border-[color:var(--rp-line)] hover:border-gray-400'}`}>
+                    <input type="radio" name="choice" value={opt.value} checked={choice === opt.value} onChange={() => setChoice(opt.value)} className="mt-1 accent-[#161616]" />
+                    <div>
+                      <p className="text-[15px] font-medium">{opt.title}</p>
+                      <p className="text-sm leading-6 text-[color:var(--rp-muted)] mt-1">{opt.text}</p>
+                      {opt.value === 'transfer' && total > 0 && (
+                        <p className="text-xs text-[color:var(--rp-muted)] mt-1">販売時の寄付の目安: 約 ¥{Math.floor(total * DONATION_RATE).toLocaleString()}</p>
+                      )}
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {choice === 'transfer' && (
+              <div className="space-y-4 p-6 bg-[#f3f2ee] rounded-sm border border-[color:var(--rp-line)]">
+                <p className="text-sm tracking-[.06em]">振込先口座</p>
+                <div className="grid grid-cols-2 gap-4">
+                  <label className="rp-field !mb-0"><span>銀行名 *</span><input type="text" value={bankName} onChange={e => setBankName(e.target.value)} placeholder="例: ○○銀行" className="rp-input" /></label>
+                  <label className="rp-field !mb-0"><span>支店名 *</span><input type="text" value={bankBranch} onChange={e => setBankBranch(e.target.value)} placeholder="例: △△支店" className="rp-input" /></label>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <label className="rp-field !mb-0"><span>口座種別 *</span>
+                    <select value={bankAccountType} onChange={e => setBankAccountType(e.target.value)} className="rp-input">
+                      <option value="普通">普通</option>
+                      <option value="当座">当座</option>
+                    </select>
+                  </label>
+                  <label className="rp-field !mb-0"><span>口座番号 *</span><input type="text" value={bankAccountNumber} onChange={e => setBankAccountNumber(e.target.value)} placeholder="例: 1234567" className="rp-input" /></label>
+                </div>
+                <label className="rp-field !mb-0"><span>口座名義（カタカナ） *</span><input type="text" value={bankAccountHolder} onChange={e => setBankAccountHolder(e.target.value)} placeholder="例: ヤマダ タロウ" className="rp-input" /></label>
+              </div>
+            )}
+
+            <button type="submit" disabled={submitting} className="rp-btn rp-btn-black w-full disabled:opacity-50">
+              {submitting ? '送信中...' : '回答を送信する'}
+            </button>
+          </form>
         </div>
-
-        {/* 回答フォーム */}
-        <form onSubmit={handleSubmit} className="space-y-8">
-          <div>
-            <p className="font-bold mb-4">受け取り方法を選んでください</p>
-            <div className="space-y-3">
-              <label className={`flex items-start gap-4 p-5 rounded-sm border-2 cursor-pointer transition-all ${payoutMethod === 'donate' ? 'border-[#161616] bg-[#f3f2ee]' : 'border-gray-200 hover:border-gray-300'}`}>
-                <input type="radio" name="payout" value="donate" checked={payoutMethod === 'donate'} onChange={() => setPayoutMethod('donate')} className="mt-0.5 accent-[#161616]" />
-                <div>
-                  <p className="font-bold">全額を動物保護団体に寄付する</p>
-                  <p className="text-sm text-gray-500 mt-1">査定額の全額が保護犬・保護猫の支援に使われます。</p>
-                </div>
-              </label>
-              <label className={`flex items-start gap-4 p-5 rounded-sm border-2 cursor-pointer transition-all ${payoutMethod === 'transfer' ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}>
-                <input type="radio" name="payout" value="transfer" checked={payoutMethod === 'transfer'} onChange={() => setPayoutMethod('transfer')} className="mt-0.5" />
-                <div>
-                  <p className="font-bold">口座振込で受け取る</p>
-                  <p className="text-sm text-gray-500 mt-1">査定額をご指定の口座へ振り込みます。なお商品が販売された際には、販売額の5%が自動的に動物保護団体へ寄付されます。</p>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          {/* 口座情報入力 */}
-          {payoutMethod === 'transfer' && (
-            <div className="space-y-4 p-6 bg-gray-50 rounded-sm border border-gray-200">
-              <p className="font-bold text-sm">振込先口座情報</p>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs text-gray-600">銀行名 *</label>
-                  <input type="text" value={bankName} onChange={e => setBankName(e.target.value)} placeholder="例: ○○銀行" className="w-full px-3 py-2 border border-gray-200 rounded-sm text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs text-gray-600">支店名 *</label>
-                  <input type="text" value={bankBranch} onChange={e => setBankBranch(e.target.value)} placeholder="例: △△支店" className="w-full px-3 py-2 border border-gray-200 rounded-sm text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs text-gray-600">口座種別 *</label>
-                  <select value={bankAccountType} onChange={e => setBankAccountType(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-sm text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white">
-                    <option value="普通">普通</option>
-                    <option value="当座">当座</option>
-                  </select>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs text-gray-600">口座番号 *</label>
-                  <input type="text" value={bankAccountNumber} onChange={e => setBankAccountNumber(e.target.value)} placeholder="例: 1234567" className="w-full px-3 py-2 border border-gray-200 rounded-sm text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
-                </div>
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-gray-600">口座名義（カタカナ） *</label>
-                <input type="text" value={bankAccountHolder} onChange={e => setBankAccountHolder(e.target.value)} placeholder="例: ヤマダ タロウ" className="w-full px-3 py-2 border border-gray-200 rounded-sm text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
-              </div>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full py-4 bg-[#161616] text-white font-medium rounded-sm hover:bg-[#333] transition-colors disabled:opacity-50"
-          >
-            {submitting ? '送信中...' : '回答を送信する'}
-          </button>
-        </form>
       </main>
       <Footer />
     </div>
