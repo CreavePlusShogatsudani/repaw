@@ -194,3 +194,16 @@ html { scroll-padding-top: 96px; }
   .shop-catalog-heading { padding-bottom: 20px; margin-bottom: 24px; }
   .shop-catalog-heading h1 { font-size: 24px; }
 }
+.shop-hero-controls { position: absolute; top: 14px; right: 14px; display: flex; gap: 4px; background: #ffffffed; padding: 2px; }
+.shop-hero-controls button { min-width: 36px; min-height: 36px; font-size: 10px; color: #62655f; }
+.shop-hero-controls button[aria-pressed="true"] { color: #293b2d; box-shadow: inset 0 -2px #53654f; }
+.shop-hero-controls button:hover { background: #eef0e9; }
+@media (max-width: 767px) {
+  .shop-hero-secondary { display: block; margin: 12px 0 0; }
+  .shop-hero-controls { top: 8px; right: 8px; }
+  .shop-hero-controls button { min-width: 40px; min-height: 40px; }
+}
+@media (max-width: 359px) {
+  .shop-hero h1 { font-size: 24px; }
+  .shop-size-links a { flex-direction: column; gap: 8px; padding: 14px 2px; }
+}

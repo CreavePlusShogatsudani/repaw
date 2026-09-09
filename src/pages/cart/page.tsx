@@ -28,14 +28,14 @@ export default function CartPage() {
       <PageMeta title="カート" noindex />
       <Navigation />
 
-      <main className="pt-20 md:pt-24 pb-12 md:pb-16">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-          <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">
+      <main className="shop-catalog pb-12 md:pb-16">
+        <div className="shop-container">
+          <h1 className="text-2xl md:text-3xl font-medium mb-6 md:mb-8">
             ショッピングカート
           </h1>
 
           {removedNames.length > 0 && (
-            <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg text-sm text-orange-800">
+            <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-sm text-sm text-orange-800">
               次の商品は売り切れ、または他のお客様が購入手続き中のためカートから外しました：
               <span className="font-medium">{removedNames.join('、')}</span>
             </div>
@@ -43,14 +43,11 @@ export default function CartPage() {
 
           {cartItems.length === 0 ? (
             <div className="text-center py-16 md:py-20">
-              <div className="w-20 h-20 md:w-24 md:h-24 flex items-center justify-center mx-auto mb-4 md:mb-6 bg-gray-100 rounded-full">
-                <i className="ri-shopping-cart-line text-4xl md:text-5xl text-gray-400"></i>
-              </div>
               <h2 className="text-lg md:text-xl font-medium mb-3 md:mb-4">カートは空です</h2>
               <p className="text-sm md:text-base text-gray-600 mb-6 md:mb-8">お気に入りの商品を見つけて、カートに追加しましょう</p>
               <Link
                 to="/products"
-                className="inline-block px-6 md:px-8 py-2.5 md:py-3 bg-gray-900 text-white rounded-lg text-sm md:text-base font-medium hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
+                className="inline-block px-6 md:px-8 py-2.5 md:py-3 bg-gray-900 text-white rounded-sm text-sm md:text-base font-medium hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
               >
                 商品一覧を見る
               </Link>
@@ -59,7 +56,7 @@ export default function CartPage() {
             <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
               {/* カート商品リスト */}
               <div className="lg:col-span-2">
-                <div className="bg-gray-50 rounded-lg p-4 md:p-6 mb-4">
+                <div className="bg-gray-50 rounded-sm p-4 md:p-6 mb-4">
                   <div className="flex items-center gap-2 text-xs md:text-sm">
                     <i className="ri-truck-line text-base md:text-lg"></i>
                     <span>
@@ -67,7 +64,7 @@ export default function CartPage() {
                         <span className="font-medium">送料無料</span>
                       ) : (
                         <span>
-                          あと<span className="font-bold text-orange-600">¥{(5000 - totalAmount).toLocaleString()}</span>で送料無料
+                          あと<span className="font-bold text-stone-700">¥{(5000 - totalAmount).toLocaleString()}</span>で送料無料
                         </span>
                       )}
                     </span>
@@ -76,22 +73,22 @@ export default function CartPage() {
 
                 <div className="space-y-4">
                   {cartItems.map((item) => (
-                    <div key={item.id} className="bg-white border rounded-lg p-4 md:p-6">
+                    <div key={item.id} className="bg-white border-b py-5 md:py-6">
                       <div className="flex gap-4 md:gap-6">
                         <Link
                           to={`/product/${item.productId}`}
                           className="flex-shrink-0 cursor-pointer"
                         >
-                          <div className="w-24 h-24 md:w-32 md:h-32 bg-gray-50 rounded-lg overflow-hidden">
+                          <div className="w-24 h-24 md:w-32 md:h-32 bg-gray-50 rounded-sm overflow-hidden">
                             {item.image ? (
                               <img
                                 src={item.image}
                                 alt={item.name}
-                                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                className="w-full h-full object-contain"
                               />
                             ) : (
                               <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
-                                No Image
+                                写真準備中
                               </div>
                             )}
                           </div>
@@ -106,13 +103,12 @@ export default function CartPage() {
                               >
                                 {item.name}
                               </Link>
-                              <p className="text-xs md:text-sm text-gray-600 mt-1">
-                                {item.seller ? `売主: ${item.seller}` : '出品者'}
-                              </p>
+                              {item.seller?.trim() && item.seller !== '出品者' && <p className="text-xs md:text-sm text-gray-600 mt-1">元のオーナー：{item.seller}</p>}
                             </div>
                             <button
+                              aria-label={`${item.name}をカートから削除`}
                               onClick={() => removeFromCart(item.id)}
-                              className="text-gray-400 hover:text-red-600 transition-colors cursor-pointer flex-shrink-0"
+                              className="text-gray-500 hover:text-gray-900 transition-colors cursor-pointer flex-shrink-0 min-w-11 min-h-11 -mt-2 -mr-2"
                             >
                               <i className="ri-close-line text-lg md:text-xl"></i>
                             </button>
@@ -134,9 +130,7 @@ export default function CartPage() {
                           </div>
 
                           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-orange-50 text-orange-700 text-xs font-medium rounded-full whitespace-nowrap">
-                              <i className="ri-sparkling-line"></i>一点物
-                            </span>
+                            <span className="text-xs text-stone-500">数量 1</span>
                             <div className="text-right">
                               <p className="text-lg md:text-xl font-bold">¥{item.price.toLocaleString()}</p>
                             </div>
@@ -151,13 +145,13 @@ export default function CartPage() {
                   <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                     <Link
                       to="/products"
-                      className="flex-1 px-4 md:px-6 py-2.5 md:py-3 border-2 border-gray-900 text-gray-900 rounded-lg text-sm md:text-base font-medium hover:bg-gray-50 transition-colors text-center cursor-pointer whitespace-nowrap"
+                      className="flex-1 px-4 md:px-6 py-2.5 md:py-3 border-2 border-gray-900 text-gray-900 rounded-sm text-sm md:text-base font-medium hover:bg-gray-50 transition-colors text-center cursor-pointer whitespace-nowrap"
                     >
                       買い物を続ける
                     </Link>
                     <button
                       disabled
-                      className="flex-1 px-4 md:px-6 py-2.5 md:py-3 bg-gray-300 text-gray-500 rounded-lg text-sm md:text-base font-medium text-center cursor-not-allowed whitespace-nowrap"
+                      className="flex-1 px-4 md:px-6 py-2.5 md:py-3 bg-gray-300 text-gray-500 rounded-sm text-sm md:text-base font-medium text-center cursor-not-allowed whitespace-nowrap"
                     >
                       購入手続きへ進む
                     </button>
@@ -170,7 +164,7 @@ export default function CartPage() {
 
               {/* 注文サマリー */}
               <div className="lg:col-span-1">
-                <div className="bg-gray-50 rounded-lg p-4 md:p-6 sticky top-20 md:top-24">
+                <div className="bg-gray-50 rounded-sm p-4 md:p-6 sticky top-20 md:top-24">
                   <h2 className="text-base md:text-lg font-bold mb-4 md:mb-6">注文サマリー</h2>
 
                   <div className="space-y-3 md:space-y-4 mb-4 md:mb-6">
@@ -197,19 +191,6 @@ export default function CartPage() {
                     </div>
                   </div>
 
-                  <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t">
-                    <p className="text-xs text-gray-600 mb-3">クーポンコードをお持ちですか？</p>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        placeholder="クーポンコード"
-                        className="flex-1 px-3 md:px-4 py-2 border rounded-lg text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
-                      />
-                      <button className="px-3 md:px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-xs md:text-sm font-medium hover:bg-gray-300 transition-colors cursor-pointer whitespace-nowrap">
-                        適用
-                      </button>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

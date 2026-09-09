@@ -101,7 +101,7 @@ export default function ProductDetail() {
       color: product.color,
       quantity: 1,
       image: imageUrl,
-      seller: '出品者' // 将来的には実際の出品者名
+      seller: null
     });
 
     // トースト通知を表示
@@ -295,7 +295,7 @@ export default function ProductDetail() {
                   {getConditionInfo(product.condition) && <div><span className="text-gray-600">状態：</span><span className="font-medium">{getConditionInfo(product.condition)!.label} · {getConditionInfo(product.condition)!.short}</span></div>}
                   {product.color?.trim() && <div><span className="text-gray-600">カラー：</span><span className="font-medium">{product.color}</span></div>}
                 </div>
-                {(!product.size?.trim() || !getConditionInfo(product.condition)) && <p className="text-xs leading-6 text-stone-600 mt-3">{[!product.size?.trim() ? 'サイズ' : '', !getConditionInfo(product.condition) ? '状態' : ''].filter(Boolean).join('・')}の情報は未登録です。<a href="/#contact" className="underline underline-offset-4">ご購入前にお問い合わせください。</a></p>}
+                {(!product.size?.trim() || !getConditionInfo(product.condition)) && <p className="text-xs leading-6 text-stone-600 mt-3">{[!product.size?.trim() ? 'サイズ' : '', !getConditionInfo(product.condition) ? '状態' : ''].filter(Boolean).join('・')}の情報は未登録です。<Link to="/contact" className="underline underline-offset-4">ご購入前にお問い合わせください。</Link></p>}
 
                 {/* 状態ランクの基準。中古品の購入で一番不安な点なので、その場で確認できるようにする */}
                 <details className="mt-4 group">

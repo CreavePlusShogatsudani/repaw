@@ -15,13 +15,13 @@ export default function HomePage() {
       <PageMeta path="/" />
       <Navigation />
       <main className="shop-home">
-      <HeroSection />
-      <NewArrivalsSection />
-      <SizeSection />
-      <FeaturedSection />
-      <QuickSystemSection />
-      <NewsSection />
-      <ContactSection />
+        <HeroSection />
+        <NewArrivalsSection />
+        <SizeSection />
+        <FeaturedSection />
+        <QuickSystemSection />
+        <NewsSection />
+        <ContactSection />
       </main>
       <Footer />
     </div>
