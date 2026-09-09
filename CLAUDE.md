@@ -88,7 +88,8 @@ supabase/
 ├── functions/
 │   ├── create-payment-intent/   # 決済開始（金額はDBが決める）
 │   ├── stripe-webhook/          # 決済確定 → finalize_order
-│   └── handle-inquiry/          # 問い合わせ受付 + Claude API
+│   ├── handle-inquiry/          # 問い合わせ受付 + Claude API
+│   └── appraise-item/           # 買取の服1点の写真を Claude に渡して読み取り（管理者のみ）
 └── config.toml             # 各 Function の verify_jwt 設定
 ```
 
@@ -211,7 +212,7 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 ### 買取（送付型・服1点ごとの査定）
 1. `/buyback`（ログイン必須、写真添付なし）。「買取できない服の扱い」（寄付 / 着払い返送）を申込時に選ぶ → `buyback_requests`（status: pending）
 2. 管理画面 `/admin/buyback/:id`: 「配送キットを送った」→ kit_sent、「商品が届いた」→ received
-3. 到着した服を「服を追加」で1点ずつ登録（`buyback_items`）。スマホで撮影（タグ・全体・気になる箇所）、ブランド・種類・色・サイズ表記・素材・実寸、可否、ランク、本人に見せる一言、買取額を入力。社内メモと販売予定価格は `buyback_item_internal`（管理者のみ）
+3. 到着した服を「服を追加」で1点ずつ登録（`buyback_items`）。スマホで撮影（タグ・全体・気になる箇所）→「AIで読み取る」（Edge Function `appraise-item`）でブランド・種類・色・サイズ表記・素材・状態の所見が空欄に入る → スタッフが確認し、実寸、可否、ランク、本人に見せる一言、買取額を入力。社内メモと販売予定価格は `buyback_item_internal`（管理者のみ）。AI の生出力は `ai_reading` に保存
 4. 「査定額を提示する」→ 服は appraised / rejected、申込は quoted（全点不可なら rejected）
 5. ユーザーは `/buyback/response/:id` で内訳を見て、寄付 / 振込 / 全点着払い返送 を申込全体で1回回答 → RPC `respond_buyback`
    - 寄付・振込のとき、買取可の服は awaiting_photo になり、下書き商品（status: draft、写真なし）が自動作成されて `product_id` に紐づく

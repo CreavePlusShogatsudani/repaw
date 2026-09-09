@@ -9,3 +9,6 @@ verify_jwt = false
 
 [functions.handle-inquiry]
 verify_jwt = true
+
+[functions.appraise-item]
+verify_jwt = true

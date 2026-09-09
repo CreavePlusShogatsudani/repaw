@@ -54,6 +54,7 @@ export default function AdminBuybackDetailPage() {
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [readingId, setReadingId] = useState<string | null>(null);
   const [adminNote, setAdminNote] = useState('');
 
   const load = async () => {
@@ -225,6 +226,31 @@ export default function AdminBuybackDetailPage() {
     }
   };
 
+  const readWithAi = async (d: ItemDraft) => {
+    if (d.intake_photos.length === 0) { alert('先に写真を撮影・追加してください。'); return; }
+    setReadingId(d.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('appraise-item', { body: { item_id: d.id } });
+      if (error || !data || data.error) throw new Error(data?.error || error?.message || '読み取りに失敗しました');
+      const r = data as { has_tag: boolean | null; brand: string | null; item_type: string | null; color: string | null; size_label: string | null; material: string | null; condition_notes: string[]; notes: string | null };
+      const notes = [...r.condition_notes, ...(r.notes ? [r.notes] : [])].join('\n');
+      setItems((prev) => prev.map((it) => it.id !== d.id ? it : {
+        ...it,
+        has_tag: it.has_tag ?? r.has_tag,
+        brand: it.brand?.trim() ? it.brand : r.brand,
+        item_type: it.item_type || r.item_type,
+        color: it.color?.trim() ? it.color : r.color,
+        size_label: it.size_label?.trim() ? it.size_label : r.size_label,
+        material: it.material?.trim() ? it.material : r.material,
+        internal: { ...it.internal, condition_notes: it.internal.condition_notes ? `${it.internal.condition_notes}\n${notes}` : notes },
+      }));
+    } catch (e) {
+      alert((e as Error).message || '読み取りに失敗しました。');
+    } finally {
+      setReadingId(null);
+    }
+  };
+
   const removePhoto = async (d: ItemDraft, url: string) => {
     const next = d.intake_photos.filter((u) => u !== url);
     const { error } = await supabase.from('buyback_items').update({ intake_photos: next }).eq('id', d.id);
@@ -300,7 +326,7 @@ export default function AdminBuybackDetailPage() {
         <h2 className="text-lg font-bold">届いた服（{items.length}点）</h2>
         {editable && <button onClick={addItem} className="px-4 py-2 bg-gray-900 text-white text-sm rounded hover:bg-gray-700"><i className="ri-add-line mr-1"></i>服を追加</button>}
       </div>
-      <p className="text-xs text-gray-500 mt-1">到着したら1点ずつ「服を追加」し、タグ・全体・気になる箇所をスマホで撮影して、可否とランクと金額を入れます。写真は本人にも見えます。</p>
+      <p className="text-xs text-gray-500 mt-1">到着したら1点ずつ「服を追加」し、タグ・全体・気になる箇所をスマホで撮影します。「AIで読み取る」でブランド・種類・色・サイズ・素材・状態の所見が空欄に入るので、確認して可否とランクと金額を入れます。写真は本人にも見えます。</p>
 
       <div className="mt-4 space-y-4">
         {items.map((d, index) => (
@@ -321,6 +347,18 @@ export default function AdminBuybackDetailPage() {
                   {editable && <button onClick={() => removePhoto(d, url)} className="absolute top-1 right-1 w-6 h-6 bg-white/90 rounded-full text-xs" aria-label="写真を削除">×</button>}
                 </div>
               ))}
+              {editable && d.intake_photos.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => readWithAi(d)}
+                  disabled={readingId === d.id}
+                  className="w-24 h-28 border border-gray-900 rounded flex flex-col items-center justify-center text-xs text-gray-900 hover:bg-gray-50 disabled:opacity-50"
+                  title="写真からブランド・種類・色・サイズ・素材・状態の所見を読み取って空欄を埋めます"
+                >
+                  <i className="ri-sparkling-line text-xl mb-1"></i>
+                  {readingId === d.id ? '読み取り中' : 'AIで読み取る'}
+                </button>
+              )}
               {editable && (
                 <label className="w-24 h-28 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center text-xs text-gray-500 cursor-pointer hover:bg-gray-50">
                   <i className="ri-camera-line text-xl mb-1"></i>
