@@ -204,7 +204,7 @@ export default function ProductDetail() {
             <p className="font-medium text-sm md:text-base">カートに追加しました</p>
             <button
               onClick={() => navigate('/cart')}
-              className="text-xs md:text-sm text-blue-300 hover:text-blue-200 cursor-pointer mt-1"
+              className="text-xs md:text-sm text-gray-300 hover:text-white cursor-pointer mt-1"
             >
               カートを見る →
             </button>
