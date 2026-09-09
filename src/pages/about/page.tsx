@@ -42,7 +42,7 @@ export default function AboutPage() {
               愛犬がサイズアウトした服、着せる機会がなかった服、旅立った子が残した服。<br className="hidden md:block" />
               そういった服を買い取り、<strong>新しいオーナーへ届けます。</strong>
             </p>
-            <div className="rp-prose mt-12 mx-auto text-center">
+            <div className="rp-prose max-w-[36em] mx-auto mt-12">
               <p>そして商品が売れるたびに、売上の一部を動物保護団体へ寄付します。服を循環させることが、そのまま保護犬・保護猫への支援になる。RePawはその仕組みをシンプルに実現するプラットフォームです。</p>
             </div>
           </div>
@@ -81,15 +81,12 @@ export default function AboutPage() {
               <p className="shop-eyebrow">Our Story</p>
               <h2>なぜ、犬服のリユースなのか</h2>
             </div>
-            <div className="grid md:grid-cols-2 gap-12 md:gap-20 mt-14">
-              <div className="rp-prose">
-                <p>犬を飼っていると、服が余ります。子犬のうちに買ったけどすぐサイズアウトした服、プレゼントでもらったけど好みじゃなかった服、愛犬が旅立ってクローゼットに残ってしまった服。</p>
-                <p>捨てるには惜しい。でも売る手間もかかる。そのまま引き出しの奥へ。そんな経験をした飼い主さんは多いはずです。</p>
-              </div>
-              <div className="rp-prose">
-                <p>一方で「保護犬を助けたい」という気持ちはあっても、日常の中で継続的に支援できている人はまだ少ない。特別なアクションを起こさないといけない、という心理的なハードルがあります。</p>
-                <p>その2つをつなごうと思いました。<strong>服を手放す人</strong>と<strong>服を必要としている人</strong>をつなぎ、その取引の中に<strong>動物保護への寄付</strong>を組み込む。それが<strong>RePaw</strong>の出発点です。</p>
-              </div>
+            {/* 日本語の長文は左右に分けず、読み幅 36em の 1 カラムで読ませる */}
+            <div className="rp-prose max-w-[36em] mx-auto mt-14">
+              <p>犬を飼っていると、服が余ります。子犬のうちに買ったけどすぐサイズアウトした服、プレゼントでもらったけど好みじゃなかった服、愛犬が旅立ってクローゼットに残ってしまった服。</p>
+              <p>捨てるには惜しい。でも売る手間もかかる。そのまま引き出しの奥へ。そんな経験をした飼い主さんは多いはずです。</p>
+              <p>一方で「保護犬を助けたい」という気持ちはあっても、日常の中で継続的に支援できている人はまだ少ない。特別なアクションを起こさないといけない、という心理的なハードルがあります。</p>
+              <p>その2つをつなごうと思いました。<strong>服を手放す人</strong>と<strong>服を必要としている人</strong>をつなぎ、その取引の中に<strong>動物保護への寄付</strong>を組み込む。それが<strong>RePaw</strong>の出発点です。</p>
             </div>
           </div>
         </section>

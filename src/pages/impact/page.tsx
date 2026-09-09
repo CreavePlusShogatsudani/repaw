@@ -53,7 +53,7 @@ export default function ImpactPage() {
             <p className="rp-manifesto">
               服を売り買いすることが、<br className="hidden md:block" /><strong>社会への貢献になる。</strong>
             </p>
-            <div className="rp-prose mt-12 mx-auto text-center">
+            <div className="rp-prose max-w-[36em] mx-auto mt-12">
               <p>特別なことをしなくても、日常の買い物のなかで社会に貢献できる仕組みをつくりたい。それがRePawを始めた理由のひとつです。</p>
             </div>
           </div>

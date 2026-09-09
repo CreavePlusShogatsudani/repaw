@@ -424,10 +424,10 @@ html { scroll-padding-top: 96px; }
 /* 写真の上の CTA */
 .rp-band-photo { position: relative; min-height: 480px; display: flex; align-items: center; justify-content: center; overflow: hidden; color: #fff; text-align: center; }
 .rp-band-photo > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
-.rp-band-photo::before { content: ''; position: absolute; inset: 0; background: linear-gradient(rgba(20,20,20,.45), rgba(20,20,20,.65)); }
+.rp-band-photo::before { content: ''; position: absolute; inset: 0; background: rgba(20,20,20,.62); }
 .rp-band-photo-inner { position: relative; padding: 72px 24px; max-width: 48em; }
-.rp-band-photo h2 { font-size: clamp(26px, 3vw, 38px); font-weight: 500; letter-spacing: .1em; line-height: 1.5; text-shadow: 0 1px 12px rgba(0,0,0,.25); }
-.rp-band-photo p { margin-top: 18px; font-size: 15px; line-height: 2; color: rgba(255,255,255,.92); }
+.rp-band-photo h2 { font-size: clamp(26px, 3vw, 38px); font-weight: 500; letter-spacing: .1em; line-height: 1.5; text-shadow: 0 2px 16px rgba(0,0,0,.45); }
+.rp-band-photo p { margin-top: 18px; font-size: 15px; line-height: 2; color: rgba(255,255,255,.95); text-shadow: 0 1px 8px rgba(0,0,0,.45); }
 .rp-btn-ghost { border: 1px solid rgba(255,255,255,.8); color: #fff; background: transparent; }
 .rp-btn-ghost:hover { background: rgba(255,255,255,.12); }
 /* タブを中央に */
