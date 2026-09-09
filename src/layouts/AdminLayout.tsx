@@ -75,6 +75,7 @@ export default function AdminLayout() {
         { path: '/admin/users', label: '管理者アカウント', icon: 'ri-shield-user-line' },
         { path: '/admin/banners', label: 'メインビジュアル', icon: 'ri-image-line' },
         { path: '/admin/collections', label: '特集記事', icon: 'ri-folder-star-line' },
+        { path: '/admin/owners', label: 'おさがりオーナー', icon: 'ri-emotion-happy-line' },
     ];
 
     const navContent = (

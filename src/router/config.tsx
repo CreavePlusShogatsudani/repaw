@@ -58,6 +58,7 @@ const AdminCollectionProductsPage = lazyWithRetry(() => import('../pages/admin/c
 const AdminNewsPage = lazyWithRetry(() => import('../pages/admin/news/page'));
 const AdminNewsFormPage = lazyWithRetry(() => import('../pages/admin/news/form'));
 const AdminRecommendedPage = lazyWithRetry(() => import('../pages/admin/recommended/page'));
+const AdminOwnersPage = lazyWithRetry(() => import('../pages/admin/owners/page'));
 
 const routes: RouteObject[] = [
   {
@@ -223,6 +224,10 @@ const routes: RouteObject[] = [
       {
         path: 'collections/:id/recommended',
         element: <AdminRecommendedPage />,
+      },
+      {
+        path: 'owners',
+        element: <AdminOwnersPage />,
       },
     ],
   },

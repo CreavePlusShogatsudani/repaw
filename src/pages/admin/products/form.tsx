@@ -71,6 +71,8 @@ export default function AdminProductFormPage() {
     const [backLengthCm, setBackLengthCm] = useState('');
     const [chestCm, setChestCm] = useState('');
     const [neckCm, setNeckCm] = useState('');
+    const [previousOwnerId, setPreviousOwnerId] = useState('');
+    const [owners, setOwners] = useState<{ id: string; dog_name: string; instagram: string | null }[]>([]);
     const fromBuyback = searchParams.get('from_buyback');
 
     useEffect(() => {
@@ -78,6 +80,12 @@ export default function AdminProductFormPage() {
             fetchProduct();
         }
     }, [id]);
+
+    // 「前のオーナー」の選択肢
+    useEffect(() => {
+        supabase.from('previous_owners').select('id, dog_name, instagram').order('sort_order', { ascending: true })
+            .then(({ data }) => setOwners(data || []));
+    }, []);
 
     const fetchProduct = async () => {
         const { data, error } = await supabase
@@ -107,6 +115,7 @@ export default function AdminProductFormPage() {
             setBackLengthCm(data.back_length_cm?.toString() || '');
             setChestCm(data.chest_cm?.toString() || '');
             setNeckCm(data.neck_cm?.toString() || '');
+            setPreviousOwnerId(data.previous_owner_id || '');
         }
         setLoading(false);
     };
@@ -247,6 +256,7 @@ export default function AdminProductFormPage() {
             back_length_cm: backLengthCm ? parseFloat(backLengthCm) : null,
             chest_cm: chestCm ? parseFloat(chestCm) : null,
             neck_cm: neckCm ? parseFloat(neckCm) : null,
+            previous_owner_id: previousOwnerId || null,
         };
 
         if (isEdit) {
@@ -465,6 +475,21 @@ export default function AdminProductFormPage() {
                     </div>
 
 
+
+                    <div className="space-y-2 md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700">前のオーナー（あの子のおさがり）</label>
+                        <select
+                            value={previousOwnerId}
+                            onChange={(e) => setPreviousOwnerId(e.target.value)}
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
+                        >
+                            <option value="">設定しない</option>
+                            {owners.map(o => (
+                                <option key={o.id} value={o.id}>{o.dog_name}{o.instagram ? `（@${o.instagram}）` : ''}</option>
+                            ))}
+                        </select>
+                        <p className="text-xs text-gray-500">選択肢は「おさがりオーナー」メニューで登録します。設定すると商品カードに「○○ちゃんのおさがり」と表示されます</p>
+                    </div>
 
                     <div className="space-y-2 md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">

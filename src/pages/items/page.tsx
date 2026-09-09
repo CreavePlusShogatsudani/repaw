@@ -8,6 +8,7 @@ import Footer from '../home/components/Footer';
 import { supabase } from '../../lib/supabase';
 import type { Product } from '../../types';
 import { PRODUCT_CATEGORIES } from '../../lib/productOptions';
+import { PRODUCT_SELECT } from '../../lib/products';
 
 const BASE_CATEGORIES = PRODUCT_CATEGORIES;
 const SIZES = ['すべて', 'S', 'M', 'L', 'XL', 'フリーサイズ'];
@@ -26,8 +27,8 @@ export default function ItemsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [selectedCategory, setSelectedCategory] = useState('すべて');
   const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'すべて');
   const selectedSize = searchParams.get('size') || 'すべて';
   const setSelectedSize = (size: string) => {
     setSearchParams(previous => {
@@ -50,11 +51,11 @@ export default function ItemsPage() {
         setLoading(true);
         const { data, error } = await supabase
           .from('products')
-          .select('*')
+          .select(PRODUCT_SELECT)
           .in('status', ['published', 'reserved', 'sold_out']); // draft・hidden は公開しない
 
         if (error) throw error;
-        setProducts(data || []);
+        setProducts((data as unknown as Product[]) || []);
       } catch (err) {
         console.error('Failed to fetch products:', err);
         setError('データの取得に失敗しました');

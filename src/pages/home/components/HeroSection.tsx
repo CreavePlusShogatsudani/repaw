@@ -34,15 +34,16 @@ export default function HeroSection() {
   return (
     <section className="shop-hero shop-container" aria-label="RePawのご紹介">
       <div className="shop-hero-copy">
-        <p className="shop-eyebrow">犬服と、次の暮らし。</p>
-        <h1>{banner?.title?.trim() || <>お気に入りを、<br />次のうちの子へ。</>}</h1>
-        <p className="shop-hero-description">{banner?.subtitle?.trim() || <>まだ着られる一着に、新しい出会いを。<br />犬服のリユースショップ、RePawです。</>}</p>
-        <Link to="/products" className="shop-button">犬服を探す <span aria-hidden="true">→</span></Link>
-        {link ? (
-          /^https?:\/\//.test(link)
-            ? <a href={link} className="shop-hero-secondary">{linkText}</a>
-            : <Link to={link.startsWith('/') && !link.startsWith('//') ? link : '/products'} className="shop-hero-secondary">{linkText}</Link>
-        ) : <Link to="/system" className="shop-hero-secondary">着なくなった犬服を譲る</Link>}
+        <h1 className="rp-display">{banner?.title?.trim() || <>お気に入りを<br />見つけよう。</>}</h1>
+        <p className="shop-hero-description">{banner?.subtitle?.trim() || 'かわいい犬服のおさがりが、毎週届きます。うちの子に似合う一着を探そう。'}</p>
+        <div className="shop-hero-actions">
+          <Link to="/products" className="rp-btn rp-btn-orange">犬服を探す <i className="ri-arrow-right-line" aria-hidden="true"></i></Link>
+          {link ? (
+            /^https?:\/\//.test(link)
+              ? <a href={link} className="rp-btn rp-btn-white">{linkText}</a>
+              : <Link to={link.startsWith('/') && !link.startsWith('//') ? link : '/products'} className="rp-btn rp-btn-white">{linkText}</Link>
+          ) : <Link to="/system" className="rp-btn rp-btn-white">着なくなった服を譲る</Link>}
+        </div>
       </div>
       <figure className="shop-hero-photo">
         <img src={failedImage === image ? '/images/repaw-dog.jpg' : image} onError={() => setFailedImage(image)} alt={banner?.title || 'ハーネスを着て飼い主の膝に座るトイプードル'} fetchPriority="high" />

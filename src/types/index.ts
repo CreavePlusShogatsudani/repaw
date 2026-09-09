@@ -17,6 +17,18 @@ export interface Profile {
     updated_at: string;
 }
 
+export interface PreviousOwner {
+    id: string;
+    dog_name: string;
+    dog_photo_url: string | null;
+    instagram: string | null;
+    story: string | null;
+    is_featured: boolean;
+    sort_order: number;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface Product {
     id: string;
     name: string;
@@ -37,6 +49,8 @@ export interface Product {
     back_length_cm: number | null;
     chest_cm: number | null;
     neck_cm: number | null;
+    previous_owner_id: string | null;
+    previous_owner?: Pick<PreviousOwner, 'id' | 'dog_name' | 'dog_photo_url' | 'instagram' | 'story'> | null;
     created_at: string;
     updated_at: string;
 }

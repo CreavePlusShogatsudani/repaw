@@ -47,9 +47,11 @@ src/
 │   ├── supabase.ts
 │   ├── stripe.ts
 │   ├── conditions.ts       # 状態ランク A/B/C の唯一の定義
-│   └── productOptions.ts   # カテゴリ・サイズ選択肢の唯一の定義（管理画面と公開側で共有）
+│   ├── productOptions.ts   # カテゴリ・サイズ選択肢の唯一の定義（管理画面と公開側で共有）
+│   ├── donation.ts         # 寄付率 5% の唯一の定義（商品詳細の寄付額・トップの案内）
+│   └── products.ts         # 公開側の商品 select（previous_owners を join）と Instagram URL
 ├── pages/
-│   ├── home/               # トップページ + セクションコンポーネント
+│   ├── home/               # トップページ（Hero / NewArrivals / Owners / Explore / Donation / Featured / News / Contact）
 │   ├── items/              # 商品一覧（?size= でフィルタ）
 │   ├── item-detail/        # 商品詳細（お気に入り・カート・売主Instagram）
 │   ├── features/ feature-detail/   # 特集
@@ -71,6 +73,7 @@ src/
 │       ├── users/          # 管理者アカウント
 │       ├── banners/        # メインビジュアル管理
 │       ├── collections/    # 特集記事管理 (page / form / products)
+│       ├── owners/         # おさがりオーナー（前に着ていた犬）管理
 │       ├── recommended/    # おすすめ商品管理（特集ごと）
 │       └── news/           # ニュース管理 (page / form)
 ├── router/
@@ -80,7 +83,7 @@ src/
     └── index.ts
 
 supabase/
-├── migrations/             # 000_baseline → 004 → 005 → 006 → 007 → 008（本番適用済み）
+├── migrations/             # 000_baseline → 004 → 005 → 006 → 007 → 008 → 009（本番適用済み）
 ├── functions/
 │   ├── create-payment-intent/   # 決済開始（金額はDBが決める）
 │   ├── stripe-webhook/          # 決済確定 → finalize_order
@@ -108,7 +111,8 @@ supabase/
 | status | text | `published` / `draft` / `reserved`（購入手続き中・15分予約） / `sold_out` |
 | reserved_by / reserved_until | uuid / timestamptz | 005 で追加。pg_cron が毎分期限切れを解放 |
 | seller_id | uuid | 現状どこからも設定されない |
-| seller_instagram | text | 管理画面で手入力。商品詳細にリンク表示 |
+| seller_instagram | text | 管理画面で手入力。前のオーナー未設定時のフォールバック表示 |
+| previous_owner_id | uuid FK | previous_owners。設定するとカードに「○○ちゃんのおさがり」、詳細に「この服を着ていた子」 |
 | back_length_cm / chest_cm / neck_cm | numeric | 実寸。管理画面フォームで入力、カード・詳細に表示 |
 | size_chart | jsonb | 型定義のみ。UI 未使用 |
 
@@ -131,6 +135,15 @@ supabase/
 
 ### favorites
 user_id + product_id（unique）。商品詳細のハートボタンで追加・解除。マイページで一覧・解除。
+
+### previous_owners（あの子のおさがり）
+| カラム | 型 | 備考 |
+|--------|-----|------|
+| dog_name | text | 犬の名前 |
+| dog_photo_url | text | Storage URL（product-images/owners/） |
+| instagram | text | 飼い主の Instagram（@なし） |
+| story | text | 一言（120字） |
+| is_featured / sort_order | boolean / int | トップの「あの子のおさがり」に出す・順番 |
 
 ### hero_banners
 title / subtitle / image_url / link_url / link_text / sort_order / is_active。
@@ -165,6 +178,14 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 | replied_at | timestamptz | |
 
 ---
+
+## デザイン方針（トップ・商品カード・詳細・ナビ・フッター）
+- 3つの軸: 服がかわいい / 前のオーナーが見える / 買うことで寄付になる
+- 色: ブルー（お店の主役）、オレンジ（購入ボタン・注目）、イエロー（特集の背景）。トークンは `src/index.css` の `--rp-*`
+- 見出しは M PLUS Rounded 1c（丸ゴシック太字、クラス `rp-display`）、本文は Noto Sans JP。角丸はカード 16px・ボタン pill
+- トップの順番: 寄付の案内帯 → ヒーロー → 新着8点 → あの子のおさがり → サイズ・種類の入口＋4点 → 寄付の仕組みと買取の流れ → 特集 → ニュース → 問い合わせ
+- 商品詳細は価格の下に「このお買い物から ¥○ を寄付」を表示。寄付率は `src/lib/donation.ts`
+- About / Impact / System / FAQ などの下層ページは旧デザインのまま（未適用）
 
 ## 主要フロー
 

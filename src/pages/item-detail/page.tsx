@@ -9,6 +9,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import PageMeta from '../../components/PageMeta';
 import ProductCard from '../../components/ProductCard';
 import { CONDITION_RANKS, CONDITION_INFO, getConditionInfo } from '../../lib/conditions';
+import { PRODUCT_SELECT, instagramHandle, instagramUrl } from '../../lib/products';
+import { donationAmount, DONATION_RATE_LABEL } from '../../lib/donation';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -40,7 +42,7 @@ export default function ProductDetail() {
         // メイン商品の取得
         const { data: productData, error: productError } = await supabase
           .from('products')
-          .select('*')
+          .select(PRODUCT_SELECT)
           .eq('id', id)
           .in('status', ['published', 'reserved', 'sold_out']) // draft・hidden はURL直打ちでも見せない
           .single();
@@ -50,11 +52,11 @@ export default function ProductDetail() {
 
         // 関連商品の取得（同じカテゴリの他の商品、またはランダムに4つ）
         if (productData) {
-          let relatedQuery = supabase.from('products').select('*').neq('id', id).eq('status', 'published');
+          let relatedQuery = supabase.from('products').select(PRODUCT_SELECT).neq('id', id).eq('status', 'published');
           if (productData.category?.trim()) relatedQuery = relatedQuery.eq('category', productData.category);
           const { data: relatedData } = await relatedQuery.order('created_at', { ascending: false }).limit(4);
 
-          setRelatedProducts(relatedData || []);
+          setRelatedProducts((relatedData as unknown as Product[]) || []);
         }
 
       } catch (err) {
@@ -280,6 +282,12 @@ export default function ProductDetail() {
                   )}
                 </div>
                 {product.category?.trim() && <p className="text-xs text-stone-600">{product.category}</p>}
+                {/* このお買い物で寄付される金額（販売価格 × DONATION_RATE） */}
+                <p className="product-donation mt-4">
+                  <i className="ri-heart-3-fill" aria-hidden="true"></i>
+                  このお買い物から ¥{donationAmount(product.price).toLocaleString()} を保護犬・保護猫の支援に寄付
+                  <span className="font-normal opacity-80">（{DONATION_RATE_LABEL}）</span>
+                </p>
               </div>
 
               {/* 商品詳細情報 */}
@@ -372,7 +380,7 @@ export default function ProductDetail() {
                   ) : (
                   <button
                     onClick={addToCart}
-                    className="flex-1 bg-gray-900 text-white py-3 md:py-4 rounded-sm text-sm md:text-base font-medium hover:bg-gray-800 transition-colors cursor-pointer whitespace-nowrap"
+                    className="flex-1 bg-[#f0641f] text-white py-3 md:py-4 rounded-full text-sm md:text-base font-bold hover:bg-[#d3520f] transition-colors cursor-pointer whitespace-nowrap"
                   >
                     カートに追加
                   </button>
@@ -381,7 +389,7 @@ export default function ProductDetail() {
                     aria-label={isFavorite ? 'お気に入りから削除' : 'お気に入りに追加'}
                     aria-pressed={isFavorite}
                     onClick={toggleFavorite}
-                    className={`px-4 md:px-6 py-3 md:py-4 border rounded-sm transition-colors cursor-pointer ${isFavorite
+                    className={`px-4 md:px-6 py-3 md:py-4 border-2 rounded-full transition-colors cursor-pointer ${isFavorite
                       ? 'border-red-500 bg-red-50'
                       : 'border-gray-300 hover:bg-gray-50'
                       }`}
@@ -392,29 +400,41 @@ export default function ProductDetail() {
                 </div>
               </div>
 
-              {/* 売主Instagram */}
-              {product.seller_instagram && (
+              {/* この服を着ていた子: 前のオーナー登録があれば犬の写真・名前・一言、無ければ売主 Instagram のみ */}
+              {(product.previous_owner || product.seller_instagram) && (
                 <div className="mb-6 pb-6 border-b">
-                  <h3 className="font-bold mb-3 text-sm md:text-base flex items-center gap-2">
-                    このお洋服の元のオーナー
-                  </h3>
-                  <a
-                    href={`https://www.instagram.com/${product.seller_instagram.trim().replace(/^@/, '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 py-3 border-y border-stone-200 hover:bg-stone-50 transition-colors group"
-                  >
-                    <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
-                      <i className="ri-instagram-line text-stone-600 text-xl"></i>
+                  <h3 className="font-bold mb-3 text-sm md:text-base">この服を着ていた子</h3>
+                  {product.previous_owner ? (
+                    <div className="product-owner">
+                      {product.previous_owner.dog_photo_url
+                        ? <img src={product.previous_owner.dog_photo_url} alt={`${product.previous_owner.dog_name}ちゃん`} />
+                        : <div className="owner-placeholder"><i className="ri-emotion-happy-line text-3xl text-white"></i></div>}
+                      <div>
+                        <p className="owner-name !text-xl">{product.previous_owner.dog_name}ちゃん</p>
+                        {product.previous_owner.story && <p className="text-sm text-slate-700 leading-relaxed mt-1">{product.previous_owner.story}</p>}
+                        {(product.previous_owner.instagram || product.seller_instagram) && (
+                          <a
+                            href={instagramUrl(product.previous_owner.instagram || product.seller_instagram)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="owner-instagram mt-2"
+                          >
+                            <i className="ri-instagram-line" aria-hidden="true"></i>@{instagramHandle(product.previous_owner.instagram || product.seller_instagram)}
+                          </a>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-semibold text-sm text-gray-900 group-hover:underline transition-colors">
-                        @{product.seller_instagram.trim().replace(/^@/, '')}
-                      </p>
-                      <p className="text-xs text-gray-500">Instagramでプロフィールを見る</p>
-                    </div>
-                    <i className="ri-external-link-line text-gray-400 ml-auto text-sm"></i>
-                  </a>
+                  ) : (
+                    <a
+                      href={instagramUrl(product.seller_instagram)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="owner-instagram"
+                    >
+                      <i className="ri-instagram-line" aria-hidden="true"></i>@{instagramHandle(product.seller_instagram)}
+                      <span className="font-normal">の子が着ていました</span>
+                    </a>
+                  )}
                 </div>
               )}
 
