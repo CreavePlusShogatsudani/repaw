@@ -146,6 +146,9 @@ html { scroll-padding-top: 96px; }
 .shop-text-link { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: .08em; color: var(--rp-ink); border-bottom: 1px solid var(--rp-ink); padding-bottom: 3px; white-space: nowrap; }
 .shop-text-link:hover { color: var(--rp-muted); border-bottom-color: var(--rp-muted); }
 
+.shop-section-more { display: flex; justify-content: center; margin-top: 48px; }
+.shop-section-more .rp-btn { min-width: 280px; min-height: 56px; font-size: 14px; }
+
 /* 商品カード: 写真 + 4行の小さな情報。箱も影も無し */
 .product-card { display: block; min-width: 0; }
 .product-card-image { position: relative; display: flex; align-items: center; justify-content: center; aspect-ratio: 4 / 5; overflow: hidden; background: var(--rp-photo-bg); border-radius: var(--rp-radius); }
@@ -268,6 +271,8 @@ html { scroll-padding-top: 96px; }
   .shop-section-heading { flex-direction: column; align-items: start; margin-bottom: 28px; }
   .shop-section-heading h2 { font-size: 24px; }
   .shop-eyebrow { font-size: 13px; margin-bottom: 10px; }
+  .shop-section-more { margin-top: 32px; }
+  .shop-section-more .rp-btn { width: 100%; }
   .shop-owners { padding-block: 56px 64px; }
   .owner-story + .owner-story { margin-top: 40px; padding-top: 40px; }
   .owner-name { font-size: 20px; }
