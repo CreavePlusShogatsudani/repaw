@@ -111,6 +111,14 @@ function json(body: unknown, status = 200) {
   });
 }
 
+// 本人に届く文章は必ずプレーンテキスト。プロンプトで禁止しているが、混入しても届かないようにここで落とす
+function stripMarkdown(s: string): string {
+  return s
+    .replace(/\*\*|__|`/g, "")
+    .replace(/^#{1,6}\s*/gm, "")
+    .replace(/^\s*[-*]\s+/gm, "・");
+}
+
 interface AiResult {
   category: "question" | "complaint" | "refund" | "buyback" | "other";
   confidence: "high" | "low";
@@ -147,7 +155,7 @@ async function askClaude(userMessage: string): Promise<AiResult> {
   return {
     category: parsed.category,
     confidence: parsed.confidence === "high" ? "high" : "low",
-    reply: parsed.reply.trim(),
+    reply: stripMarkdown(parsed.reply).trim(),
   };
 }
 
