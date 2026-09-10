@@ -6,6 +6,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import type { Product } from '../../types';
 import PageMeta from '../../components/PageMeta';
+import { lookupPostalCode, normalizePostalCode } from '../../lib/postal';
 import { BUYBACK_ITEM_PUBLIC_SELECT, BUYBACK_SHIP_TO, REQUEST_STATUS_USER, ITEM_STATUS_USER, itemDisplayName, requestTotal, type BuybackItem } from '../../lib/buyback';
 import { DONATION_RATE } from '../../lib/donation';
 
@@ -89,10 +90,24 @@ export default function MyPage() {
   const [showInstagram, setShowInstagram] = useState(true);
   const [recipientName, setRecipientName] = useState('');
   const [postalCode, setPostalCode] = useState('');
+  const [postalError, setPostalError] = useState('');
   const [prefecture, setPrefecture] = useState('');
   const [city, setCity] = useState('');
   const [address, setAddress] = useState('');
   const [building, setBuilding] = useState('');
+
+  // 郵便番号から都道府県・市区町村を自動入力。番地・建物名は触らない
+  const searchAddress = async (value: string) => {
+    setPostalError('');
+    try {
+      const found = await lookupPostalCode(value);
+      if (!found) { setPostalError('該当する住所が見つかりません'); return; }
+      setPrefecture(found.prefecture);
+      setCity(found.city);
+    } catch {
+      setPostalError('住所の検索に失敗しました');
+    }
+  };
   const [phone, setPhone] = useState('');
 
   // 注文・お気に入りデータ
@@ -115,6 +130,7 @@ export default function MyPage() {
       setShowInstagram(profile.show_instagram ?? true);
       setRecipientName(profile.full_name || '');
       setPostalCode(profile.postal_code || '');
+      setPostalError('');
       setPrefecture(profile.prefecture || '');
       setCity(profile.city || '');
       setAddress(profile.address || '');
@@ -412,14 +428,26 @@ export default function MyPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-2">郵便番号</label>
-                      <input
-                        type="text"
-                        value={postalCode}
-                        onChange={(e) => setPostalCode(e.target.value)}
-                        disabled={!isEditing}
-                        className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
-                        placeholder="123-4567"
-                      />
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={postalCode}
+                          onChange={(e) => { setPostalCode(e.target.value); if (normalizePostalCode(e.target.value).length === 7) searchAddress(e.target.value); }}
+                          disabled={!isEditing}
+                          className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 disabled:bg-gray-50 disabled:text-gray-600"
+                          placeholder="123-4567"
+                          maxLength={8}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => searchAddress(postalCode)}
+                          disabled={!isEditing || normalizePostalCode(postalCode).length !== 7}
+                          className="px-4 py-3 border border-[#161616] text-sm rounded-sm whitespace-nowrap hover:bg-[#161616] hover:text-white transition-colors disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-inherit"
+                        >
+                          住所を検索
+                        </button>
+                      </div>
+                      {postalError && <p className="mt-1 text-xs text-red-600">{postalError}</p>}
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-2">都道府県</label>

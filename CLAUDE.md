@@ -50,6 +50,7 @@ src/
 │   ├── productOptions.ts   # カテゴリ・サイズ選択肢の唯一の定義（管理画面と公開側で共有）
 │   ├── donation.ts         # 寄付率 5% の唯一の定義（商品詳細の寄付額・トップの案内）
 │   ├── products.ts         # 公開側の商品 select（previous_owners を join）と Instagram URL
+│   ├── postal.ts           # 郵便番号→都道府県・市区町村（zipcloud API。マイページとチェックアウトで共有）
 │   └── buyback.ts          # 買取のステータス・表示名・服1点の型
 ├── pages/
 │   ├── home/               # トップページ（Hero / NewArrivals / Owners / Explore / Donation / Featured / News / Contact）

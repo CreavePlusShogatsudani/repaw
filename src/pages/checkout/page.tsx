@@ -1,3 +1,4 @@
+import { lookupPostalCode, normalizePostalCode } from '../../lib/postal';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
@@ -46,6 +47,7 @@ export default function CheckoutPage() {
 
   // 住所選択モード: 'saved' = 登録済み, 'new' = 別の住所
   const [addressMode, setAddressMode] = useState<'saved' | 'new'>('saved');
+  const [postalError, setPostalError] = useState('');
 
   const [formData, setFormData] = useState<FormData>({
     email: '',
@@ -212,6 +214,19 @@ export default function CheckoutPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'postalCode' && normalizePostalCode(value).length === 7) searchAddress(value);
+  };
+
+  // 郵便番号から都道府県・市区町村を自動入力。番地・建物名は触らない
+  const searchAddress = async (value: string) => {
+    setPostalError('');
+    try {
+      const found = await lookupPostalCode(value);
+      if (!found) { setPostalError('該当する住所が見つかりません'); return; }
+      setFormData(prev => ({ ...prev, prefecture: found.prefecture, city: found.city }));
+    } catch {
+      setPostalError('住所の検索に失敗しました');
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -390,16 +405,27 @@ export default function CheckoutPage() {
                         <label className="block text-sm font-medium mb-2">
                           郵便番号 <span className="text-red-500">*</span>
                         </label>
-                        <input
-                          type="text"
-                          name="postalCode"
-                          value={formData.postalCode}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
-                          placeholder="123-4567"
-                          maxLength={8}
-                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            name="postalCode"
+                            value={formData.postalCode}
+                            onChange={handleInputChange}
+                            required
+                            className="w-full px-4 py-3 border rounded-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm"
+                            placeholder="123-4567"
+                            maxLength={8}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => searchAddress(formData.postalCode)}
+                            disabled={normalizePostalCode(formData.postalCode).length !== 7}
+                            className="px-4 py-3 border border-[#161616] text-sm rounded-sm whitespace-nowrap hover:bg-[#161616] hover:text-white transition-colors disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-inherit"
+                          >
+                            住所を検索
+                          </button>
+                        </div>
+                        {postalError && <p className="mt-1 text-xs text-red-600">{postalError}</p>}
                       </div>
 
                       <div>
