@@ -9,6 +9,7 @@ export default function AdminLayout() {
     const [loading, setLoading] = useState(true);
     const [buybackBadge, setBuybackBadge] = useState(0);
     const [photoBadge, setPhotoBadge] = useState(0);
+    const [inquiryBadge, setInquiryBadge] = useState(0);
     const [mobileOpen, setMobileOpen] = useState(false);
 
     useEffect(() => {
@@ -56,6 +57,12 @@ export default function AdminLayout() {
             .select('id', { count: 'exact', head: true })
             .eq('status', 'awaiting_photo')
             .then(({ count }) => setPhotoBadge(count ?? 0));
+        // 未処理（AI 失敗）と承認待ちの問い合わせ
+        supabase
+            .from('inquiries')
+            .select('id', { count: 'exact', head: true })
+            .in('status', ['received', 'pending_approval'])
+            .then(({ count }) => setInquiryBadge(count ?? 0));
     }, [location.pathname]);
 
     if (loading) {
@@ -77,7 +84,7 @@ export default function AdminLayout() {
         { path: '/admin/orders', label: '注文管理', icon: 'ri-file-list-3-line' },
         { path: '/admin/buyback', label: '買取申込管理', icon: 'ri-price-tag-3-line', badge: buybackBadge },
         { path: '/admin/photo-queue', label: '撮影待ち', icon: 'ri-camera-line', badge: photoBadge },
-        { path: '/admin/inquiries', label: '問い合わせ管理', icon: 'ri-question-answer-line' },
+        { path: '/admin/inquiries', label: '問い合わせ管理', icon: 'ri-question-answer-line', badge: inquiryBadge },
         { path: '/admin/members', label: 'ユーザー一覧', icon: 'ri-group-line' },
         { path: '/admin/users', label: '管理者アカウント', icon: 'ri-shield-user-line' },
         { path: '/admin/banners', label: 'メインビジュアル', icon: 'ri-image-line' },

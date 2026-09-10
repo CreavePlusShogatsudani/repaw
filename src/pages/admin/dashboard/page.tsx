@@ -111,7 +111,7 @@ export default function AdminDashboardPage() {
                         </div>
                     </div>
                     <div className="text-3xl font-bold text-gray-900">{stats.buybackAction}<span className="text-base font-normal text-gray-500 ml-1">件</span></div>
-                    <p className="text-xs text-gray-500 mt-2">キット送付・査定・振込や寄付処理が待っている申込</p>
+                    <p className="text-xs text-gray-500 mt-2">到着・査定・振込や寄付処理が待っている申込</p>
                 </Link>
             </div>
         </div>

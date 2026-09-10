@@ -15,20 +15,20 @@ const PROCESS_STEPS = [
   },
   {
     number: '02',
-    title: '無料配送キット到着',
-    description: '申し込み後、3営業日以内に無料の配送キットをお届けします。',
+    title: '梱包して着払いで発送',
+    description: 'お手持ちの箱や袋に犬服を入れて、着払いでお送りください。送料はRePawが負担します。',
     icon: 'ri-box-3-line'
   },
   {
     number: '03',
-    title: '商品を梱包・発送',
-    description: '配送キットに犬服を入れて、集荷依頼または最寄りのコンビニから発送。',
+    title: '到着・1点ずつ査定',
+    description: '届いた服を専門スタッフが1点ずつ確認し、マイページに査定結果をお知らせします。',
     icon: 'ri-truck-line'
   },
   {
     number: '04',
-    title: '査定・入金 or 寄付',
-    description: '到着後、専門スタッフが査定。入金または全額寄付を選択できます。',
+    title: '入金 or 寄付',
+    description: '査定結果を見て、振込・全額寄付・全点返送から選べます。',
     icon: 'ri-money-dollar-circle-line'
   }
 ];

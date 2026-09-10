@@ -6,7 +6,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import type { Product } from '../../types';
 import PageMeta from '../../components/PageMeta';
-import { BUYBACK_ITEM_PUBLIC_SELECT, REQUEST_STATUS_USER, ITEM_STATUS_USER, itemDisplayName, requestTotal, type BuybackItem } from '../../lib/buyback';
+import { BUYBACK_ITEM_PUBLIC_SELECT, BUYBACK_SHIP_TO, REQUEST_STATUS_USER, ITEM_STATUS_USER, itemDisplayName, requestTotal, type BuybackItem } from '../../lib/buyback';
 import { DONATION_RATE } from '../../lib/donation';
 
 interface OrderItemWithProduct {
@@ -676,7 +676,14 @@ export default function MyPage() {
                         {/* 服1点ごとの内訳。査定前は「査定中」だけ見せる */}
                         <div className="mt-4 border-t border-[#e6e6e1]">
                           {req.buyback_items.length === 0 ? (
-                            <p className="py-4 text-sm text-gray-500">お送りいただいた服が届きしだい、1点ずつ査定します。</p>
+                            <div className="py-4 text-sm text-gray-500">
+                              <p>お送りいただいた服が届きしだい、1点ずつ査定します。</p>
+                              {req.status === 'pending' && (
+                                <p className="mt-2 leading-6">
+                                  送り先（着払い）: {BUYBACK_SHIP_TO.postal} {BUYBACK_SHIP_TO.address} {BUYBACK_SHIP_TO.name} TEL {BUYBACK_SHIP_TO.tel}
+                                </p>
+                              )}
+                            </div>
                           ) : req.buyback_items.map((item) => (
                             <div key={item.id} className="grid grid-cols-[64px_1fr_auto] gap-4 py-4 border-b border-[#e6e6e1] items-start">
                               <div className="aspect-[4/5] bg-[#f1f0ec] overflow-hidden">

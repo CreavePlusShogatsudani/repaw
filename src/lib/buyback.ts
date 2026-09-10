@@ -29,8 +29,7 @@ export const BUYBACK_ITEM_PUBLIC_SELECT =
 
 // 申込のステータス（ユーザー向けの言葉）
 export const REQUEST_STATUS_USER: Record<string, string> = {
-  pending:   '受付済み',
-  kit_sent:  '配送キット送付済み',
+  pending:   '受付済み（発送をお待ちしています）',
   received:  '商品到着・査定中',
   reviewing: '査定中',
   quoted:    '査定額が届いています',
@@ -42,8 +41,7 @@ export const REQUEST_STATUS_USER: Record<string, string> = {
 
 // 申込のステータス（管理画面向け）
 export const REQUEST_STATUS_ADMIN: Record<string, { label: string; color: string }> = {
-  pending:   { label: '申込',         color: 'bg-yellow-100 text-yellow-800' },
-  kit_sent:  { label: 'キット送付済み', color: 'bg-blue-100 text-blue-800' },
+  pending:   { label: '申込（到着待ち）', color: 'bg-yellow-100 text-yellow-800' },
   received:  { label: '到着・査定中',  color: 'bg-purple-100 text-purple-800' },
   reviewing: { label: '査定中',       color: 'bg-purple-100 text-purple-800' },
   quoted:    { label: '査定額提示済み', color: 'bg-orange-100 text-orange-800' },
@@ -64,6 +62,15 @@ export const ITEM_STATUS_USER: Record<string, string> = {
   sold:           '売れました',
   rejected:       '買取不可',
   returned:       '返送',
+};
+
+// 買取の送り先。ユーザーが自分で梱包して着払いで送る（配送キットは送らない。2026-09-10 決定）
+// TODO: 実際の宛名・住所・電話番号に差し替える
+export const BUYBACK_SHIP_TO = {
+  name: 'RePaw 買取係',
+  postal: '〒000-0000',
+  address: '（送り先住所を設定してください）',
+  tel: '000-0000-0000',
 };
 
 export const RANK_OPTIONS = ['A', 'B', 'C'] as const;

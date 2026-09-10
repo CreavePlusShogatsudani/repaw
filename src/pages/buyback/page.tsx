@@ -5,6 +5,7 @@ import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { BUYBACK_SHIP_TO } from '../../lib/buyback';
 
 export default function BuybackPage() {
   const [formData, setFormData] = useState({
@@ -315,8 +316,14 @@ export default function BuybackPage() {
             {submitStatus === 'success' && (
               <div className="mt-6 p-4 bg-[#f3f2ee] border border-[#e6e6e1] rounded-sm">
                 <p className="text-[#2a2a28] text-sm">
-                  お申し込みありがとうございます。担当者より3営業日以内にご連絡いたします。
+                  お申し込みありがとうございます。犬服をお手持ちの箱や袋に入れて、下記まで<strong>着払い</strong>でお送りください。送料はRePawが負担します。
                 </p>
+                <p className="mt-3 text-sm leading-6 text-[#2a2a28]">
+                  {BUYBACK_SHIP_TO.postal} {BUYBACK_SHIP_TO.address}<br />
+                  {BUYBACK_SHIP_TO.name}<br />
+                  TEL {BUYBACK_SHIP_TO.tel}
+                </p>
+                <p className="mt-3 text-xs text-gray-500">送り先はマイページの「買取申込履歴」からもご確認いただけます。到着後、2〜3営業日で査定結果をお知らせします。</p>
               </div>
             )}
 

@@ -164,10 +164,10 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 | user_id | uuid | 申込はログイン必須 |
 | name / email / phone / address / instagram | text | プロフィールからプリフィル |
 | item_type / item_description / condition / purchase_date / message | text | |
-| status | text | pending → kit_sent → received → quoted → accepted → completed。途中で returned / rejected |
+| status | text | pending → received → quoted → accepted → completed。途中で returned / rejected（kit_sent は 2026-09-10 に廃止） |
 | estimated_price / admin_note | integer / text | 管理者が入力 |
 | return_preference | text | 買取不可・不同意時の扱い: `donate` / `return_cod` |
-| kit_sent_at / received_at / paid_at | timestamptz | 送付型の日時 |
+| kit_sent_at / received_at / paid_at | timestamptz | 到着・完了の日時（kit_sent_at は未使用で残置） |
 | payout_method | text | `donate`（全額寄付） / `transfer`（振込。販売時5%を自動寄付） |
 | bank_* / user_responded_at | | ユーザーの査定回答。**RPC `respond_buyback()` 経由でのみ書ける**（010） |
 
@@ -195,7 +195,7 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 - 書体: 本文・見出しとも Noto Sans JP（見出しは 500、字間 .06〜.08em）。Playfair Display はロゴと英字の小見出しだけ
 - 角丸は 2px。区切りは余白と 1px の罫線。影は使わない
 - トップの順番: 全面写真のヒーロー（1〜2行のコピー + 黒/白ボタン1つ）→ 約束の行（5%寄付・一点物・前のオーナー）→ 新着8点 → あの子のおさがり → サイズ（テキスト）と種類（商品写真タイル）の入口 + 4点 → 寄付の仕組みと買取の流れ（生成り地）→ 特集 → ニュース → 問い合わせ
-- 商品カード: 写真（`--rp-photo-bg` 地に multiply）、ブランド小文字、品名、サイズ・ランク、価格、最終行に「○○ちゃんのおさがり」
+- 商品カード: 写真（`--rp-photo-bg` 地に multiply）、ブランド小文字、品名、カテゴリ・サイズ・ランク、価格、最終行に「○○ちゃんのおさがり」
 - 商品詳細は価格の下に「このお買い物から ¥○ を寄付」。寄付率は `src/lib/donation.ts`
 - 商品写真が最大のボトルネック。一眼レフでの統一撮影（背景・照明・構図を固定）が前提
 - 下層ページも同じ文法。共通部品 `src/components/PageHeader.tsx`（英字の小見出し + h1 + 一文）と `src/index.css` の「下層ページ共通」クラス（page / page-section / rp-prose / rp-rows / rp-steps / rp-tabs / rp-faq / rp-band / rp-input / rp-article）を使う
@@ -210,9 +210,9 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 3. `stripe-webhook` が `finalize_order()` で注文・明細・sold_out を1トランザクションで確定（冪等）
 - 再開手順: `src/pages/checkout/page.tsx` の `CHECKOUT_ENABLED` を true にする。**カート側の「購入手続きへ進む」は別途 disabled ハードコードのため要修正**
 
-### 買取（送付型・服1点ごとの査定）
-1. `/buyback`（ログイン必須、写真添付なし）。「買取できない服の扱い」（寄付 / 着払い返送）を申込時に選ぶ → `buyback_requests`（status: pending）
-2. 管理画面 `/admin/buyback/:id`: 「配送キットを送った」→ kit_sent、「商品が届いた」→ received
+### 買取（ユーザーが着払いで送る・服1点ごとの査定）
+1. `/buyback`（ログイン必須、写真添付なし）。「買取できない服の扱い」（寄付 / 着払い返送）を申込時に選ぶ → `buyback_requests`（status: pending）。完了画面とマイページに送り先（`BUYBACK_SHIP_TO`、`src/lib/buyback.ts`）を表示し、ユーザーが自分で梱包して**着払い**で送る。配送キットは送らない
+2. 管理画面 `/admin/buyback/:id`: 「商品が届いた」→ received
 3. 到着した服を「服を追加」で1点ずつ登録（`buyback_items`）。スマホで撮影（タグ・全体・気になる箇所）→「AIで読み取る」（Edge Function `appraise-item`）でブランド・種類・色・サイズ表記・素材・状態の所見が空欄に入る → スタッフが確認し、実寸、可否、ランク、本人に見せる一言、買取額を入力。社内メモと販売予定価格は `buyback_item_internal`（管理者のみ）。AI の生出力は `ai_reading` に保存
 4. 「査定額を提示する」→ 服は appraised / rejected、申込は quoted（全点不可なら rejected）
 5. ユーザーは `/buyback/response/:id` で内訳を見て、寄付 / 振込 / 全点着払い返送 を申込全体で1回回答 → RPC `respond_buyback`
@@ -249,9 +249,9 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 | 商品管理 | /admin/products | CRUD・画像アップロード・実寸・ステータス（公開/下書き/売り切れ） |
 | ニュース管理 | /admin/news | 記事 CRUD・公開管理 |
 | 注文管理 | /admin/orders | 注文一覧・ステータス更新 |
-| 買取申込管理 | /admin/buyback | キット送付・到着・1点ごとの査定（AI読み取り）・査定額提示・完了 |
+| 買取申込管理 | /admin/buyback | 到着・1点ごとの査定（AI読み取り）・査定額提示・完了 |
 | 撮影待ち | /admin/photo-queue | 買取確定した服の撮影・公開状況 |
-| 問い合わせ管理 | /admin/inquiries | ステータスフィルタ（既定: 承認待ち）・AI下書き編集・承認送信 |
+| 問い合わせ管理 | /admin/inquiries | ステータスフィルタ（既定: 承認待ち）・AI下書き編集・承認送信。左メニューに未処理+承認待ちの件数 |
 | ユーザー一覧 | /admin/members | |
 | 管理者アカウント | /admin/users | is_admin の付与・剥奪 |
 | メインビジュアル | /admin/banners | ヒーローバナー管理 |

@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 type Product = {
     id: string;
     name: string;
+    category: string | null;
+    size: string | null;
     price: number;
     stock: number;
     status: string;
@@ -19,7 +21,7 @@ export default function AdminProductsPage() {
         setLoading(true);
         const { data, error } = await supabase
             .from('products')
-            .select('id, name, price, stock, status, created_at')
+            .select('id, name, category, size, price, stock, status, created_at')
             .order('created_at', { ascending: false });
 
         if (error) {
@@ -71,6 +73,8 @@ export default function AdminProductsPage() {
                         <thead>
                             <tr className="bg-gray-50 border-b border-gray-100 text-sm text-gray-500">
                                 <th className="p-4 font-medium">商品名</th>
+                                <th className="p-4 font-medium">カテゴリ</th>
+                                <th className="p-4 font-medium">サイズ</th>
                                 <th className="p-4 font-medium">価格</th>
                                 <th className="p-4 font-medium">在庫数</th>
                                 <th className="p-4 font-medium">ステータス</th>
@@ -81,13 +85,13 @@ export default function AdminProductsPage() {
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan={6} className="p-8 text-center text-gray-500">
+                                    <td colSpan={8} className="p-8 text-center text-gray-500">
                                         読み込み中...
                                     </td>
                                 </tr>
                             ) : products.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="p-8 text-center text-gray-500">
+                                    <td colSpan={8} className="p-8 text-center text-gray-500">
                                         商品がありません。
                                     </td>
                                 </tr>
@@ -97,6 +101,8 @@ export default function AdminProductsPage() {
                                         <td className="p-4 text-sm font-medium text-gray-900">
                                             {product.name}
                                         </td>
+                                        <td className="p-4 text-sm text-gray-500">{product.category || '-'}</td>
+                                        <td className="p-4 text-sm text-gray-500">{product.size || '-'}</td>
                                         <td className="p-4 text-sm text-gray-500">
                                             ¥{(product.price ?? 0).toLocaleString()}
                                         </td>

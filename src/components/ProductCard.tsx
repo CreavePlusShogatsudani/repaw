@@ -19,8 +19,9 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
       {product.brand?.trim() && <p className="product-card-brand">{product.brand}</p>}
       <h3 className={product.brand?.trim() ? '' : 'mt-3'}>{product.name}</h3>
-      {(product.size?.trim() || condition) && (
+      {(product.category?.trim() || product.size?.trim() || condition) && (
         <p className="product-card-meta">
+          {product.category?.trim() && <span>{product.category}</span>}
           {product.size?.trim() && <span>サイズ {product.size}</span>}
           {condition && <span title={condition.description}>{condition.label}</span>}
         </p>

@@ -10,7 +10,6 @@ interface BuybackRow {
   status: string;
   payout_method: 'donate' | 'transfer' | null;
   created_at: string;
-  kit_sent_at: string | null;
   received_at: string | null;
   item_count: number;
 }
@@ -34,7 +33,7 @@ export default function AdminBuybackPage() {
     setLoading(true);
     const { data, error } = await supabase
       .from('buyback_requests')
-      .select('id, name, email, status, payout_method, created_at, kit_sent_at, received_at, buyback_items(count)')
+      .select('id, name, email, status, payout_method, created_at, received_at, buyback_items(count)')
       .order('created_at', { ascending: false });
     if (error) {
       console.error('Error fetching buyback requests:', error);
@@ -65,7 +64,7 @@ export default function AdminBuybackPage() {
         </button>
       </div>
 
-      <p className="text-sm text-gray-500 mb-4">流れ: 申込 → キット送付 → 到着（スマホで撮影して1点ずつ査定）→ 査定額提示 → ユーザー回答 → 入金/寄付で完了</p>
+      <p className="text-sm text-gray-500 mb-4">流れ: 申込 → ユーザーが着払いで発送 → 到着（スマホで撮影して1点ずつ査定）→ 査定額提示 → ユーザー回答 → 入金/寄付で完了</p>
 
       <div className="flex flex-wrap gap-2 mb-6">
         {FILTERS.map(({ value, label }) => (
@@ -101,8 +100,7 @@ export default function AdminBuybackPage() {
               {visible.map((r) => {
                 const st = REQUEST_STATUS_ADMIN[r.status] ?? { label: r.status, color: 'bg-gray-100 text-gray-800' };
                 const next: Record<string, string> = {
-                  pending: '配送キットを送る',
-                  kit_sent: '到着を待つ',
+                  pending: '到着を待つ',
                   received: '撮影して査定する',
                   quoted: 'ユーザーの回答を待つ',
                   accepted: r.payout_method === 'transfer' ? '振り込む' : '寄付処理をする',

@@ -26,7 +26,6 @@ interface BuybackRequest {
   bank_account_number: string | null;
   bank_account_holder: string | null;
   user_responded_at: string | null;
-  kit_sent_at: string | null;
   received_at: string | null;
   paid_at: string | null;
   created_at: string;
@@ -88,7 +87,6 @@ export default function AdminBuybackDetailPage() {
     if (error) { alert('更新に失敗しました。'); return; }
     await load();
   };
-  const markKitSent = () => updateRequest({ status: 'kit_sent', kit_sent_at: new Date().toISOString() });
   const markReceived = () => updateRequest({ status: 'received', received_at: new Date().toISOString() });
   const markCompleted = () => {
     if (!confirm(request?.payout_method === 'transfer' ? '振込済みとして完了にしますか？' : '寄付処理済みとして完了にしますか？')) return;
@@ -261,7 +259,7 @@ export default function AdminBuybackDetailPage() {
   if (loading || !request) return <div className="text-center py-16 text-gray-500">読み込み中...</div>;
 
   const st = REQUEST_STATUS_ADMIN[request.status] ?? { label: request.status, color: 'bg-gray-100 text-gray-800' };
-  const editable = ['pending', 'kit_sent', 'received', 'reviewing'].includes(request.status);
+  const editable = ['pending', 'received', 'reviewing'].includes(request.status);
   const total = requestTotal(items.map(numeric));
   const inputCls = 'w-full p-2.5 border border-gray-200 rounded text-sm bg-white';
 
@@ -276,8 +274,7 @@ export default function AdminBuybackDetailPage() {
           <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${st.color}`}>{st.label}</span>
         </div>
         <div className="flex flex-wrap gap-2">
-          {request.status === 'pending' && <button onClick={markKitSent} className="px-4 py-2 bg-gray-900 text-white text-sm rounded hover:bg-gray-700">配送キットを送った</button>}
-          {['pending', 'kit_sent'].includes(request.status) && <button onClick={markReceived} className="px-4 py-2 border text-sm rounded hover:bg-gray-50">商品が届いた</button>}
+          {request.status === 'pending' && <button onClick={markReceived} className="px-4 py-2 bg-gray-900 text-white text-sm rounded hover:bg-gray-700">商品が届いた</button>}
           {editable && <button onClick={quote} className="px-4 py-2 bg-orange-500 text-white text-sm rounded hover:bg-orange-600">査定額を提示する（¥{total.toLocaleString()}）</button>}
           {request.status === 'accepted' && <button onClick={markCompleted} className="px-4 py-2 bg-gray-900 text-white text-sm rounded hover:bg-gray-700">{request.payout_method === 'transfer' ? '振込済みにする' : '寄付処理済みにする'}</button>}
         </div>
@@ -301,7 +298,7 @@ export default function AdminBuybackDetailPage() {
           <p><span className="text-gray-500">購入時期:</span> {request.purchase_date || '-'}</p>
           <p><span className="text-gray-500">ご要望:</span> {request.message || '-'}</p>
           <p className="text-xs text-gray-400 pt-2">
-            キット送付: {request.kit_sent_at ? new Date(request.kit_sent_at).toLocaleDateString('ja-JP') : '-'} / 到着: {request.received_at ? new Date(request.received_at).toLocaleDateString('ja-JP') : '-'} / 完了: {request.paid_at ? new Date(request.paid_at).toLocaleDateString('ja-JP') : '-'}
+            到着: {request.received_at ? new Date(request.received_at).toLocaleDateString('ja-JP') : '-'} / 完了: {request.paid_at ? new Date(request.paid_at).toLocaleDateString('ja-JP') : '-'}
           </p>
         </div>
       </div>
