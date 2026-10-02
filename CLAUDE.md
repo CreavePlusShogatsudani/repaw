@@ -86,7 +86,7 @@ src/
     └── index.ts
 
 supabase/
-├── migrations/             # 000_baseline → 004 → … → 014（本番適用済み）
+├── migrations/             # 000_baseline → 004 → … → 014（本番適用済み）→ 015（寄付サイトの申込。未適用）
 ├── functions/
 │   ├── create-payment-intent/   # 決済開始（金額はDBが決める）
 │   ├── stripe-webhook/          # 決済確定 → finalize_order
@@ -176,6 +176,10 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 - items: request_id、intake_photos、has_tag、brand、item_type、color、size_label、material、実寸3項目、rank、appraisal_comment（本人に見せる）、decision（buyable / not_buyable）、reject_reason、buyback_price、product_id、status（pending → appraised → awaiting_photo → photographed → listed → sold、rejected / returned）
 - internal: condition_notes、ai_reading、sale_price。管理者だけが読める（RLS）
 
+### donation_signups（寄付サイトの申込。015）
+寄付サイト（donate.repaw.jp。別リポジトリ ~/Developer/repaw-donate、同じ Supabase を使う）のフォームから、ログイン不要で INSERT だけできる。読めるのは管理者だけ（当面は Table Editor で見る）。
+name / email / item_count（点数の目安）/ address / instagram / thanks_consent / locale。`thanks_consent = true` の人だけ、オープン時のスペシャルサンクスページに Instagram を載せる（本人の同意。同意するなら instagram 必須の check あり）。
+
 ### inquiries（問い合わせ）
 | カラム | 型 | 備考 |
 |--------|-----|------|
@@ -213,6 +217,7 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 - 再開前に直すもの（2026-10-02 の監査で判明・未対応）: 確認画面の「注文を確定する」が決済せずに遷移する / 予約切れ後に finalize_order が二重販売しうる（予約者を確認しない）/ 注文完了画面の「確認メールを送信しました」に送信処理が無い / 管理画面の注文キャンセルが商品・返金・買取の服に反映されない / 商品フォームが reserved を上書きしうる
 
 ### 買取（ユーザーが着払いで送る・服1点ごとの査定）
+- **受付は停止中**（古物商の許可待ち。2026-10-02）: `src/pages/buyback/page.tsx` の `BUYBACK_ENABLED = false` で「準備中」表示。既存申込の査定回答・管理画面は動く。許可が下りたら true にする。それまでは寄付サイト（donate.repaw.jp、別リポジトリ）で無償の寄付だけ受け付ける
 1. `/buyback`（ログイン必須、写真添付なし）。「買取できない服の扱い」（寄付 / 着払い返送）を申込時に選ぶ → `buyback_requests`（status: pending）。完了画面とマイページに送り先（`BUYBACK_SHIP_TO`、`src/lib/buyback.ts`）を表示し、ユーザーが自分で梱包して**着払い**で送る。配送キットは送らない
 2. 管理画面 `/admin/buyback/:id`: 「商品が届いた」→ received
 3. 到着した服を「服を追加」で1点ずつ登録（`buyback_items`）。スマホで撮影（タグ・全体・気になる箇所）→「AIで読み取る」（Edge Function `appraise-item`）でブランド・種類・色・サイズ表記・素材・状態の所見が空欄に入る → スタッフが確認し、実寸、可否、ランク、本人に見せる一言、買取額を入力。社内メモと販売予定価格は `buyback_item_internal`（管理者のみ）。AI の生出力は `ai_reading` に保存

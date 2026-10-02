@@ -7,6 +7,9 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { BUYBACK_SHIP_TO } from '../../lib/buyback';
 
+// 古物商の許可が下りるまで買取の受付を停止（true にすると再開）。既存の申込の査定回答・管理画面はそのまま動く
+const BUYBACK_ENABLED = false;
+
 export default function BuybackPage() {
   const [formData, setFormData] = useState({
     name: '',
@@ -88,6 +91,27 @@ export default function BuybackPage() {
       setIsSubmitting(false);
     }
   };
+
+  if (!BUYBACK_ENABLED) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Navigation />
+        <main className="pt-32 pb-24 px-4 text-center">
+          <h1 className="text-[26px] md:text-[34px] font-medium tracking-[.08em]">買取の受付は準備中です</h1>
+          <p className="mt-3 text-sm text-[#6f6f6a] leading-relaxed">
+            準備が整い次第、お申し込みいただけるようになります。
+          </p>
+          <Link
+            to="/products"
+            className="inline-block mt-8 px-8 py-3 bg-[#161616] text-white rounded-sm font-medium hover:bg-[#333] transition-colors cursor-pointer whitespace-nowrap"
+          >
+            商品一覧へ戻る
+          </Link>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
