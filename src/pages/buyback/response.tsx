@@ -6,7 +6,7 @@ import PageHeader from '../../components/PageHeader';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { BUYBACK_ITEM_PUBLIC_SELECT, itemDisplayName, requestTotal, type BuybackItem } from '../../lib/buyback';
-import { DONATION_RATE, DONATION_RATE_LABEL } from '../../lib/donation';
+import { DONATION_RATE_LABEL } from '../../lib/donation';
 
 interface BuybackRequest {
   id: string;
@@ -104,13 +104,16 @@ export default function BuybackResponsePage() {
 
   // 既に回答済み、または回答できる状態ではない
   if (request.status !== 'quoted') {
+    const waiting = ['pending', 'received', 'reviewing'].includes(request.status);
+    const title = waiting ? 'まだ査定中です' : request.status === 'rejected' ? '買取できる服がありませんでした' : 'この申込は回答済みです';
+    const lead = waiting ? '査定が終わりしだい、このページで結果をご確認いただけます。' : request.status === 'rejected' ? '理由はマイページの買取履歴からご確認いただけます。' : '内容はマイページの買取履歴からご確認いただけます。';
     return (
       <div className="min-h-screen bg-white">
         <Navigation />
         <main className="page">
           <div className="shop-container max-w-[40em] mx-auto py-24 text-center">
-            <h1 className="text-[26px] font-medium tracking-[.08em]">この申込は回答済みです</h1>
-            <p className="mt-4 text-sm text-[color:var(--rp-muted)]">内容はマイページの買取履歴からご確認いただけます。</p>
+            <h1 className="text-[26px] font-medium tracking-[.08em]">{title}</h1>
+            <p className="mt-4 text-sm text-[color:var(--rp-muted)]">{lead}</p>
             <button onClick={() => navigate('/mypage', { state: { tab: 'sell' } })} className="rp-btn rp-btn-black mt-8">マイページへ戻る</button>
           </div>
         </main>
@@ -175,9 +178,6 @@ export default function BuybackResponsePage() {
                     <div>
                       <p className="text-[15px] font-medium">{opt.title}</p>
                       <p className="text-sm leading-6 text-[color:var(--rp-muted)] mt-1">{opt.text}</p>
-                      {opt.value === 'transfer' && total > 0 && (
-                        <p className="text-xs text-[color:var(--rp-muted)] mt-1">販売時の寄付の目安: 約 ¥{Math.floor(total * DONATION_RATE).toLocaleString()}</p>
-                      )}
                     </div>
                   </label>
                 ))}

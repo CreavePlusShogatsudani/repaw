@@ -11,11 +11,11 @@ export default function DonationSection() {
           <h2>お買い物が、<br />動物たちの支援になる。</h2>
           <p className="mt-4 text-sm leading-8 text-[color:var(--rp-text)] max-w-[34em]">RePawで買った犬服の販売価格の{DONATION_RATE_LABEL}を、動物保護団体へ寄付しています。特別なことをしなくても、好きな服を選ぶだけで支援になります。</p>
           <dl className="donation-facts">
-            <div><dt>寄付先</dt><dd>提携している動物保護NPO</dd></div>
+            <div><dt>寄付先</dt><dd>動物保護団体（現在選定中）</dd></div>
             <div><dt>使いみち</dt><dd>保護犬・保護猫の医療費、食費、シェルターの運営費</dd></div>
-            <div><dt>報告</dt><dd>寄付の実績はニュースと「動物たちへの支援」ページで公開</dd></div>
+            <div><dt>報告</dt><dd>寄付のご報告はニュースでお知らせします</dd></div>
           </dl>
-          <Link to="/impact" className="shop-text-link mt-7">取り組みと実績を見る</Link>
+          <Link to="/impact" className="shop-text-link mt-7">取り組みを見る</Link>
         </div>
         <div>
           <p className="shop-eyebrow">Pass it on</p>

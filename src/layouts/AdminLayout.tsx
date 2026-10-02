@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { NEEDS_ACTION_FILTER } from '../lib/buyback';
 
 export default function AdminLayout() {
     const navigate = useNavigate();
@@ -50,7 +51,7 @@ export default function AdminLayout() {
         supabase
             .from('buyback_requests')
             .select('id', { count: 'exact', head: true })
-            .in('status', ['pending', 'received', 'accepted'])
+            .or(NEEDS_ACTION_FILTER)
             .then(({ count }) => setBuybackBadge(count ?? 0));
         supabase
             .from('buyback_items')

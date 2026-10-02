@@ -153,7 +153,7 @@ export default function AdminOwnersPage() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-2xl font-bold">おさがりオーナー</h1>
-          <p className="text-sm text-gray-500 mt-1">商品に紐づける「前に着ていた子」。「特集に出す」をONにするとトップの「あの子のおさがり」に表示されます</p>
+          <p className="text-sm text-gray-500 mt-1">商品に紐づける「前に着ていた子」。「特集に出す」をONにするとトップの「あの子のおさがり」に表示されます（表示順の先頭3件まで）</p>
         </div>
         <button onClick={openNew} className="px-4 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 whitespace-nowrap">
           <i className="ri-add-line mr-1"></i>追加

@@ -103,7 +103,6 @@ export default function CartPage() {
                               >
                                 {item.name}
                               </Link>
-                              {item.seller?.trim() && item.seller !== '出品者' && <p className="text-xs md:text-sm text-gray-600 mt-1">元のオーナー：{item.seller}</p>}
                             </div>
                             <button
                               aria-label={`${item.name}をカートから削除`}

@@ -8,7 +8,6 @@ type Product = {
     category: string | null;
     size: string | null;
     price: number;
-    stock: number;
     status: string;
     created_at: string;
 };
@@ -21,7 +20,7 @@ export default function AdminProductsPage() {
         setLoading(true);
         const { data, error } = await supabase
             .from('products')
-            .select('id, name, category, size, price, stock, status, created_at')
+            .select('id, name, category, size, price, status, created_at')
             .order('created_at', { ascending: false });
 
         if (error) {
@@ -47,7 +46,10 @@ export default function AdminProductsPage() {
 
         if (error) {
             console.error('Error deleting product:', error);
-            alert('商品の削除に失敗しました。');
+            // 23503: 買取の服や注文に紐づいている（014 で削除を止めている）
+            alert(error.code === '23503'
+                ? '買取の服や注文に紐づいているため削除できません。非公開（下書き）にしてください。'
+                : '商品の削除に失敗しました。');
         } else {
             alert('商品を削除しました。');
             fetchProducts();
@@ -76,7 +78,6 @@ export default function AdminProductsPage() {
                                 <th className="p-4 font-medium">カテゴリ</th>
                                 <th className="p-4 font-medium">サイズ</th>
                                 <th className="p-4 font-medium">価格</th>
-                                <th className="p-4 font-medium">在庫数</th>
                                 <th className="p-4 font-medium">ステータス</th>
                                 <th className="p-4 font-medium">登録日</th>
                                 <th className="p-4 font-medium text-right">操作</th>
@@ -85,13 +86,13 @@ export default function AdminProductsPage() {
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan={8} className="p-8 text-center text-gray-500">
+                                    <td colSpan={7} className="p-8 text-center text-gray-500">
                                         読み込み中...
                                     </td>
                                 </tr>
                             ) : products.length === 0 ? (
                                 <tr>
-                                    <td colSpan={8} className="p-8 text-center text-gray-500">
+                                    <td colSpan={7} className="p-8 text-center text-gray-500">
                                         商品がありません。
                                     </td>
                                 </tr>
@@ -105,9 +106,6 @@ export default function AdminProductsPage() {
                                         <td className="p-4 text-sm text-gray-500">{product.size || '-'}</td>
                                         <td className="p-4 text-sm text-gray-500">
                                             ¥{(product.price ?? 0).toLocaleString()}
-                                        </td>
-                                        <td className="p-4 text-sm text-gray-500">
-                                            {product.stock ?? 0}
                                         </td>
                                         <td className="p-4 text-sm">
                                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${product.status === 'published'

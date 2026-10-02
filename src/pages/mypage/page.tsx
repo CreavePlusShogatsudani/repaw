@@ -8,7 +8,7 @@ import type { Product } from '../../types';
 import PageMeta from '../../components/PageMeta';
 import { lookupPostalCode, normalizePostalCode } from '../../lib/postal';
 import { BUYBACK_ITEM_PUBLIC_SELECT, BUYBACK_SHIP_TO, REQUEST_STATUS_USER, ITEM_STATUS_USER, itemDisplayName, requestTotal, type BuybackItem } from '../../lib/buyback';
-import { DONATION_RATE } from '../../lib/donation';
+import { DONATION_RATE, DONATION_RATE_LABEL } from '../../lib/donation';
 
 interface OrderItemWithProduct {
   id: string;
@@ -37,7 +37,7 @@ interface BuybackRequest {
   payout_method: 'donate' | 'transfer' | null;
   return_preference: 'donate' | 'return_cod';
   created_at: string;
-  buyback_items: BuybackItem[];
+  buyback_items: (BuybackItem & { product?: { price: number } | null })[];
 }
 
 interface Inquiry {
@@ -127,7 +127,7 @@ export default function MyPage() {
       setPetName(profile.pet_name || '');
       setPetBreed(profile.pet_breed || '');
       setInstagramAccount(profile.instagram_account || '');
-      setShowInstagram(profile.show_instagram ?? true);
+      setShowInstagram(profile.show_instagram ?? false);
       setRecipientName(profile.full_name || '');
       setPostalCode(profile.postal_code || '');
       setPostalError('');
@@ -160,7 +160,7 @@ export default function MyPage() {
     setBuybackLoading(true);
     supabase
       .from('buyback_requests')
-      .select(`id, status, payout_method, return_preference, created_at, buyback_items(${BUYBACK_ITEM_PUBLIC_SELECT})`)
+      .select(`id, status, payout_method, return_preference, created_at, buyback_items(${BUYBACK_ITEM_PUBLIC_SELECT}, product:products(price))`)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
@@ -203,12 +203,15 @@ export default function MyPage() {
       });
   }, [activeTab, user]);
 
+  // 全額寄付は管理者が「寄付処理済み」にした申込だけ、振込は売れた服の販売価格の寄付率分だけを数える
   const donateTotal = buybackRequests
-    .filter(r => r.payout_method === 'donate')
+    .filter(r => r.payout_method === 'donate' && r.status === 'completed')
     .reduce((sum, r) => sum + requestTotal(r.buyback_items), 0);
   const transferDonation = buybackRequests
     .filter(r => r.payout_method === 'transfer')
-    .reduce((sum, r) => sum + Math.floor(requestTotal(r.buyback_items) * DONATION_RATE), 0);
+    .flatMap(r => r.buyback_items)
+    .filter(i => i.status === 'sold' && i.product)
+    .reduce((sum, i) => sum + Math.floor((i.product?.price ?? 0) * DONATION_RATE), 0);
   const donationTotal = donateTotal + transferDonation;
 
   const handleSaveProfile = async () => {
@@ -625,7 +628,7 @@ export default function MyPage() {
                         <h3 className="font-medium mb-2">{product.name}</h3>
                         <div className="flex items-center gap-2 mb-3">
                           <span className="font-bold">¥{(product.price ?? 0).toLocaleString()}</span>
-                          {product.original_price && (
+                          {product.original_price != null && product.original_price > product.price && (
                             <span className="text-sm text-gray-400 line-through">
                               ¥{(product.original_price ?? 0).toLocaleString()}
                             </span>
@@ -673,7 +676,7 @@ export default function MyPage() {
                         <p className="text-xs text-gray-400">全額寄付 ¥{donateTotal.toLocaleString()}</p>
                       )}
                       {transferDonation > 0 && (
-                        <p className="text-xs text-gray-400">振込5% ¥{transferDonation.toLocaleString()}</p>
+                        <p className="text-xs text-gray-400">販売時の{DONATION_RATE_LABEL} ¥{transferDonation.toLocaleString()}</p>
                       )}
                     </div>
                     <p className="text-xs text-gray-400 mt-0.5">保護犬・保護猫の支援に使われています</p>
@@ -687,7 +690,7 @@ export default function MyPage() {
                 <div className="space-y-6">
                   {buybackRequests.map((req) => {
                     const date = new Date(req.created_at).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
-                    const showPrices = ['quoted', 'accepted', 'completed', 'returned'].includes(req.status);
+                    const showPrices = ['quoted', 'accepted', 'completed', 'returned', 'rejected'].includes(req.status);
                     const total = requestTotal(req.buyback_items);
                     return (
                       <div key={req.id} className="bg-white border border-[#e6e6e1] rounded-sm p-6">
@@ -737,12 +740,12 @@ export default function MyPage() {
                           ))}
                         </div>
 
-                        {showPrices && (
+                        {showPrices && !['returned', 'rejected'].includes(req.status) && (
                           <div className="flex justify-between items-baseline pt-4">
                             <p className="text-sm text-gray-600">
                               買取額 合計
                               {req.payout_method === 'donate' && <span className="ml-2 text-xs">全額寄付</span>}
-                              {req.payout_method === 'transfer' && <span className="ml-2 text-xs">振込（販売時に{Math.floor(total * DONATION_RATE).toLocaleString()}円を寄付）</span>}
+                              {req.payout_method === 'transfer' && <span className="ml-2 text-xs">振込（販売時に販売価格の{DONATION_RATE_LABEL}を寄付）</span>}
                             </p>
                             <p className="text-lg font-medium tabular-nums">¥{total.toLocaleString()}</p>
                           </div>

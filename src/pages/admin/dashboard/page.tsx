@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
+import { NEEDS_ACTION_FILTER } from '../../../lib/buyback';
 
 export default function AdminDashboardPage() {
     const [stats, setStats] = useState({
@@ -35,7 +36,7 @@ export default function AdminDashboardPage() {
             const { count: buybackAction } = await supabase
                 .from('buyback_requests')
                 .select('id', { count: 'exact', head: true })
-                .in('status', ['pending', 'received', 'accepted']);
+                .or(NEEDS_ACTION_FILTER);
 
             setStats({
                 productsCount: productsCount || 0,
@@ -111,7 +112,7 @@ export default function AdminDashboardPage() {
                         </div>
                     </div>
                     <div className="text-3xl font-bold text-gray-900">{stats.buybackAction}<span className="text-base font-normal text-gray-500 ml-1">件</span></div>
-                    <p className="text-xs text-gray-500 mt-2">到着・査定・振込や寄付処理が待っている申込</p>
+                    <p className="text-xs text-gray-500 mt-2">到着・査定・振込や寄付処理・返送が待っている申込</p>
                 </Link>
             </div>
         </div>

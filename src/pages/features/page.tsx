@@ -23,13 +23,14 @@ export default function FeaturesPage() {
     useEffect(() => {
         supabase
             .from('collections')
-            .select('*, collection_products(count)')
+            .select('*, collection_products(product:products(status))')
             .eq('is_active', true)
             .order('sort_order', { ascending: true })
             .then(({ data }) => {
                 const mapped = (data || []).map((c: any) => ({
                     ...c,
-                    product_count: c.collection_products?.[0]?.count ?? 0,
+                    // 詳細ページと同じく、公開中・手続き中・売り切れの商品だけを数える
+                    product_count: (c.collection_products || []).filter((cp: any) => ['published', 'reserved', 'sold_out'].includes(cp.product?.status)).length,
                 }));
                 setCollections(mapped);
                 setLoading(false);

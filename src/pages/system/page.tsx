@@ -44,7 +44,7 @@ const APPRAISAL_POINTS = [
   },
   {
     title: 'お受けできないもの',
-    description: '著しい汚れや破損、においが強いもの、犬服以外のものはお受けできない場合があります。その場合は申し込み時に選んだ方法（返送または寄付）でお返しします。',
+    description: '著しい汚れや破損、においが強いものはお受けできない場合があります。犬服のほか、犬用のバッグ・靴・アクセサリーもお受けしています。その場合は申し込み時に選んだ方法（返送または寄付）でお返しします。',
   },
 ];
 
@@ -81,7 +81,7 @@ const faqs = [
   },
   {
     question: '寄付先の団体はどこですか？',
-    answer: '複数の動物保護NPO団体と提携しており、寄付実績は定期的に公開しています。詳しくは「社会貢献」ページをご覧ください。'
+    answer: '寄付先の動物保護団体は現在選定中です。決まりしだいニュースでお知らせします。寄付のご報告もニュースで行います。'
   },
   {
     question: '買取金額の一部だけ寄付することはできますか？',
@@ -157,10 +157,6 @@ export default function SystemPage() {
                     <div>
                       <h3 className="text-[18px] font-medium tracking-[.04em]">売主からの直接寄付</h3>
                       <p className="mt-3 text-[14px] leading-8">買取査定後、「寄付する」を選択すると、買取金額の全額を動物保護NPOへ寄付します。</p>
-                      <dl className="mt-4 grid grid-cols-[8em_1fr] gap-y-1 text-[13px] text-[color:var(--rp-muted)]">
-                        <dt>例：買取査定額</dt><dd>¥5,000</dd>
-                        <dt>寄付額</dt><dd>¥5,000（全額）</dd>
-                      </dl>
                     </div>
                   </div>
                   <div className="grid grid-cols-[56px_1fr] gap-4">
@@ -199,7 +195,7 @@ export default function SystemPage() {
                 </div>
               ))}
             </div>
-            <p className="mt-12 text-center text-[13px] text-[color:var(--rp-muted)]">寄付実績は定期的に公開し、透明性を保っています。</p>
+            <p className="mt-12 text-center text-[13px] text-[color:var(--rp-muted)]">寄付のご報告はニュースで行います。</p>
           </div>
         </section>
 

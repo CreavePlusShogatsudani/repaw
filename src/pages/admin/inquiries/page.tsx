@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../lib/supabase';
+import { stripMarkdown } from '../../../lib/plainText';
 
 interface Inquiry {
   id: string;
@@ -35,7 +36,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 export default function AdminInquiriesPage() {
   const [inquiries, setInquiries] = useState<InquiryWithEmail[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<string>('pending_approval');
+  const [filter, setFilter] = useState<string>('action');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [draft, setDraft] = useState('');
   const [saving, setSaving] = useState(false);
@@ -86,7 +87,7 @@ export default function AdminInquiriesPage() {
   };
 
   const approveAndSend = async (inq: InquiryWithEmail) => {
-    const reply = draft.trim();
+    const reply = stripMarkdown(draft).trim();
     if (!reply) {
       alert('回答本文を入力してください。');
       return;
@@ -122,8 +123,10 @@ export default function AdminInquiriesPage() {
     setExpandedId(null);
   };
 
-  const pendingCount = inquiries.filter((r) => r.status === 'pending_approval' || r.status === 'received').length;
-  const visible = filter === 'all' ? inquiries : inquiries.filter((r) => r.status === filter);
+  // 要対応 = AI未処理 + 承認待ち（左メニューの件数と同じ条件）
+  const needsAction = (r: Inquiry) => r.status === 'pending_approval' || r.status === 'received';
+  const pendingCount = inquiries.filter(needsAction).length;
+  const visible = filter === 'all' ? inquiries : filter === 'action' ? inquiries.filter(needsAction) : inquiries.filter((r) => r.status === filter);
 
   return (
     <div>
@@ -147,7 +150,7 @@ export default function AdminInquiriesPage() {
 
       {/* ステータスフィルタ */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {[...Object.entries(STATUS_LABELS).map(([value, { label }]) => ({ value, label })), { value: 'all', label: 'すべて' }].map(({ value, label }) => (
+        {[{ value: 'action', label: '要対応' }, ...Object.entries(STATUS_LABELS).map(([value, { label }]) => ({ value, label })), { value: 'all', label: 'すべて' }].map(({ value, label }) => (
           <button
             key={value}
             onClick={() => setFilter(value)}

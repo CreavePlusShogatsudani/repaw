@@ -37,7 +37,7 @@ src/
 ├── components/
 │   ├── PageMeta.tsx        # SEO メタタグ共通コンポーネント
 │   ├── ProductCard.tsx     # 商品カード（一覧・トップ新着・関連商品で共用）
-│   ├── CountUp.tsx / RevealObserver.tsx / InstallPrompt.tsx
+│   ├── RevealObserver.tsx / InstallPrompt.tsx
 ├── contexts/
 │   ├── AuthContext.tsx     # user / profile / signOut / refreshProfile
 │   └── CartContext.tsx     # localStorage 永続化。一点物のため同一商品は1点のみ
@@ -86,7 +86,7 @@ src/
     └── index.ts
 
 supabase/
-├── migrations/             # 000_baseline → 004 → 005 → 006 → 007 → 008 → 009 → 010 → 011（本番適用済み）
+├── migrations/             # 000_baseline → 004 → … → 014（本番適用済み）
 ├── functions/
 │   ├── create-payment-intent/   # 決済開始（金額はDBが決める）
 │   ├── stripe-webhook/          # 決済確定 → finalize_order
@@ -111,7 +111,7 @@ supabase/
 | condition | text | A/B/C（`conditions.ts`） |
 | brand | text | |
 | images | text[] | Storage URL 配列 |
-| stock | integer | |
+| stock | integer | 管理画面では入力しない（一点物。既定 1） |
 | status | text | `published` / `draft` / `reserved`（購入手続き中・15分予約） / `sold_out` |
 | reserved_by / reserved_until | uuid / timestamptz | 005 で追加。pg_cron が毎分期限切れを解放 |
 | seller_id | uuid | 現状どこからも設定されない |
@@ -120,7 +120,7 @@ supabase/
 | back_length_cm / chest_cm / neck_cm | numeric | 実寸。管理画面フォームで入力、カード・詳細に表示 |
 | size_chart | jsonb | 型定義のみ。UI 未使用 |
 
-公開側（一覧・詳細）は `status in (published, reserved, sold_out)` のみ表示。draft は URL 直打ちでも非表示。
+公開側（一覧・詳細）は `status in (published, reserved, sold_out)` のみ表示。draft は URL 直打ちでも非表示で、RLS でも管理者以外は読めない（013）。公開するには写真・価格（1円以上）・カテゴリ・サイズ・状態ランクが必要。
 
 ### profiles
 | カラム | 型 | 備考 |
@@ -129,7 +129,7 @@ supabase/
 | email / full_name / phone | text | |
 | postal_code / prefecture / city / address / building | text | 住所 |
 | pet_name / pet_breed | text | サインアップ時の metadata から反映（008） |
-| instagram_account / show_instagram | text / boolean | ※現状は公開サイトに表示されない（下記「既知の未実装」） |
+| instagram_account / show_instagram | text / boolean | show_instagram（既定 OFF）が ON のとき、本人が買取に出した商品の詳細に表示（012 の計算カラム owner_instagram） |
 | is_admin | boolean | 管理者フラグ。トリガー protect_is_admin で自己昇格を防止 |
 
 ### orders / order_items / checkout_sessions
@@ -151,7 +151,7 @@ user_id + product_id（unique）。商品詳細のハートボタンで追加・
 
 ### hero_banners
 title / subtitle / image_url / link_url / link_text / sort_order / is_active。
-トップの HeroSection が有効バナーを sort_order 順に表示（複数なら5秒で切替）。未登録時は静的な既定コピーと `/images/repaw-dog.jpg`。
+トップの HeroSection は既定のショップ紹介（静的コピーと `/images/repaw-dog.jpg`）を最初に出し、有効バナーがあれば sort_order 順に5秒ごとに切り替える（番号ボタンでも選べる。動きを減らす設定の人には自動で切り替えない）。
 
 ### collections / collection_products / recommended_products
 特集記事と紐づけ商品。`content` は `# 見出し` / `## 見出し` / `![](url)` 記法。
@@ -168,7 +168,7 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 | status | text | pending → received → quoted → accepted → completed。途中で returned / rejected（kit_sent は 2026-09-10 に廃止） |
 | estimated_price / admin_note | integer / text | 管理者が入力 |
 | return_preference | text | 買取不可・不同意時の扱い: `donate` / `return_cod` |
-| kit_sent_at / received_at / paid_at | timestamptz | 到着・完了の日時（kit_sent_at は未使用で残置） |
+| kit_sent_at / received_at / paid_at / returned_at | timestamptz | 到着・完了・返送の日時（kit_sent_at は未使用で残置。returned_at は 014） |
 | payout_method | text | `donate`（全額寄付） / `transfer`（振込。販売時5%を自動寄付） |
 | bank_* / user_responded_at | | ユーザーの査定回答。**RPC `respond_buyback()` 経由でのみ書ける**（010） |
 
@@ -210,6 +210,7 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 2. 有効化時: Edge Function `create-payment-intent` が `begin_checkout()` で金額計算＋商品を15分予約 → Stripe PaymentIntent 作成
 3. `stripe-webhook` が `finalize_order()` で注文・明細・sold_out を1トランザクションで確定（冪等）
 - 再開手順: `src/pages/checkout/page.tsx` の `CHECKOUT_ENABLED` を true にする。**カート側の「購入手続きへ進む」は別途 disabled ハードコードのため要修正**
+- 再開前に直すもの（2026-10-02 の監査で判明・未対応）: 確認画面の「注文を確定する」が決済せずに遷移する / 予約切れ後に finalize_order が二重販売しうる（予約者を確認しない）/ 注文完了画面の「確認メールを送信しました」に送信処理が無い / 管理画面の注文キャンセルが商品・返金・買取の服に反映されない / 商品フォームが reserved を上書きしうる
 
 ### 買取（ユーザーが着払いで送る・服1点ごとの査定）
 1. `/buyback`（ログイン必須、写真添付なし）。「買取できない服の扱い」（寄付 / 着払い返送）を申込時に選ぶ → `buyback_requests`（status: pending）。完了画面とマイページに送り先（`BUYBACK_SHIP_TO`、`src/lib/buyback.ts`）を表示し、ユーザーが自分で梱包して**着払い**で送る。配送キットは送らない
@@ -218,8 +219,8 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 4. 「査定額を提示する」→ 服は appraised / rejected、申込は quoted（全点不可なら rejected）
 5. ユーザーは `/buyback/response/:id` で内訳を見て、寄付 / 振込 / 全点着払い返送 を申込全体で1回回答 → RPC `respond_buyback`
    - 寄付・振込のとき、買取可の服は awaiting_photo になり、下書き商品（status: draft、写真なし）が自動作成されて `product_id` に紐づく
-6. 管理者が「振込済み / 寄付処理済み」→ completed
-7. 管理画面「撮影待ち」（/admin/photo-queue）から下書き商品を開き、一眼レフの写真を入れて公開。写真が入ると photographed、公開で listed、売り切れで sold に服の status が自動で進む（011 のトリガー）。写真が無い商品は公開できない
+6. 管理者が「振込済み / 寄付処理済み」→ completed。買取不可の服を返送する申込は、このとき返送も記録する（returned_at）。全点返送・全点不可（返送希望）は「返送した」で returned_at を記録するまで「要対応」に出る（`needsAction`、`src/lib/buyback.ts`）
+7. 管理画面「撮影待ち」（/admin/photo-queue）から下書き商品を開き、一眼レフの写真を入れて公開。服の status は商品の状態から自動で決まる（写真なし awaiting_photo / 写真ありの下書き photographed / 公開 listed / 売り切れ sold。014 のトリガー）。写真が無い商品は公開できない。買取の服に紐づく商品は削除できない（下書きに戻す）
 - 買取価格の率・目安は公開しない。査定額に不同意なら全点返送（着払い）か全点寄付
 - ステータスと表示名の定義は `src/lib/buyback.ts`
 
@@ -230,7 +231,7 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 4. 管理画面「問い合わせ管理」で下書きを編集し「承認して送信」→ `approved_sent`
 5. ユーザーはマイページ「問い合わせ履歴」で閲覧。回答は `admin_edited_reply ?? ai_draft`。未回答は「確認中です」
 - 回答ポリシー（システムプロンプト）: 返品・返金の確約をしない／取り置き・値引きを約束しない／買取価格に言及しない／不明点は「担当者が確認します」
-- **本人に届く文章はプレーンテキスト**（2026-09-10 ルール化）。`**` `#` `-` などの Markdown 記法を使わない。プロンプトで禁止し、さらに `stripMarkdown()` で落としてから保存する。通知メールを実装するときも同じ
+- **本人に届く文章はプレーンテキスト**（2026-09-10 ルール化）。`**` `#` `-` などの Markdown 記法を使わない。プロンプトで禁止し、さらに `stripMarkdown()` で落としてから保存する（管理者が編集した回答も `src/lib/plainText.ts` で同じ処理）。通知メールを実装するときも同じ
 - Claude API が失敗しても問い合わせは `received` のまま残り、ユーザーには受付成功を返す
 - 必要な Secrets: `ANTHROPIC_API_KEY`（未設定なら AI ステップのみスキップ）
 
@@ -333,7 +334,10 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 ## 既知の未実装・残タスク
 - 通知メール（問い合わせ回答時・買取査定時）: 基盤未選定。`// TODO(#21)` が handle-inquiry と admin/inquiries にある
 - 利用規約 `/terms`・プライバシーポリシー `/privacy`: リンクはあるがページが無い（文面待ち）
-- プロフィールの Instagram（instagram_account / show_instagram）は公開サイトに反映されない。products.seller_id も未設定
+- products.seller_id は未設定（買取由来の売主は buyback_items 経由でたどる）
+- 買取の送り先（`BUYBACK_SHIP_TO`）が仮の値のまま。寄付先の団体も未定のため、サイトでは「選定中・ご報告はニュースで」と表記
+- Supabase 標準のメール送信は組織メンバー宛て・1時間2通まで。独自 SMTP を設定しないとパスワード再設定メールがお客さんに届かない（通知メールの基盤と合わせて選ぶ）
+- 査定提示前の buyback_items（金額・可否）も RLS が行単位のため本人が API から読める（ai_draft と同じ）
 - カートの「購入手続きへ進む」が `CHECKOUT_ENABLED` と連動していない。クーポン入力欄は飾り
 - pending_approval の ai_draft は RLS が行単位のため本人が API から読める（UI では非表示）
 - トップのヒーロー画像 `repaw-dog.jpg` が 2.7MB

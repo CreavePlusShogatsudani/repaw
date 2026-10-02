@@ -42,7 +42,7 @@ export default function ProductDetail() {
         // メイン商品の取得
         const { data: productData, error: productError } = await supabase
           .from('products')
-          .select(PRODUCT_SELECT)
+          .select(`${PRODUCT_SELECT}, owner_instagram`)
           .eq('id', id)
           .in('status', ['published', 'reserved', 'sold_out']) // draft・hidden はURL直打ちでも見せない
           .single();
@@ -103,7 +103,6 @@ export default function ProductDetail() {
       color: product.color,
       quantity: 1,
       image: imageUrl,
-      seller: null
     });
 
     // トースト通知を表示
@@ -181,6 +180,9 @@ export default function ProductDetail() {
       availability: product.status === 'sold_out' ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
     },
   } : undefined;
+
+  // 管理者の手入力を優先し、無ければ買取に出した本人（マイページで表示 ON の人だけ）
+  const sellerInstagram = product.seller_instagram || product.owner_instagram;
 
   return (
     <div className="min-h-screen bg-white">
@@ -401,7 +403,7 @@ export default function ProductDetail() {
               </div>
 
               {/* この服を着ていた子: 前のオーナー登録があれば犬の写真・名前・一言、無ければ売主 Instagram のみ */}
-              {(product.previous_owner || product.seller_instagram) && (
+              {(product.previous_owner || sellerInstagram) && (
                 <div className="mb-6 pb-6 border-b">
                   <h3 className="font-bold mb-3 text-sm md:text-base">この服を着ていた子</h3>
                   {product.previous_owner ? (
@@ -412,26 +414,26 @@ export default function ProductDetail() {
                       <div>
                         <p className="owner-name !text-lg">{product.previous_owner.dog_name}ちゃん</p>
                         {product.previous_owner.story && <p className="text-sm text-slate-700 leading-relaxed mt-1">{product.previous_owner.story}</p>}
-                        {(product.previous_owner.instagram || product.seller_instagram) && (
+                        {(product.previous_owner.instagram || sellerInstagram) && (
                           <a
-                            href={instagramUrl(product.previous_owner.instagram || product.seller_instagram)}
+                            href={instagramUrl(product.previous_owner.instagram || sellerInstagram)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="owner-instagram mt-2"
                           >
-                            <i className="ri-instagram-line" aria-hidden="true"></i>@{instagramHandle(product.previous_owner.instagram || product.seller_instagram)}
+                            <i className="ri-instagram-line" aria-hidden="true"></i>@{instagramHandle(product.previous_owner.instagram || sellerInstagram)}
                           </a>
                         )}
                       </div>
                     </div>
                   ) : (
                     <a
-                      href={instagramUrl(product.seller_instagram)}
+                      href={instagramUrl(sellerInstagram)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="owner-instagram"
                     >
-                      <i className="ri-instagram-line" aria-hidden="true"></i>@{instagramHandle(product.seller_instagram)}
+                      <i className="ri-instagram-line" aria-hidden="true"></i>@{instagramHandle(sellerInstagram)}
                       <span className="font-normal">の子が着ていました</span>
                     </a>
                   )}

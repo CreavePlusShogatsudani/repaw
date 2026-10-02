@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
 import { CONDITION_RANKS, CONDITION_INFO } from '../../../lib/conditions';
 import { PRODUCT_CATEGORIES, PRODUCT_SIZES } from '../../../lib/productOptions';
@@ -45,7 +45,6 @@ const BRAND_OPTIONS = [
 export default function AdminProductFormPage() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
     const isEdit = Boolean(id);
 
     const [loading, setLoading] = useState(isEdit);
@@ -53,27 +52,25 @@ export default function AdminProductFormPage() {
 
     // Form state
     const [name, setName] = useState('');
-    const [description, setDescription] = useState(searchParams.get('description') || '');
+    const [description, setDescription] = useState('');
     const [price, setPrice] = useState('');
     const [originalPrice, setOriginalPrice] = useState('');
-    const [category, setCategory] = useState(searchParams.get('category') || '');
+    const [category, setCategory] = useState('');
     const [size, setSize] = useState('');
     const [color, setColor] = useState('');
     const [condition, setCondition] = useState('');
-    const [stock, setStock] = useState('1');
     const [status, setStatus] = useState('published');
     // 複数画像管理
     const [existingImages, setExistingImages] = useState<string[]>([]); // 保存済みURL
     const [newImageFiles, setNewImageFiles] = useState<{ file: File; preview: string }[]>([]); // 追加予定
     const [uploadingImage, setUploadingImage] = useState(false);
-    const [sellerInstagram, setSellerInstagram] = useState(searchParams.get('seller_instagram') || '');
+    const [sellerInstagram, setSellerInstagram] = useState('');
     const [brand, setBrand] = useState('');
     const [backLengthCm, setBackLengthCm] = useState('');
     const [chestCm, setChestCm] = useState('');
     const [neckCm, setNeckCm] = useState('');
     const [previousOwnerId, setPreviousOwnerId] = useState('');
     const [owners, setOwners] = useState<{ id: string; dog_name: string; instagram: string | null }[]>([]);
-    const fromBuyback = searchParams.get('from_buyback');
 
     useEffect(() => {
         if (isEdit) {
@@ -107,7 +104,6 @@ export default function AdminProductFormPage() {
             setSize(data.size || '');
             setColor(data.color || '');
             setCondition(data.condition || '');
-            setStock(data.stock?.toString() || '0');
             setStatus(data.status || 'draft');
             setExistingImages(data.images || []);
             setSellerInstagram(data.seller_instagram || '');
@@ -219,6 +215,21 @@ export default function AdminProductFormPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // 公開する商品は、価格と選択肢の項目がそろっていること（買取から作った下書きは ¥0 や自由記述のサイズのことがある）
+        if (status === 'published') {
+            const missing = [
+                !(parseInt(price, 10) >= 1) && '価格（1円以上）',
+                !PRODUCT_CATEGORIES.includes(category) && 'カテゴリー',
+                !PRODUCT_SIZES.includes(size) && 'サイズ',
+                !(CONDITION_RANKS as readonly string[]).includes(condition) && '状態ランク',
+            ].filter(Boolean);
+            if (missing.length > 0) {
+                alert(`公開するには次の項目を入れてください: ${missing.join('・')}`);
+                return;
+            }
+        }
+
         setSaving(true);
 
         let uploadedUrls: string[] = [];
@@ -253,7 +264,6 @@ export default function AdminProductFormPage() {
             size,
             color,
             condition,
-            stock: parseInt(stock, 10) || 0,
             status,
             images: finalImages,
             seller_instagram: sellerInstagram.replace('@', '') || null,
@@ -432,18 +442,6 @@ export default function AdminProductFormPage() {
                         </select>
                     </div>
 
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">在庫数 *</label>
-                        <input
-                            type="number"
-                            required
-                            min="0"
-                            value={stock}
-                            onChange={(e) => setStock(e.target.value)}
-                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                        />
-                    </div>
-
                     {/* 実寸（商品カード・詳細ページに表示される） */}
                     {([
                         ['背丈 (cm)', backLengthCm, setBackLengthCm],
@@ -502,12 +500,6 @@ export default function AdminProductFormPage() {
                             売主のInstagramアカウント
                             <span className="text-gray-400 font-normal text-xs">任意・商品ページに表示</span>
                         </label>
-                        {fromBuyback && (
-                            <p className="text-xs text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg flex items-center gap-1.5 w-fit">
-                                <i className="ri-links-line"></i>
-                                買取申込から自動入力されました
-                            </p>
-                        )}
                         <div className="relative">
                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">@</span>
                             <input

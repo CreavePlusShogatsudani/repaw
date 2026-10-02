@@ -292,7 +292,7 @@ export default function BuybackPage() {
                     placeholder="your_instagram_id"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">入力いただいた場合、商品ページに「このお洋服の元のオーナー」として表示されます</p>
+                <p className="text-xs text-gray-500 mt-1">マイページで「商品ページでの表示」をONにすると、マイページに登録したアカウントが商品ページに表示されます</p>
               </div>
 
               <div>

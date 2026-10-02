@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
-import { REQUEST_STATUS_ADMIN, RANK_OPTIONS, ITEM_TYPE_OPTIONS, ITEM_STATUS_USER, itemDisplayName, requestTotal, type BuybackItem } from '../../../lib/buyback';
+import { CONDITION_RANKS } from '../../../lib/conditions';
+import { REQUEST_STATUS_ADMIN, ITEM_TYPE_OPTIONS, ITEM_STATUS_USER, itemDisplayName, requestTotal, needsReturn, type BuybackItem } from '../../../lib/buyback';
 
 interface BuybackRequest {
   id: string;
@@ -28,6 +29,7 @@ interface BuybackRequest {
   user_responded_at: string | null;
   received_at: string | null;
   paid_at: string | null;
+  returned_at: string | null;
   created_at: string;
 }
 
@@ -89,17 +91,32 @@ export default function AdminBuybackDetailPage() {
   };
   const markReceived = () => updateRequest({ status: 'received', received_at: new Date().toISOString() });
   const markCompleted = () => {
-    if (!confirm(request?.payout_method === 'transfer' ? '振込済みとして完了にしますか？' : '寄付処理済みとして完了にしますか？')) return;
-    return updateRequest({ status: 'completed', paid_at: new Date().toISOString() });
+    // 買取不可の服を着払いで返す申込は、完了と一緒に返送も記録する
+    const returnCount = request?.return_preference === 'return_cod' && !request.returned_at
+      ? items.filter((i) => i.decision === 'not_buyable').length : 0;
+    const action = request?.payout_method === 'transfer' ? '振込済み' : '寄付処理済み';
+    if (!confirm(returnCount > 0 ? `${action}として完了にし、買取不可の${returnCount}点も着払いで返送済みにしますか？` : `${action}として完了にしますか？`)) return;
+    const now = new Date().toISOString();
+    return updateRequest({ status: 'completed', paid_at: now, ...(returnCount > 0 ? { returned_at: now } : {}) });
+  };
+  const markReturned = () => {
+    if (!confirm('着払いで返送済みにしますか？')) return;
+    return updateRequest({ returned_at: new Date().toISOString() });
   };
   const saveNote = () => updateRequest({ admin_note: adminNote || null });
 
   const quote = async () => {
     if (items.length === 0) { alert('服が1点も登録されていません。'); return; }
-    const undecided = items.filter((i) => !i.decision || (i.decision === 'buyable' && !i.buyback_price) || (i.decision === 'not_buyable' && !i.reject_reason));
+    // 未保存の入力があっても、先に全点を保存し、DB の値で確かめて提示する（画面と DB の食い違いを防ぐ）
+    for (const d of items) { if (!(await saveItem(d))) return; }
+    const { data: saved, error: loadError } = await supabase.from('buyback_items')
+      .select('decision, buyback_price, reject_reason').eq('request_id', id);
+    if (loadError || !saved) { alert('更新に失敗しました。'); return; }
+    const undecided = saved.filter((i) => !i.decision || (i.decision === 'buyable' && !i.buyback_price) || (i.decision === 'not_buyable' && !i.reject_reason));
     if (undecided.length > 0) { alert('可否・金額（または不可の理由）が未入力の服があります。'); return; }
-    const allRejected = items.every((i) => i.decision === 'not_buyable');
-    if (!confirm(allRejected ? '全点買取不可として確定しますか？' : `査定額 合計 ¥${requestTotal(items.map(numeric)).toLocaleString()} でユーザーに提示しますか？`)) return;
+    const allRejected = saved.every((i) => i.decision === 'not_buyable');
+    const savedTotal = requestTotal(saved);
+    if (!confirm(allRejected ? '全点買取不可として確定しますか？' : `査定額 合計 ¥${savedTotal.toLocaleString()} でユーザーに提示しますか？`)) return;
     const { error: itemError } = await supabase.from('buyback_items')
       .update({ status: 'appraised', updated_at: new Date().toISOString() })
       .eq('request_id', id).eq('decision', 'buyable');
@@ -107,7 +124,7 @@ export default function AdminBuybackDetailPage() {
       .update({ status: 'rejected', updated_at: new Date().toISOString() })
       .eq('request_id', id).eq('decision', 'not_buyable');
     if (itemError || rejError) { alert('更新に失敗しました。'); return; }
-    await updateRequest({ status: allRejected ? 'rejected' : 'quoted', estimated_price: requestTotal(items.map(numeric)) });
+    await updateRequest({ status: allRejected ? 'rejected' : 'quoted', estimated_price: savedTotal });
     // TODO(#21): 通知メール送信（査定結果が届きました）
   };
 
@@ -127,7 +144,7 @@ export default function AdminBuybackDetailPage() {
   const setInternal = (itemId: string, patch: Partial<ItemInternal>) =>
     setItems((prev) => prev.map((it) => (it.id === itemId ? { ...it, internal: { ...it.internal, ...patch } } : it)));
 
-  const saveItem = async (d: ItemDraft) => {
+  const saveItem = async (d: ItemDraft): Promise<boolean> => {
     setSavingId(d.id);
     const { error } = await supabase.from('buyback_items').update({
       has_tag: d.has_tag,
@@ -153,7 +170,8 @@ export default function AdminBuybackDetailPage() {
       updated_at: new Date().toISOString(),
     });
     setSavingId(null);
-    if (error || internalError) { alert('保存に失敗しました。'); return; }
+    if (error || internalError) { alert('保存に失敗しました。'); return false; }
+    return true;
   };
 
   const deleteItem = async (itemId: string) => {
@@ -229,7 +247,14 @@ export default function AdminBuybackDetailPage() {
     setReadingId(d.id);
     try {
       const { data, error } = await supabase.functions.invoke('appraise-item', { body: { item_id: d.id } });
-      if (error || !data || data.error) throw new Error(data?.error || error?.message || '読み取りに失敗しました');
+      if (error) {
+        // 失敗時は data が空になるので、エラーコードはレスポンス本文から読む（checkout と同じ）
+        let code = '';
+        try { code = (await error.context?.json())?.error ?? ''; } catch { /* noop */ }
+        const messages: Record<string, string> = { NO_PHOTOS: '写真がありません。先に撮影してください。', FORBIDDEN: '管理者だけが使えます。', UNAUTHORIZED: 'ログインし直してください。' };
+        throw new Error(messages[code] || code || '読み取りに失敗しました');
+      }
+      if (!data || data.error) throw new Error(data?.error || '読み取りに失敗しました');
       const r = data as { has_tag: boolean | null; brand: string | null; item_type: string | null; color: string | null; size_label: string | null; material: string | null; condition_notes: string[]; notes: string | null };
       const notes = [...r.condition_notes, ...(r.notes ? [r.notes] : [])].join('\n');
       setItems((prev) => prev.map((it) => it.id !== d.id ? it : {
@@ -275,7 +300,8 @@ export default function AdminBuybackDetailPage() {
         </div>
         <div className="flex flex-wrap gap-2">
           {request.status === 'pending' && <button onClick={markReceived} className="px-4 py-2 bg-gray-900 text-white text-sm rounded hover:bg-gray-700">商品が届いた</button>}
-          {editable && <button onClick={quote} className="px-4 py-2 bg-orange-500 text-white text-sm rounded hover:bg-orange-600">査定額を提示する（¥{total.toLocaleString()}）</button>}
+          {['received', 'reviewing'].includes(request.status) && <button onClick={quote} className="px-4 py-2 bg-orange-500 text-white text-sm rounded hover:bg-orange-600">査定額を提示する（¥{total.toLocaleString()}）</button>}
+          {needsReturn(request) && <button onClick={markReturned} className="px-4 py-2 bg-gray-900 text-white text-sm rounded hover:bg-gray-700">返送した</button>}
           {request.status === 'accepted' && <button onClick={markCompleted} className="px-4 py-2 bg-gray-900 text-white text-sm rounded hover:bg-gray-700">{request.payout_method === 'transfer' ? '振込済みにする' : '寄付処理済みにする'}</button>}
         </div>
       </div>
@@ -288,7 +314,7 @@ export default function AdminBuybackDetailPage() {
           <p><span className="text-gray-500">住所:</span> {request.address || '-'}</p>
           {request.instagram && <p><span className="text-gray-500">Instagram:</span> @{request.instagram.replace('@', '')}</p>}
           <p><span className="text-gray-500">申込日:</span> {new Date(request.created_at).toLocaleString('ja-JP')}</p>
-          <p><span className="text-gray-500">買取不可の扱い:</span> {request.return_preference === 'return_cod' ? '着払いで返送' : '寄付に回す'}</p>
+          <p><span className="text-gray-500">買取不可の扱い:</span> {request.status === 'returned' ? '全点を着払いで返送（ユーザーが選択）' : request.return_preference === 'return_cod' ? '着払いで返送' : '寄付に回す'}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm p-5 space-y-1.5">
           <p className="font-bold mb-2">申込内容（ユーザー入力）</p>
@@ -298,7 +324,7 @@ export default function AdminBuybackDetailPage() {
           <p><span className="text-gray-500">購入時期:</span> {request.purchase_date || '-'}</p>
           <p><span className="text-gray-500">ご要望:</span> {request.message || '-'}</p>
           <p className="text-xs text-gray-400 pt-2">
-            到着: {request.received_at ? new Date(request.received_at).toLocaleDateString('ja-JP') : '-'} / 完了: {request.paid_at ? new Date(request.paid_at).toLocaleDateString('ja-JP') : '-'}
+            到着: {request.received_at ? new Date(request.received_at).toLocaleDateString('ja-JP') : '-'} / 完了: {request.paid_at ? new Date(request.paid_at).toLocaleDateString('ja-JP') : '-'} / 返送: {request.returned_at ? new Date(request.returned_at).toLocaleDateString('ja-JP') : '-'}
           </p>
         </div>
       </div>
@@ -402,7 +428,7 @@ export default function AdminBuybackDetailPage() {
                 <>
                   <label className="space-y-1"><span className="text-xs text-gray-500">ランク</span>
                     <select value={d.rank ?? ''} onChange={(e) => setField(d.id, { rank: e.target.value || null })} className={inputCls}>
-                      <option value="">選択</option>{RANK_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+                      <option value="">選択</option>{CONDITION_RANKS.map((r) => <option key={r} value={r}>{r}</option>)}
                     </select>
                   </label>
                   <label className="space-y-1"><span className="text-xs text-gray-500">買取額（円）</span><input type="number" min="0" value={d.buyback_price} onChange={(e) => setField(d.id, { buyback_price: e.target.value })} className={inputCls} placeholder="500" /></label>

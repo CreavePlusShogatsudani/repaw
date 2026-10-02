@@ -51,6 +51,7 @@ export interface Product {
     neck_cm: number | null;
     previous_owner_id: string | null;
     previous_owner?: Pick<PreviousOwner, 'id' | 'dog_name' | 'dog_photo_url' | 'instagram' | 'story'> | null;
+    owner_instagram?: string | null; // 買取に出した人が表示 ON のときだけ入る（012 の計算カラム。商品詳細でのみ取得）
     created_at: string;
     updated_at: string;
 }

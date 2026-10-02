@@ -42,7 +42,7 @@ export default function AdminUsersPage() {
     const { data } = await supabase
       .from('profiles')
       .select('id, email, full_name, created_at')
-      .eq('email', searchEmail.trim())
+      .eq('email', searchEmail.trim().toLowerCase()) // 認証側はメールを小文字で保存する
       .single();
 
     setSearchResult(data ? (data as AdminUser) : 'not_found');

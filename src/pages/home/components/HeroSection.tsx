@@ -12,7 +12,7 @@ interface HeroBanner {
   link_text: string | null;
 }
 
-// 全面写真のヒーロー。実写のショップ紹介を最初に表示し、管理バナーは手動で選ぶ。
+// 全面写真のヒーロー。実写のショップ紹介を最初に表示し、管理バナーがあれば5秒ごとに切り替える（番号ボタンでも選べる）。
 // 直下に「約束」の行（寄付・一点物・前のオーナー）を小さく置く
 export default function HeroSection() {
   const [banners, setBanners] = useState<HeroBanner[]>([]);
@@ -27,6 +27,13 @@ export default function HeroSection() {
       .then(({ data }) => { if (active) setBanners(data || []); });
     return () => { active = false; };
   }, []);
+
+  // 手動で選んだときもそこから5秒数え直す。動きを減らす設定の人には自動で切り替えない
+  useEffect(() => {
+    if (banners.length === 0 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer = setTimeout(() => setCurrentIndex((i) => (i + 1) % (banners.length + 1)), 5000);
+    return () => clearTimeout(timer);
+  }, [banners.length, currentIndex]);
 
   const banner = currentIndex > 0 ? banners[currentIndex - 1] : null;
   const image = banner?.image_url || '/images/repaw-dog.jpg';
@@ -60,7 +67,7 @@ export default function HeroSection() {
         <div className="shop-promises">
           <div><strong>お買い物の{DONATION_RATE_LABEL}を寄付</strong><span>販売価格の{DONATION_RATE_LABEL}を動物保護団体へ届けます</span></div>
           <div><strong>すべて一点物</strong><span>状態はA〜Cのランクと実寸で表示</span></div>
-          <div><strong>前のオーナーが見える</strong><span>着ていた子と飼い主さんのInstagramをご紹介</span></div>
+          <div><strong>前のオーナーが見える</strong><span>着ていた子と飼い主さんのInstagramをご紹介<br />※Instagramを表示にされている方のみ、リンクが表示されます</span></div>
         </div>
       </div>
     </>

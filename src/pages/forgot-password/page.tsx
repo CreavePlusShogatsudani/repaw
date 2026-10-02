@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
+import PageMeta from '../../components/PageMeta';
 import { supabase } from '../../lib/supabase';
 
 export default function ForgotPasswordPage() {
@@ -29,6 +30,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <PageMeta title="パスワードを忘れた" noindex />
       <Navigation />
       
       <main className="pt-24 pb-16">
@@ -127,11 +129,7 @@ export default function ForgotPasswordPage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-700 font-light leading-relaxed">
-                      メールが届かない場合や、その他お困りのことがございましたら、
-                      <Link to="/contact" className="text-[#161616] underline underline-offset-4 hover:text-[#6f6f6a] cursor-pointer">
-                        お問い合わせフォーム
-                      </Link>
-                      からご連絡ください。
+                      数分たってもメールが届かない場合は、登録したメールアドレスと同じか確認のうえ、「別のメールアドレスで再送信」からもう一度お試しください。
                     </p>
                   </div>
                 </div>

@@ -504,7 +504,7 @@ export default function AdminCollectionFormPage() {
                             className="w-4 h-4 accent-gray-900"
                         />
                         <label htmlFor="is_active" className="text-sm font-medium text-gray-700 cursor-pointer">
-                            公開する（特集ページ・トップページに表示）
+                            公開する（特集ページ・トップページに表示。トップは表示順の先頭3件まで）
                         </label>
                     </div>
                 </div>

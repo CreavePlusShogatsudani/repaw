@@ -7,18 +7,18 @@ import Navigation from '../home/components/Navigation';
 import Footer from '../home/components/Footer';
 import { supabase } from '../../lib/supabase';
 import type { Product } from '../../types';
-import { PRODUCT_CATEGORIES } from '../../lib/productOptions';
+import { PRODUCT_CATEGORIES, PRODUCT_SIZES } from '../../lib/productOptions';
 import { PRODUCT_SELECT } from '../../lib/products';
 
 const BASE_CATEGORIES = PRODUCT_CATEGORIES;
-const SIZES = ['すべて', 'S', 'M', 'L', 'XL', 'フリーサイズ'];
+const SIZES = ['すべて', ...PRODUCT_SIZES];
 const CONDITIONS = ['すべて', ...CONDITION_RANKS];
 
 const PRICE_RANGES = [
   { label: 'すべて', min: 0, max: Infinity },
-  { label: '¥0 - ¥2,000', min: 0, max: 2000 },
-  { label: '¥2,000 - ¥3,000', min: 2000, max: 3000 },
-  { label: '¥3,000 - ¥4,000', min: 3000, max: 4000 },
+  { label: '¥2,000未満', min: 0, max: 2000 },
+  { label: '¥2,000〜¥3,000未満', min: 2000, max: 3000 },
+  { label: '¥3,000〜¥4,000未満', min: 3000, max: 4000 },
   { label: '¥4,000以上', min: 4000, max: Infinity },
 ];
 
@@ -28,16 +28,19 @@ export default function ItemsPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'すべて');
+  // カテゴリとサイズは URL に持つ（ナビやトップの入口から来たとき・戻ったときに絞り込みが合うように）
+  const selectedCategory = searchParams.get('category') || 'すべて';
   const selectedSize = searchParams.get('size') || 'すべて';
-  const setSelectedSize = (size: string) => {
+  const setParam = (key: 'category' | 'size') => (value: string) => {
     setSearchParams(previous => {
       const next = new URLSearchParams(previous);
-      if (size === 'すべて') next.delete('size');
-      else next.set('size', size);
+      if (value === 'すべて') next.delete(key);
+      else next.set(key, value);
       return next;
     });
   };
+  const setSelectedCategory = setParam('category');
+  const setSelectedSize = setParam('size');
   const categories = ['すべて', ...new Set([...BASE_CATEGORIES, ...products.map(p => p.category?.trim()).filter((value): value is string => Boolean(value))])];
   const sizes = [...new Set([...SIZES, ...products.map(p => p.size?.trim()).filter((value): value is string => Boolean(value)), selectedSize])];
   const [selectedCondition, setSelectedCondition] = useState('すべて');
@@ -77,7 +80,7 @@ export default function ItemsPage() {
     if (!matchesFilter(product.category, selectedCategory)) return false;
     if (!matchesFilter(product.size, selectedSize)) return false;
     if (!matchesFilter(product.condition, selectedCondition)) return false;
-    if (product.price < selectedPriceRange.min || product.price > selectedPriceRange.max) return false;
+    if (product.price < selectedPriceRange.min || product.price >= selectedPriceRange.max) return false;
     return true;
   });
 
@@ -95,8 +98,12 @@ export default function ItemsPage() {
   filteredProducts = [...filteredProducts].sort((a, b) => byStatus(a, b) || secondary(a, b));
 
   const resetFilters = () => {
-    setSelectedCategory('すべて');
-    setSelectedSize('すべて');
+    setSearchParams(previous => {
+      const next = new URLSearchParams(previous);
+      next.delete('category');
+      next.delete('size');
+      return next;
+    });
     setSelectedCondition('すべて');
     setSelectedPriceRange(PRICE_RANGES[0]);
   };

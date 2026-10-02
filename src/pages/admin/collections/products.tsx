@@ -117,7 +117,7 @@ export default function AdminCollectionProductsPage() {
                     <i className="ri-arrow-left-line text-xl"></i>
                 </Link>
                 <div>
-                    <p className="text-xs text-gray-500">おすすめ商品グループ管理</p>
+                    <p className="text-xs text-gray-500">特集の犬服</p>
                     <h1 className="text-2xl font-bold text-gray-900">{collection?.title}</h1>
                 </div>
                 <button

@@ -51,6 +51,17 @@ export const REQUEST_STATUS_ADMIN: Record<string, { label: string; color: string
   rejected:  { label: '全点買取不可',  color: 'bg-red-100 text-red-800' },
 };
 
+// 管理者が次に動く必要がある申込: 到着待ち・査定・支払い処理と、まだ返送していない全点返送・全点不可（返送希望）。
+// 一部の買取不可の返送は「振込済み / 寄付処理済み」と一緒に記録する（accepted の間は要対応に入っている）
+type ActionFields = { status: string; returned_at: string | null; return_preference: string };
+export const needsAction = (r: ActionFields) =>
+  ['pending', 'received', 'accepted'].includes(r.status) || needsReturn(r);
+export const needsReturn = (r: ActionFields) =>
+  !r.returned_at && (r.status === 'returned' || (r.status === 'rejected' && r.return_preference === 'return_cod'));
+// needsAction と同じ条件の PostgREST フィルタ（件数バッジ・ダッシュボード用）
+export const NEEDS_ACTION_FILTER =
+  'status.in.(pending,received,accepted),and(returned_at.is.null,or(status.eq.returned,and(status.eq.rejected,return_preference.eq.return_cod)))';
+
 // 服1点のステータス（ユーザー向け）
 export const ITEM_STATUS_USER: Record<string, string> = {
   pending:        '査定中',
@@ -73,7 +84,6 @@ export const BUYBACK_SHIP_TO = {
   tel: '000-0000-0000',
 };
 
-export const RANK_OPTIONS = ['A', 'B', 'C'] as const;
 export const ITEM_TYPE_OPTIONS = ['パーカー', 'トレーナー', 'Tシャツ', 'タンクトップ', 'ニット', 'ワンピース', 'アウター', 'レインコート', 'ハーネス', 'その他'];
 
 // 「グレーのパーカー」「ブランド パーカー」のような表示名

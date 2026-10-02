@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
-import { REQUEST_STATUS_ADMIN } from '../../../lib/buyback';
+import { REQUEST_STATUS_ADMIN, needsAction, needsReturn } from '../../../lib/buyback';
 
 interface BuybackRow {
   id: string;
@@ -9,6 +9,8 @@ interface BuybackRow {
   email: string;
   status: string;
   payout_method: 'donate' | 'transfer' | null;
+  return_preference: string;
+  returned_at: string | null;
   created_at: string;
   received_at: string | null;
   item_count: number;
@@ -21,9 +23,6 @@ const FILTERS: { value: string; label: string }[] = [
   ...Object.entries(REQUEST_STATUS_ADMIN).filter(([v]) => v !== 'reviewing').map(([value, { label }]) => ({ value, label })),
 ];
 
-// 管理者が次に動く必要があるステータス
-const NEEDS_ACTION = ['pending', 'received', 'accepted'];
-
 export default function AdminBuybackPage() {
   const [rows, setRows] = useState<BuybackRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +32,7 @@ export default function AdminBuybackPage() {
     setLoading(true);
     const { data, error } = await supabase
       .from('buyback_requests')
-      .select('id, name, email, status, payout_method, created_at, received_at, buyback_items(count)')
+      .select('id, name, email, status, payout_method, return_preference, returned_at, created_at, received_at, buyback_items(count)')
       .order('created_at', { ascending: false });
     if (error) {
       console.error('Error fetching buyback requests:', error);
@@ -46,9 +45,9 @@ export default function AdminBuybackPage() {
   useEffect(() => { fetchRows(); }, []);
 
   const visible = rows.filter((r) =>
-    filter === 'all' ? true : filter === 'action' ? NEEDS_ACTION.includes(r.status) : r.status === filter
+    filter === 'all' ? true : filter === 'action' ? needsAction(r) : r.status === filter
   );
-  const actionCount = rows.filter((r) => NEEDS_ACTION.includes(r.status)).length;
+  const actionCount = rows.filter(needsAction).length;
 
   return (
     <div>
@@ -105,6 +104,7 @@ export default function AdminBuybackPage() {
                   quoted: 'ユーザーの回答を待つ',
                   accepted: r.payout_method === 'transfer' ? '振り込む' : '寄付処理をする',
                 };
+                if (needsReturn(r)) next[r.status] = '着払いで返送する';
                 return (
                   <tr key={r.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-gray-600 whitespace-nowrap">{new Date(r.created_at).toLocaleDateString('ja-JP')}</td>

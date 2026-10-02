@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
-import { PRODUCT_CATEGORIES } from '../../../lib/productOptions';
+import { PRODUCT_CATEGORIES, PRODUCT_SIZES } from '../../../lib/productOptions';
 
 // 種類ごとの入口は、アイコンではなく実際の商品写真をタイルにする。
 // 商品が無い種類は出さない。サイズはテキストのリンク。
-const SIZES = ['S', 'M', 'L', 'XL', 'フリーサイズ'];
 
 export default function ExploreSection() {
   const [tiles, setTiles] = useState<{ category: string; image: string }[]>([]);
@@ -34,7 +33,7 @@ export default function ExploreSection() {
       <div data-reveal>
         <p className="explore-label">サイズから</p>
         <div className="explore-sizes">
-          {SIZES.map((size) => <Link key={size} to={`/products?size=${encodeURIComponent(size)}`} aria-label={`${size === 'フリーサイズ' ? size : `${size}サイズ`}の犬服を見る`}>{size === 'フリーサイズ' ? 'フリー' : size}</Link>)}
+          {PRODUCT_SIZES.map((size) => <Link key={size} to={`/products?size=${encodeURIComponent(size)}`} aria-label={`${size === 'フリーサイズ' ? size : `${size}サイズ`}の犬服を見る`}>{size === 'フリーサイズ' ? 'フリー' : size}</Link>)}
         </div>
         {tiles.length > 0 && (
           <>
