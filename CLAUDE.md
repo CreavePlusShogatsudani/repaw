@@ -86,7 +86,7 @@ src/
     └── index.ts
 
 supabase/
-├── migrations/             # 000_baseline → 004 → … → 014（本番適用済み）→ 015（寄付サイトの申込。未適用）
+├── migrations/             # 000_baseline → 004 → … → 016（本番適用済み。015・016 は寄付サイトの申込）
 ├── functions/
 │   ├── create-payment-intent/   # 決済開始（金額はDBが決める）
 │   ├── stripe-webhook/          # 決済確定 → finalize_order
@@ -179,6 +179,7 @@ category: お知らせ / 寄付報告 / 新商品 / イベント。`is_published
 ### donation_signups（寄付サイトの申込。015）
 寄付サイト（donate.repaw.jp。別リポジトリ ~/Developer/repaw-donate、同じ Supabase を使う）のフォームから、ログイン不要で INSERT だけできる。読めるのは管理者だけ（当面は Table Editor で見る）。
 name / email / item_count（点数の目安）/ address / instagram / thanks_consent / locale。`thanks_consent = true` の人だけ、オープン時のスペシャルサンクスページに Instagram を載せる（本人の同意。同意するなら instagram 必須の check あり）。
+status（016）: new（新規・要対応）→ contacted（送り先を案内済み）→ received（到着済み）/ cancelled。admin_note は社内メモ。フォームからは new としてしか作れない。管理画面 /admin/donations で扱う。
 
 ### inquiries（問い合わせ）
 | カラム | 型 | 備考 |
@@ -258,6 +259,7 @@ name / email / item_count（点数の目安）/ address / instagram / thanks_con
 | 注文管理 | /admin/orders | 注文一覧・ステータス更新 |
 | 買取申込管理 | /admin/buyback | 到着・1点ごとの査定（AI読み取り）・査定額提示・完了 |
 | 撮影待ち | /admin/photo-queue | 買取確定した服の撮影・公開状況 |
+| 寄付の申込 | /admin/donations | 寄付サイトの申込。状態（新規→送り先を案内済み→到着済み）・社内メモ・スペシャルサンクス掲載OKの人の Instagram をまとめてコピー。左メニューに新規の件数 |
 | 問い合わせ管理 | /admin/inquiries | ステータスフィルタ（既定: 承認待ち）・AI下書き編集・承認送信。左メニューに未処理+承認待ちの件数 |
 | ユーザー一覧 | /admin/members | |
 | 管理者アカウント | /admin/users | is_admin の付与・剥奪 |

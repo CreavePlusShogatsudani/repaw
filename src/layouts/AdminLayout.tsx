@@ -11,6 +11,7 @@ export default function AdminLayout() {
     const [buybackBadge, setBuybackBadge] = useState(0);
     const [photoBadge, setPhotoBadge] = useState(0);
     const [inquiryBadge, setInquiryBadge] = useState(0);
+    const [donationBadge, setDonationBadge] = useState(0);
     const [mobileOpen, setMobileOpen] = useState(false);
 
     useEffect(() => {
@@ -64,6 +65,12 @@ export default function AdminLayout() {
             .select('id', { count: 'exact', head: true })
             .in('status', ['received', 'pending_approval'])
             .then(({ count }) => setInquiryBadge(count ?? 0));
+        // 寄付サイトからの新規申込（送り先をまだ案内していないもの）
+        supabase
+            .from('donation_signups')
+            .select('id', { count: 'exact', head: true })
+            .eq('status', 'new')
+            .then(({ count }) => setDonationBadge(count ?? 0));
     }, [location.pathname]);
 
     if (loading) {
@@ -86,6 +93,7 @@ export default function AdminLayout() {
         { path: '/admin/buyback', label: '買取申込管理', icon: 'ri-price-tag-3-line', badge: buybackBadge },
         { path: '/admin/photo-queue', label: '撮影待ち', icon: 'ri-camera-line', badge: photoBadge },
         { path: '/admin/inquiries', label: '問い合わせ管理', icon: 'ri-question-answer-line', badge: inquiryBadge },
+        { path: '/admin/donations', label: '寄付の申込', icon: 'ri-hand-heart-line', badge: donationBadge },
         { path: '/admin/members', label: 'ユーザー一覧', icon: 'ri-group-line' },
         { path: '/admin/users', label: '管理者アカウント', icon: 'ri-shield-user-line' },
         { path: '/admin/banners', label: 'メインビジュアル', icon: 'ri-image-line' },
