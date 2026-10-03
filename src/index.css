@@ -422,15 +422,24 @@ html { scroll-padding-top: 96px; }
 .rp-steps p { font-size: 14px; color: var(--rp-text); }
 .rp-rows h3 { font-size: 18px; }
 .rp-rows > div { padding: 32px 0; }
-/* 写真の上の CTA */
-.rp-band-photo { position: relative; min-height: 480px; display: flex; align-items: center; justify-content: center; overflow: hidden; color: #fff; text-align: center; }
-.rp-band-photo > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
-.rp-band-photo::before { content: ''; position: absolute; inset: 0; background: rgba(20,20,20,.62); }
-.rp-band-photo-inner { position: relative; padding: 72px 24px; max-width: 48em; }
-.rp-band-photo h2 { font-size: clamp(26px, 3vw, 38px); font-weight: 500; letter-spacing: .1em; line-height: 1.5; text-shadow: 0 2px 16px rgba(0,0,0,.45); }
-.rp-band-photo p { margin-top: 18px; font-size: 15px; line-height: 2; color: rgba(255,255,255,.95); text-shadow: 0 1px 8px rgba(0,0,0,.45); }
-.rp-btn-ghost { border: 1px solid rgba(255,255,255,.8); color: #fff; background: transparent; }
-.rp-btn-ghost:hover { background: rgba(255,255,255,.12); }
+/* 下層ページ末尾の CTA 帯。写真は使わず濃いオレンジで目立たせる（2026-10-03 ユーザー指定。
+   原色のブロックを使わない決まりの例外。白文字は #b4531a 地で 5.0:1、ボタンの文字は白地で 5.6:1） */
+.rp-band-cta { background: #b4531a; color: #fff; text-align: center; }
+.rp-band-cta-inner { margin-inline: auto; padding: 80px 24px; max-width: 48em; }
+.rp-band-cta h2 { font-size: clamp(26px, 3vw, 36px); font-weight: 500; letter-spacing: .08em; line-height: 1.5; text-wrap: balance; word-break: auto-phrase; } /* 最後の1〜2文字だけが次の行に残らないように */
+.rp-band-cta p { margin-top: 18px; font-size: 16px; line-height: 2; color: #fff; }
+.rp-band-cta .rp-btn { min-height: 56px; padding: 14px 36px; font-size: 15px; }
+.rp-btn-on-orange { background: #fff; color: #a84e14; font-weight: 600; }
+.rp-btn-on-orange:hover { background: #fbeee4; }
+.rp-btn-on-orange i { transition: transform .2s; }
+.rp-btn-on-orange:hover i { transform: translateX(3px); }
+.rp-btn-ghost { border: 1px solid #fff; color: #fff; background: transparent; }
+.rp-btn-ghost:hover { background: rgba(255,255,255,.14); }
+@media (max-width: 767px) {
+  .rp-band-cta-inner { padding: 56px 20px; }
+  .rp-band-cta h2 { font-size: 22px; letter-spacing: .04em; }
+  .rp-band-cta .rp-btn { width: 100%; }
+}
 /* タブを中央に */
 .rp-tabs-center { justify-content: center; }
 .rp-faq summary { font-size: 16px; padding: 24px 0; }

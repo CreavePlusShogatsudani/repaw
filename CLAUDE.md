@@ -204,6 +204,7 @@ status（016）: new（新規・要対応）→ contacted（送り先を案内�
 - 商品カード: 写真（`--rp-photo-bg` 地に multiply）、ブランド小文字、品名、カテゴリ・サイズ・ランク、価格、最終行に「○○ちゃんのおさがり」
 - 商品詳細は価格の下に「このお買い物から ¥○ を寄付」。寄付率は `src/lib/donation.ts`
 - 商品写真が最大のボトルネック。一眼レフでの統一撮影（背景・照明・構図を固定）が前提
+- 例外: 下層ページ末尾の CTA 帯（`src/components/CtaBand.tsx`、FAQ・About・仕組み・社会への取り組み）は写真を使わず濃いオレンジ（#b4531a、白文字）にする。押してほしいボタンは白地にオレンジ文字＋→（2026-10-03 ユーザー指定）
 - 下層ページも同じ文法。共通部品 `src/components/PageHeader.tsx`（英字の小見出し + h1 + 一文）と `src/index.css` の「下層ページ共通」クラス（page / page-section / rp-prose / rp-rows / rp-steps / rp-tabs / rp-faq / rp-band / rp-input / rp-article）を使う
 - 記事本文（特集・ニュース）の `#` `##` は半角スペース無しでも見出しとして描画する
 - ログインの「ログイン状態を保持」と Google / Apple ログインは未実装のため UI から削除済み
