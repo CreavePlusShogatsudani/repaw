@@ -151,7 +151,7 @@ user_id + product_id（unique）。商品詳細のハートボタンで追加・
 
 ### hero_banners
 title / subtitle / image_url / link_url / link_text / sort_order / is_active。
-トップの HeroSection は既定のショップ紹介（静的コピーと `/images/repaw-dog.jpg`）を最初に出し、有効バナーがあれば sort_order 順に5秒ごとに切り替える（番号ボタンでも選べる。動きを減らす設定の人には自動で切り替えない）。
+トップの HeroSection は管理画面で有効にしたバナーだけを sort_order 順に出す（固定のショップ紹介は 2026-10-03 に廃止）。2枚以上なら5秒ごとに切り替え（番号ボタンでも選べる。動きを減らす設定の人には自動で切り替えない）。タイトルの無いバナーは写真だけ（リンクがあればボタンだけ出す）。有効なバナーが0枚ならヒーロー欄ごと出さない。見出しが画面に無いときも sr-only の h1 を残す。
 
 ### collections / collection_products / recommended_products
 特集記事と紐づけ商品。`content` は `# 見出し` / `## 見出し` / `![](url)` 記法。

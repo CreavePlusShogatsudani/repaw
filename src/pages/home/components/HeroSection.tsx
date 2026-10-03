@@ -12,12 +12,13 @@ interface HeroBanner {
   link_text: string | null;
 }
 
-// 全面写真のヒーロー。実写のショップ紹介を最初に表示し、管理バナーがあれば5秒ごとに切り替える（番号ボタンでも選べる）。
+// 全面写真のヒーロー。管理画面（メインビジュアル）で有効にしたバナーだけを sort_order 順に出す。
+// 2枚以上なら5秒ごとに切り替える（番号ボタンでも選べる）。1枚もなければヒーロー欄ごと出さない。
+// タイトルの無いバナーは写真だけ（リンクを登録したときだけボタンを出す）。
 // 直下に「約束」の行（寄付・一点物・前のオーナー）を小さく置く
 export default function HeroSection() {
-  const [banners, setBanners] = useState<HeroBanner[]>([]);
+  const [banners, setBanners] = useState<HeroBanner[] | null>(null); // null = 読み込み中
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [failedImage, setFailedImage] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -29,40 +30,51 @@ export default function HeroSection() {
   }, []);
 
   // 手動で選んだときもそこから5秒数え直す。動きを減らす設定の人には自動で切り替えない
+  const count = banners?.length ?? 0;
   useEffect(() => {
-    if (banners.length === 0 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const timer = setTimeout(() => setCurrentIndex((i) => (i + 1) % (banners.length + 1)), 5000);
+    if (count < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer = setTimeout(() => setCurrentIndex((i) => (i + 1) % count), 5000);
     return () => clearTimeout(timer);
-  }, [banners.length, currentIndex]);
+  }, [count, currentIndex]);
 
-  const banner = currentIndex > 0 ? banners[currentIndex - 1] : null;
-  const image = banner?.image_url || '/images/repaw-dog.jpg';
+  const banner = banners?.[currentIndex];
+  const title = banner?.title?.trim();
+  const subtitle = banner?.subtitle?.trim();
   const link = banner?.link_url?.trim();
   const linkText = banner?.link_text?.trim() || '詳しく見る';
   const cta = link
     ? (/^https?:\/\//.test(link)
         ? <a href={link} className="rp-btn rp-btn-white">{linkText}</a>
         : <Link to={link.startsWith('/') && !link.startsWith('//') ? link : '/products'} className="rp-btn rp-btn-white">{linkText}</Link>)
-    : <Link to="/products" className="rp-btn rp-btn-white">犬服を探す</Link>;
+    : title ? <Link to="/products" className="rp-btn rp-btn-white">犬服を探す</Link> : null;
 
   return (
     <>
-      <section className="shop-hero" aria-label="RePawのご紹介">
-        <figure className="shop-hero-photo">
-          <img src={failedImage === image ? '/images/repaw-dog.jpg' : image} onError={() => setFailedImage(image)} alt={banner?.title || 'ハーネスを着て飼い主の膝に座るトイプードル'} fetchPriority="high" />
-          {!banner && <figcaption>いつものお出かけに、もう一度。</figcaption>}
-        </figure>
-        <div className="shop-hero-copy">
-          <div>
-            <h1 className="rp-display">{banner?.title?.trim() || <>お気に入りを、<br />次のうちの子へ。</>}</h1>
-            <p className="shop-hero-description">{banner?.subtitle?.trim() || 'まだ着られる一着に、新しい出会いを。犬服のリユースショップ、RePawです。'}</p>
-            <div className="shop-hero-actions">{cta}</div>
-          </div>
-        </div>
-        {banners.length > 0 && <div className="shop-hero-controls" aria-label="メインビジュアルの切り替え">
-          {[null, ...banners].map((item, index) => <button key={item?.id || 'shop'} type="button" aria-label={index === 0 ? 'ショップ紹介を表示' : `お知らせ${index}：${item?.title || '犬服のリユース'}`} aria-pressed={index === currentIndex} onClick={() => setCurrentIndex(index)}>{String(index + 1).padStart(2, '0')}</button>)}
-        </div>}
-      </section>
+      {/* 見出しが画面に無いとき（写真だけのバナー・バナー0枚）も、検索エンジン向けの h1 は残す */}
+      {!title && <h1 className="sr-only">RePaw 犬服のリユースショップ</h1>}
+
+      {/* 読み込み中は同じ高さの枠を出しておき、下の内容がずれないようにする。0枚なら欄ごと出さない */}
+      {banners === null ? (
+        <div className="shop-hero" aria-hidden="true" />
+      ) : banner && (
+        <section className={`shop-hero${title || cta ? '' : ' shop-hero-plain'}`} aria-label="メインビジュアル">
+          <figure className="shop-hero-photo">
+            <img src={banner.image_url} alt={title || 'RePaw のお知らせ'} fetchPriority="high" />
+          </figure>
+          {(title || cta) && (
+            <div className="shop-hero-copy">
+              <div>
+                {title && <h1 className="rp-display">{title}</h1>}
+                {title && subtitle && <p className="shop-hero-description">{subtitle}</p>}
+                {cta && <div className="shop-hero-actions">{cta}</div>}
+              </div>
+            </div>
+          )}
+          {count > 1 && <div className="shop-hero-controls" aria-label="メインビジュアルの切り替え">
+            {banners.map((item, index) => <button key={item.id} type="button" aria-label={`メインビジュアル${index + 1}${item.title ? `：${item.title}` : ''}`} aria-pressed={index === currentIndex} onClick={() => setCurrentIndex(index)}>{String(index + 1).padStart(2, '0')}</button>)}
+          </div>}
+        </section>
+      )}
       <div className="shop-container">
         <div className="shop-promises">
           <div><strong>お買い物の{DONATION_RATE_LABEL}を寄付</strong><span>販売価格の{DONATION_RATE_LABEL}を動物保護団体へ届けます</span></div>
